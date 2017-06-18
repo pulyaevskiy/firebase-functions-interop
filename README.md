@@ -5,7 +5,7 @@ It also exposes a convenience layer to simplify writing Cloud Functions
 applications in Dart.
 
 > Please note that it's currently a proof-of-concept-preview version so it lacks 
-> many features, tests and documentation. But it's already fun to play with!
+> many features, tests and documentation. But, it's already fun to play with!
 
 ## Usage
 
@@ -38,10 +38,9 @@ environment:
   sdk: '>=1.20.1 <2.0.0'
 
 dependencies:
-  firebase_functions_interop: ^0.0.1 # Firebase Functions bindings
-
-dev_dependencies:
-  # NodeJS bindings required to compile a nice-looking JS file for Node.
+  # Firebase Functions bindings
+  firebase_functions_interop: ^0.0.1 
+  # Node bindings required to compile a nice-looking JS file for Node.
   # Also provides access to globals like `require` and `exports`.
   node_interop: ^0.0.1 
 
