@@ -1,11 +1,11 @@
 # Firebase Functions Interop Library for Dart
 
 This library provides JS bindings for Firebase Functions Node SDK.
-It also exposes a thin convenience layer to simplify writing Cloud Functions 
+It also exposes a convenience layer to simplify writing Cloud Functions 
 applications in Dart.
 
-> This library is a proof-of-concept preview version so it lacks many features,
-> tests and documentation.
+> Please note that it's currently a proof-of-concept-preview version so it lacks 
+> many features, tests and documentation. But it's already fun to play with!
 
 ## Usage
 

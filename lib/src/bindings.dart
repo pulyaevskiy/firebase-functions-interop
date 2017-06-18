@@ -31,9 +31,3 @@ abstract class JsEvent {
   external String get resource;
   external dynamic get timestamp;
 }
-
-@JS('Promise')
-abstract class Promise {
-  external void then(Function onFulfilled, Function onRejected);
-  external static Promise resolve(dynamic value);
-}

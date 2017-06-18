@@ -1,5 +1,5 @@
 import 'bindings.dart';
-import 'package:node_interop/util.dart';
+import 'package:node_interop/node_interop.dart';
 
 class Request implements JsRequest {
   final JsRequest _inner;
