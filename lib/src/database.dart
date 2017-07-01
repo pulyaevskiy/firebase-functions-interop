@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:js';
 
 import 'package:node_interop/node_interop.dart';
@@ -111,18 +112,11 @@ class DeltaSnapshot {
   /// `String`, `int`, `bool`, `null`.
   dynamic val() {
     var value = _inner.val();
-    if (value is String ||
-        value is double ||
-        value is int ||
-        value is bool ||
-        value == null) {
-      return value;
-    } else if (value is JsObject) {
+    if (value is JsObject) {
       return jsObjectToMap(_inner.val());
-    } else {
-      throw new UnimplementedError(
-          'Unsupported value type: ${value.runtimeType}');
     }
+
+    return JSON.decode(stringify(value));
   }
 }
 
