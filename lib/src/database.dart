@@ -43,8 +43,8 @@ class RefBuilder {
   }
 }
 
-class Event implements JsEvent {
-  final dynamic data;
+class Event<T> implements JsEvent {
+  final T data;
   final String eventId;
   final String eventType;
   final Map<String, String> params;
@@ -61,10 +61,7 @@ class Event implements JsEvent {
   });
 }
 
-class DatabaseEvent extends Event {
-  @override
-  DeltaSnapshot get data => super.data;
-
+class DatabaseEvent extends Event<DeltaSnapshot> {
   DatabaseEvent({
     DeltaSnapshot data,
     String eventId,
