@@ -1,5 +1,7 @@
-import 'bindings.dart';
 import 'package:node_interop/node_interop.dart';
+import 'package:js/js_util.dart';
+
+import 'bindings.dart';
 
 class Request implements JsRequest {
   final JsRequest _inner;
@@ -12,6 +14,17 @@ class Request implements JsRequest {
   @override
   Map<String, dynamic> get query => _query ??= jsObjectToMap(_inner.query);
   Map<String, dynamic> _query;
+
+  @override
+  Map<String, dynamic> get headers =>
+      _headers ??= jsObjectToMap(_inner.headers);
+  Map<String, dynamic> _headers;
+
+  @override
+  String get url => _inner.url;
+
+  @override
+  String get originalUrl => _inner.originalUrl;
 }
 
 class Response implements JsResponse {
@@ -22,5 +35,16 @@ class Response implements JsResponse {
   @override
   void send(value) {
     _inner.send(value);
+  }
+
+  @override
+  void setHeader(String name, String value) => _inner.setHeader(name, value);
+
+  @override
+  void json([body]) {
+    if (body is Map || body is Iterable) {
+      body = jsify(body);
+    }
+    _inner.json(body);
   }
 }

@@ -1,4 +1,11 @@
-part of firebase_functions_interop;
+import 'dart:async';
+import 'dart:js';
+
+import 'package:node_interop/node_interop.dart';
+
+import 'bindings.dart';
+
+Database createImpl(JsDatabase source) => new Database._(source);
 
 class Database {
   final JsDatabase _inner;
