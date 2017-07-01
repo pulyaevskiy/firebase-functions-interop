@@ -12,6 +12,7 @@ abstract class JsRequest {
 
 @JS()
 abstract class JsResponse {
+  external void json([body]);
   external void setHeader(String name, String value);
   external void send(value);
 }

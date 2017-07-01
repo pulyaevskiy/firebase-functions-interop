@@ -1,4 +1,5 @@
 import 'package:node_interop/node_interop.dart';
+import 'package:js/js_util.dart';
 
 import 'bindings.dart';
 
@@ -38,4 +39,12 @@ class Response implements JsResponse {
 
   @override
   void setHeader(String name, String value) => _inner.setHeader(name, value);
+
+  @override
+  void json([body]) {
+    if (body is Map || body is Iterable) {
+      body = jsify(body);
+    }
+    _inner.json(body);
+  }
 }
