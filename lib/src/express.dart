@@ -13,6 +13,11 @@ class Request implements JsRequest {
   @override
   Map<String, dynamic> get query => _query ??= jsObjectToMap(_inner.query);
   Map<String, dynamic> _query;
+
+  @override
+  Map<String, dynamic> get headers =>
+      _headers ??= jsObjectToMap(_inner.headers);
+  Map<String, dynamic> _headers;
 }
 
 class Response implements JsResponse {
@@ -24,4 +29,7 @@ class Response implements JsResponse {
   void send(value) {
     _inner.send(value);
   }
+
+  @override
+  void setHeader(String name, String value) => _inner.setHeader(name, value);
 }
