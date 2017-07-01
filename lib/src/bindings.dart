@@ -31,3 +31,15 @@ abstract class JsEvent {
   external String get resource;
   external dynamic get timestamp;
 }
+
+//TODO: Perhaps should be exposed in pkg/node_interop?
+@JS()
+external Console get console;
+
+//TODO: Perhaps should be exposed in pkg/node_interop?
+@JS()
+@anonymous
+abstract class Console {
+  external void log(String message);
+  external void error(String message);
+}
