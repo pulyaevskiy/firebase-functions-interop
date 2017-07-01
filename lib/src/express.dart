@@ -18,6 +18,12 @@ class Request implements JsRequest {
   Map<String, dynamic> get headers =>
       _headers ??= jsObjectToMap(_inner.headers);
   Map<String, dynamic> _headers;
+
+  @override
+  String get url => _inner.url;
+
+  @override
+  String get originalUrl => _inner.originalUrl;
 }
 
 class Response implements JsResponse {
