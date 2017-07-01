@@ -74,7 +74,7 @@ Copy-pasting also works.
 
 Building functions is as simple as running `pub build`. Note that Pub by 
 default assumes a "web" project and only builds `web` folder so we need
-to explicitely tell it about `bin`:
+to explicitly tell it about `bin`:
 
 ```bash
 $ pub build bin
@@ -97,7 +97,7 @@ $ firebase deploy --only functions
 
 ### 6. Test it
 
-Navigate to the new function's URL printed out by the deploy  command. You should 
+Navigate to the new function's URL printed out by the deploy command. You should 
 see "Hello from Firebase Functions Dart Interop!" on the screen.
 
 ## Features and bugs
