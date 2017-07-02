@@ -153,6 +153,8 @@ class Reference {
           'Unsupported value type: ${value.runtimeType}');
     }
 
+    // Firebase calls onComplete with two arguments even though it's documented
+    // as only accepting one.
     void onComplete(error, undocumented) {
       print(
           'Completed with error "$error" and undocumented param "$undocumented"');

@@ -51,7 +51,7 @@ transformers:
 
 Then run `pub get` to install dependencies.
 
-### 3. Write a Web function
+### 3.1 Write a Web function
 
 Create `bin/index.dart` and type in something like this:
 
@@ -70,7 +70,28 @@ void main() {
 
 Copy-pasting also works.
 
-### 4. Build your function
+### 3.2 Write a Realtime Database Function (optional)
+
+Update `bin/index.dart` with following:
+
+```dart
+void main() {
+  // ...Add after helloWorld function...
+
+  // This implements makeUppercase function from the Getting Started tutorial:
+  // https://firebase.google.com/docs/functions/get-started
+  var dbFunc =
+      functions.database.ref('/messages/{pushId}/original').onWrite((event) {
+    String original = event.data.val();
+    print('Uppercasing $original');
+    String uppercase = original.toUpperCase();
+    return event.data.ref.parent.child('uppercase').set(uppercase);
+  });
+  exports.setProperty('makeUppercase', dbFunc);
+}
+```
+
+### 4. Build your function(s)
 
 Building functions is as simple as running `pub build`. Note that Pub by 
 default assumes a "web" project and only builds `web` folder so we need
@@ -97,8 +118,9 @@ $ firebase deploy --only functions
 
 ### 6. Test it
 
-Navigate to the new function's URL printed out by the deploy command. You should 
-see "Hello from Firebase Functions Dart Interop!" on the screen.
+You can navigate to the new HTTPS function's URL printed out by the deploy command. 
+For the Realtime Database function, login to the Firebase Console and try
+changing values under `/messages/{randomValue}/original`.
 
 ## Features and bugs
 

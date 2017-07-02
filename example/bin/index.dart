@@ -1,10 +1,10 @@
 library my_functions;
 
-import 'package:node_interop/node_interop.dart';
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
   var functions = new FirebaseFunctions();
+  // Example HTTPS cloud function which responds with "Hello World".
   var httpsFunc = functions.https.onRequest((request, response) {
     String name = request.query['name'];
     if (name != null) {
@@ -14,4 +14,15 @@ void main() {
     }
   });
   exports.setProperty('helloWorld', httpsFunc);
+
+  // Example Realtime Database cloud function from the Getting Started tutorial:
+  // https://firebase.google.com/docs/functions/get-started
+  var dbFunc =
+      functions.database.ref('/messages/{pushId}/original').onWrite((event) {
+    String original = event.data.val();
+    print('Uppercasing $original');
+    String uppercase = original.toUpperCase();
+    return event.data.ref.parent.child('uppercase').set(uppercase);
+  });
+  exports.setProperty('makeUppercase', dbFunc);
 }
