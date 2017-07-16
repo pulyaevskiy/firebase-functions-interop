@@ -13,8 +13,6 @@ pub build bin
 cp build/bin/clear.dart.js index.js
 firebase deploy --only functions --token "$FIREBASE_TOKEN"
 
-sleep 5
-
 # Create new functions
 cp build/bin/index.dart.js index.js
-firebase deploy --only functions --token "$FIREBASE_TOKEN"
+firebase --debug deploy --only functions --token "$FIREBASE_TOKEN"
