@@ -2,7 +2,10 @@
 
 set -e
 
+pub get
+
 cd functions
+pub get
 pub build bin
 
 # The only way I know to delete existing functions is to deploy empty module:
