@@ -3,7 +3,8 @@ sudo: false
 language: dart
 
 before_install:
-  - nvm install node
+  - nvm install 8.1.0
+  - nvm use 8.1.0
   - node --version
   - npm install -g firebase-tools
   - ./tool/deploy.sh

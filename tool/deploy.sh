@@ -15,4 +15,4 @@ firebase deploy --only functions --token "$FIREBASE_TOKEN"
 
 # Create new functions
 cp build/bin/index.dart.js index.js
-firebase --debug deploy --only functions --token "$FIREBASE_TOKEN"
+firebase deploy --only functions --token "$FIREBASE_TOKEN"
