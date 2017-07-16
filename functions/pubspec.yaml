@@ -1,0 +1,17 @@
+name: firebase_functions_interop_test
+description: Test Firebase Functions Interop
+version: 0.0.0
+#homepage: https://www.example.com
+author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
+
+environment:
+  sdk: '>=1.20.1 <2.0.0'
+
+dependencies:
+  firebase_functions_interop:
+    path: ../
+  node_interop: any
+
+transformers:
+  - $dart2js
+  - node_interop

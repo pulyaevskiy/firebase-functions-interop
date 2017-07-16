@@ -7,3 +7,8 @@ pubspec.lock
 
 # Directory created by dartdoc
 doc/api/
+
+# Node
+functions/node_modules/
+functions/index.js
+functions/build/

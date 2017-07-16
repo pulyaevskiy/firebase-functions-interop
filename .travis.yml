@@ -1,0 +1,11 @@
+sudo: false
+
+language: dart
+
+before_install:
+  - nvm install node
+  - node --version
+  - ./tool/deploy.sh
+script:
+  - pub run test
+  - pub run test --platform node
