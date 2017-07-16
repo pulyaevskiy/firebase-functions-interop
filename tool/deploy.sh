@@ -6,6 +6,7 @@ pub get
 
 cd functions
 pub get
+npm install
 pub build bin
 
 # The only way I know to delete existing functions is to deploy empty module:
