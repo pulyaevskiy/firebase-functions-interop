@@ -15,6 +15,10 @@ void main() {
       }
     });
 
+    tearDownAll(() async {
+      await app.delete();
+    });
+
     test('happy path integration test', () async {
       var ref = app.database().ref('/messages/test/original');
       var value = 'lowercase' + (new DateTime.now().toIso8601String());

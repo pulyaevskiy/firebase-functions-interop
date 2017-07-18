@@ -12,3 +12,6 @@ doc/api/
 functions/node_modules/
 functions/index.js
 functions/build/
+
+# Logs
+*.log
