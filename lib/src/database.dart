@@ -131,19 +131,15 @@ class Reference {
 
   Future<Null> set(dynamic value) {
     var jsValue;
-    if (value is String ||
-        value is double ||
-        value is int ||
-        value is bool ||
-        value == null) {
-      jsValue = value;
-    } else if (value is JsObject) {
+    if (value is JsObject) {
       jsValue = new JsObject.jsify(value);
     } else {
-      throw new UnsupportedError(
-          'Unsupported value type: ${value.runtimeType}');
+      try {
+        jsValue = parse(JSON.encode(value, toEncodable: _noCustomEncodable));
+      } on JsonUnsupportedObjectError {
+        throw new ArgumentError("Only basic JS types are supported");
+      }
     }
-
     // Firebase calls onComplete with two arguments even though it's documented
     // as only accepting one.
     void onComplete(error, undocumented) {
@@ -155,3 +151,6 @@ class Reference {
     return jsPromiseToFuture(promise);
   }
 }
+
+_noCustomEncodable(value) =>
+    throw new UnsupportedError("Object with toJson shouldn't work either");

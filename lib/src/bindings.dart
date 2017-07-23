@@ -34,3 +34,6 @@ abstract class JsEvent {
 
 @JS("JSON.stringify")
 external String stringify(obj);
+
+@JS("JSON.parse")
+external dynamic parse(s);
