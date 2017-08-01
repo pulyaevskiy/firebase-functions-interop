@@ -8,6 +8,7 @@ environment:
   sdk: '>=1.20.1 <2.0.0'
 
 dependencies:
+  js: ^0.6.1
   node_interop: ^0.0.4
 
 dev_dependencies:

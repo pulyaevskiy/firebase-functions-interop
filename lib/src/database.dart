@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:js';
 
+import 'package:js/js_util.dart' as util;
 import 'package:node_interop/node_interop.dart';
 
 import 'bindings.dart';
@@ -111,12 +111,7 @@ class DeltaSnapshot {
   /// Returns current value which can be a `Map`, a `List` or any primitive type:
   /// `String`, `int`, `bool`, `null`.
   dynamic val() {
-    var value = _inner.val();
-    if (value is JsObject) {
-      return jsObjectToMap(_inner.val());
-    }
-
-    return JSON.decode(stringify(value));
+    return dartify(_inner.val());
   }
 }
 
@@ -134,11 +129,7 @@ class Reference {
     if (value is JsObject) {
       jsValue = new JsObject.jsify(value);
     } else {
-      try {
-        jsValue = parse(JSON.encode(value, toEncodable: _noCustomEncodable));
-      } on JsonUnsupportedObjectError {
-        throw new ArgumentError("Only basic JS types are supported");
-      }
+      jsValue = jsify(value);
     }
     // Firebase calls onComplete with two arguments even though it's documented
     // as only accepting one.
@@ -152,5 +143,34 @@ class Reference {
   }
 }
 
-_noCustomEncodable(value) =>
-    throw new UnsupportedError("Object with toJson shouldn't work either");
+/// Returns Dart representation from JS Object.
+dynamic dartify(Object jsObject) {
+  if (_isBasicType(jsObject)) {
+    return jsObject;
+  }
+
+  if (jsObject is List) {
+    return jsObject.map(dartify).toList();
+  }
+
+  // TODO: this helper doesn't "fix" nested objects, like other lists or maps...
+  return jsObjectToMap(jsObject);
+}
+
+/// Returns the JS implementation from Dart Object.
+dynamic jsify(Object dartObject) {
+  if (_isBasicType(dartObject)) {
+    return dartObject;
+  }
+
+  return util.jsify(dartObject);
+}
+
+/// Returns [:true:] if the [value] is a very basic built-in type - e.g.
+/// [null], [num], [bool] or [String]. It returns [:false:] in the other case.
+bool _isBasicType(value) {
+  if (value == null || value is num || value is bool || value is String) {
+    return true;
+  }
+  return false;
+}
