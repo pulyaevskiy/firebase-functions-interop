@@ -1,5 +1,7 @@
 # Firebase Functions Interop Library for Dart
 
+[![Build Status](https://travis-ci.org/pulyaevskiy/firebase-functions-interop.svg?branch=master)](https://travis-ci.org/pulyaevskiy/firebase-functions-interop)
+
 This library provides JS bindings for Firebase Functions Node SDK.
 It also exposes a convenience layer to simplify writing Cloud Functions 
 applications in Dart.
