@@ -1,6 +1,5 @@
 import 'dart:async';
-import 'dart:js';
-
+import 'dart:js' as js;
 import 'package:js/js_util.dart' as util;
 import 'package:node_interop/node_interop.dart';
 
@@ -14,6 +13,14 @@ class Database {
   Database._(this._inner);
 
   RefBuilder ref(String path) => new RefBuilder._(_inner.ref(path));
+
+  // TODO: maybe this is not really needed and we can settle with integration testing?
+  // JsDeltaSnapshot createSnapshot() {
+  //   var obj = js.context['Object']
+  //       .callMethod('create', [_inner.DeltaSnapshot.prototype]);
+  //   _inner.DeltaSnapshot.apply(obj, [null, null, null, 'foo', null]);
+  //   return obj;
+  // }
 }
 
 class RefBuilder {
@@ -24,7 +31,7 @@ class RefBuilder {
   JsCloudFunction onWrite(FutureOr<Null> handler(DatabaseEvent event)) {
     dynamic wrapper(JsEvent event) {
       var dartEvent = new DatabaseEvent(
-        data: new DeltaSnapshot(event.data),
+        data: new DeltaSnapshot._(event.data),
         eventId: event.eventId,
         eventType: event.eventType,
         params: jsObjectToMap(event.params),
@@ -38,7 +45,7 @@ class RefBuilder {
       return null;
     }
 
-    var jsWrapper = allowInterop(wrapper);
+    var jsWrapper = js.allowInterop(wrapper);
 
     return _inner.onWrite(jsWrapper);
   }
@@ -84,15 +91,14 @@ class DatabaseEvent extends Event<DeltaSnapshot> {
 class DeltaSnapshot {
   final JsDeltaSnapshot _inner;
 
-  DeltaSnapshot(this._inner);
-
+  DeltaSnapshot._(this._inner);
   Reference get adminRef => new Reference._(_inner.adminRef);
 
   bool changed() => _inner.changed();
 
-  DeltaSnapshot child(String path) => new DeltaSnapshot(_inner.child(path));
+  DeltaSnapshot child(String path) => new DeltaSnapshot._(_inner.child(path));
 
-  DeltaSnapshot get current => new DeltaSnapshot(_inner.current);
+  DeltaSnapshot get current => new DeltaSnapshot._(_inner.current);
 
   bool exists() => _inner.exists();
 
@@ -104,7 +110,7 @@ class DeltaSnapshot {
 
   int numChildren() => _inner.numChildren();
 
-  DeltaSnapshot get previous => new DeltaSnapshot(_inner.previous);
+  DeltaSnapshot get previous => new DeltaSnapshot._(_inner.previous);
 
   Reference get ref => new Reference._(_inner.ref);
 
@@ -125,12 +131,8 @@ class Reference {
   Reference get parent => new Reference._(_inner.parent);
 
   Future<Null> set(dynamic value) {
-    var jsValue;
-    if (value is JsObject) {
-      jsValue = new JsObject.jsify(value);
-    } else {
-      jsValue = jsify(value);
-    }
+    var jsValue = jsify(value);
+
     // Firebase calls onComplete with two arguments even though it's documented
     // as only accepting one.
     void onComplete(error, undocumented) {
@@ -138,7 +140,7 @@ class Reference {
           'Completed with error "$error" and undocumented param "$undocumented"');
     }
 
-    var promise = _inner.set(jsValue, allowInterop(onComplete));
+    var promise = _inner.set(jsValue, js.allowInterop(onComplete));
     return jsPromiseToFuture(promise);
   }
 }

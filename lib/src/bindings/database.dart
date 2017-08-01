@@ -4,6 +4,14 @@ part of firebase_functions_interop.bindings;
 @anonymous
 abstract class JsDatabase {
   external JsRefBuilder ref(String path);
+  external JsType get DeltaSnapshot;
+}
+
+@JS()
+@anonymous
+abstract class JsType {
+  external dynamic get prototype;
+  external void apply(obj, args);
 }
 
 @JS()
