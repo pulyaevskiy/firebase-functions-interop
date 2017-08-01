@@ -31,3 +31,6 @@ abstract class JsEvent {
   external String get resource;
   external dynamic get timestamp;
 }
+
+@JS("JSON.stringify")
+external String stringify(obj);

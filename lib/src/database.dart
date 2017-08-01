@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:js';
 
+import 'package:js/js_util.dart' as util;
 import 'package:node_interop/node_interop.dart';
 
 import 'bindings.dart';
@@ -43,8 +44,8 @@ class RefBuilder {
   }
 }
 
-class Event implements JsEvent {
-  final dynamic data;
+class Event<T> implements JsEvent {
+  final T data;
   final String eventId;
   final String eventType;
   final Map<String, String> params;
@@ -61,10 +62,7 @@ class Event implements JsEvent {
   });
 }
 
-class DatabaseEvent extends Event {
-  @override
-  DeltaSnapshot get data => super.data;
-
+class DatabaseEvent extends Event<DeltaSnapshot> {
   DatabaseEvent({
     DeltaSnapshot data,
     String eventId,
@@ -113,19 +111,7 @@ class DeltaSnapshot {
   /// Returns current value which can be a `Map`, a `List` or any primitive type:
   /// `String`, `int`, `bool`, `null`.
   dynamic val() {
-    var value = _inner.val();
-    if (value is String ||
-        value is double ||
-        value is int ||
-        value is bool ||
-        value == null) {
-      return value;
-    } else if (value is JsObject) {
-      return jsObjectToMap(_inner.val());
-    } else {
-      throw new UnimplementedError(
-          'Unsupported value type: ${value.runtimeType}');
-    }
+    return dartify(_inner.val());
   }
 }
 
@@ -140,19 +126,11 @@ class Reference {
 
   Future<Null> set(dynamic value) {
     var jsValue;
-    if (value is String ||
-        value is double ||
-        value is int ||
-        value is bool ||
-        value == null) {
-      jsValue = value;
-    } else if (value is JsObject) {
+    if (value is JsObject) {
       jsValue = new JsObject.jsify(value);
     } else {
-      throw new UnsupportedError(
-          'Unsupported value type: ${value.runtimeType}');
+      jsValue = jsify(value);
     }
-
     // Firebase calls onComplete with two arguments even though it's documented
     // as only accepting one.
     void onComplete(error, undocumented) {
@@ -163,4 +141,36 @@ class Reference {
     var promise = _inner.set(jsValue, allowInterop(onComplete));
     return jsPromiseToFuture(promise);
   }
+}
+
+/// Returns Dart representation from JS Object.
+dynamic dartify(Object jsObject) {
+  if (_isBasicType(jsObject)) {
+    return jsObject;
+  }
+
+  if (jsObject is List) {
+    return jsObject.map(dartify).toList();
+  }
+
+  // TODO: this helper doesn't "fix" nested objects, like other lists or maps...
+  return jsObjectToMap(jsObject);
+}
+
+/// Returns the JS implementation from Dart Object.
+dynamic jsify(Object dartObject) {
+  if (_isBasicType(dartObject)) {
+    return dartObject;
+  }
+
+  return util.jsify(dartObject);
+}
+
+/// Returns [:true:] if the [value] is a very basic built-in type - e.g.
+/// [null], [num], [bool] or [String]. It returns [:false:] in the other case.
+bool _isBasicType(value) {
+  if (value == null || value is num || value is bool || value is String) {
+    return true;
+  }
+  return false;
 }
