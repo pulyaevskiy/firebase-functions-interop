@@ -1,4 +1,6 @@
-# Changelog
+## 0.0.3
+
+- Add `toJson` to `DeltaSnapshot`.
 
 ## 0.0.2
 

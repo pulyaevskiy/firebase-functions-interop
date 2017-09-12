@@ -119,6 +119,10 @@ class DeltaSnapshot {
   dynamic val() {
     return dartify(_inner.val());
   }
+
+  // NOTE: intentionally not following JS library name – using Dart convention.
+  /// Returns a JSON-serializable representation of this object.
+  Object toJson() => dartify(_inner.toJSON());
 }
 
 class Reference {

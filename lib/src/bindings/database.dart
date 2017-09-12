@@ -34,6 +34,7 @@ abstract class JsDeltaSnapshot {
   external bool hasChild(String path);
   external bool hasChildren();
   external int numChildren();
+  external dynamic toJSON();
   external dynamic val();
 }
 
