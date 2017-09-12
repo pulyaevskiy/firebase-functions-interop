@@ -43,5 +43,5 @@ abstract class JsDeltaSnapshot {
 abstract class JsReference {
   external JsReference get parent;
   external JsReference child(String path);
-  external dynamic set(value, void onComplete(error, undocumented));
+  external dynamic set(value, [void onComplete(error, undocumented)]);
 }

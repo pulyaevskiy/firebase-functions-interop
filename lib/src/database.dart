@@ -116,9 +116,7 @@ class DeltaSnapshot {
 
   /// Returns current value which can be a `Map`, a `List` or any primitive type:
   /// `String`, `int`, `bool`, `null`.
-  dynamic val() {
-    return dartify(_inner.val());
-  }
+  dynamic val() => dartify(_inner.val());
 
   // NOTE: intentionally not following JS library name – using Dart convention.
   /// Returns a JSON-serializable representation of this object.
@@ -137,14 +135,7 @@ class Reference {
   Future<Null> set(dynamic value) {
     var jsValue = jsify(value);
 
-    // Firebase calls onComplete with two arguments even though it's documented
-    // as only accepting one.
-    void onComplete(error, undocumented) {
-      print(
-          'Completed with error "$error" and undocumented param "$undocumented"');
-    }
-
-    var promise = _inner.set(jsValue, js.allowInterop(onComplete));
+    var promise = _inner.set(jsValue);
     return jsPromiseToFuture(promise);
   }
 }
