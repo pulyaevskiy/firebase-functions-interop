@@ -8,7 +8,8 @@ part 'bindings/database.dart';
 part 'bindings/express.dart';
 part 'bindings/https.dart';
 
-JsFirebaseFunctions requireFirebaseFunctions() => require('firebase-functions');
+final JsFirebaseFunctions requireFirebaseFunctions =
+    require('firebase-functions');
 
 @JS()
 @anonymous
