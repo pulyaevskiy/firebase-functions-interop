@@ -1,17 +1,21 @@
 import 'dart:js';
 
+import 'package:node_interop/node_interop.dart';
+
 import 'bindings.dart';
 import 'database.dart';
 import 'express.dart';
+
+final FirebaseFunctions firebaseFunctions =
+    new FirebaseFunctions._(require('firebase-functions'));
 
 class FirebaseFunctions {
   final JsFirebaseFunctions _functions;
 
   FirebaseFunctions._(this._functions);
 
-  factory FirebaseFunctions() {
-    return new FirebaseFunctions._(requireFirebaseFunctions());
-  }
+  @Deprecated("Use the top-level `firebaseFunctions` variable instead.")
+  factory FirebaseFunctions() => firebaseFunctions;
 
   Https get https => _https ??= new Https._(_functions.https);
   Https _https;

@@ -34,6 +34,7 @@ abstract class JsDeltaSnapshot {
   external bool hasChild(String path);
   external bool hasChildren();
   external int numChildren();
+  external dynamic toJSON();
   external dynamic val();
 }
 
@@ -42,5 +43,5 @@ abstract class JsDeltaSnapshot {
 abstract class JsReference {
   external JsReference get parent;
   external JsReference child(String path);
-  external dynamic set(value, void onComplete(error, undocumented));
+  external dynamic set(value, [void onComplete(error, undocumented)]);
 }
