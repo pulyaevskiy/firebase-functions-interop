@@ -3,9 +3,8 @@ library my_functions;
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
-  var functions = new FirebaseFunctions();
   // Example HTTPS cloud function which responds with "Hello World".
-  var httpsFunc = functions.https.onRequest((request, response) {
+  var httpsFunc = firebaseFunctions.https.onRequest((request, response) {
     String name = request.query['name'];
     if (name != null) {
       response.send('Hello to you $name from Dart Firebase Functions interop');
@@ -17,8 +16,9 @@ void main() {
 
   // Example Realtime Database cloud function from the Getting Started tutorial:
   // https://firebase.google.com/docs/functions/get-started
-  var dbFunc =
-      functions.database.ref('/messages/{pushId}/original').onWrite((event) {
+  var dbFunc = firebaseFunctions.database
+      .ref('/messages/{pushId}/original')
+      .onWrite((event) {
     String original = event.data.val();
     print('Uppercasing $original');
     String uppercase = original.toUpperCase();
