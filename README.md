@@ -3,16 +3,16 @@
 [![Build Status](https://travis-ci.org/pulyaevskiy/firebase-functions-interop.svg?branch=master)](https://travis-ci.org/pulyaevskiy/firebase-functions-interop)
 
 This library provides JS bindings for Firebase Functions Node SDK.
-It also exposes a convenience layer to simplify writing Cloud Functions 
+It also exposes a convenience layer to simplify writing Cloud Functions
 applications in Dart.
 
-> Please note that it's currently a proof-of-concept-preview version so it lacks 
+> Please note that it's currently a proof-of-concept-preview version so it lacks
 > many features, tests and documentation. But, it's already fun to play with!
 
 ## Usage
 
 > Make sure you have Firebase CLI installed as well as a Firebase account
-> and a test app. 
+> and a test app.
 > See [Getting started](https://firebase.google.com/docs/functions/get-started)
 > for more details.
 
@@ -41,10 +41,10 @@ environment:
 
 dependencies:
   # Firebase Functions bindings
-  firebase_functions_interop: ^0.0.1 
+  firebase_functions_interop: ^0.0.3
   # Node bindings required to compile a nice-looking JS file for Node.
   # Also provides access to globals like `require` and `exports`.
-  node_interop: ^0.0.1 
+  node_interop: ^0.0.4
 
 transformers:
   - $dart2js
@@ -61,8 +61,7 @@ Create `bin/index.dart` and type in something like this:
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
-  FirebaseFunctions functions = new FirebaseFunctions();
-  var httpsFunc = functions.https.onRequest((request, response) {
+  var httpsFunc = firebaseFunctions.https.onRequest((request, response) {
     response.send('Hello from Firebase Functions Dart Interop!');
   });
 
@@ -82,8 +81,9 @@ void main() {
 
   // This implements makeUppercase function from the Getting Started tutorial:
   // https://firebase.google.com/docs/functions/get-started
-  var dbFunc =
-      functions.database.ref('/messages/{pushId}/original').onWrite((event) {
+  var dbFunc = firebaseFunctions.database
+      .ref('/messages/{pushId}/original')
+      .onWrite((event) {
     String original = event.data.val();
     print('Uppercasing $original');
     String uppercase = original.toUpperCase();
@@ -95,7 +95,7 @@ void main() {
 
 ### 4. Build your function(s)
 
-Building functions is as simple as running `pub build`. Note that Pub by 
+Building functions is as simple as running `pub build`. Note that Pub by
 default assumes a "web" project and only builds `web` folder so we need
 to explicitly tell it about `bin`:
 
@@ -120,7 +120,7 @@ $ firebase deploy --only functions
 
 ### 6. Test it
 
-You can navigate to the new HTTPS function's URL printed out by the deploy command. 
+You can navigate to the new HTTPS function's URL printed out by the deploy command.
 For the Realtime Database function, login to the Firebase Console and try
 changing values under `/messages/{randomValue}/original`.
 
