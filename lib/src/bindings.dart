@@ -1,6 +1,7 @@
 @JS()
 library firebase_functions_interop.bindings;
 
+import 'dart:js';
 import 'package:js/js.dart';
 import 'package:node_interop/node_interop.dart';
 
@@ -16,6 +17,7 @@ final JsFirebaseFunctions requireFirebaseFunctions =
 abstract class JsFirebaseFunctions {
   external JsHttps get https;
   external JsDatabase get database;
+  external JsObject config();
 }
 
 @JS()

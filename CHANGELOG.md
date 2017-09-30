@@ -2,7 +2,9 @@
 
 - Added `toJson` to `DeltaSnapshot`.
 - Added top-level `firebaseFunctions` getter.
-- Deprecated `FirebaseFunctions` constructor. Use `firebaseFunctions` instead. 
+- Deprecated `FirebaseFunctions` constructor. Use `firebaseFunctions` instead.
+- Implemented `firebaseFunctions.config()`.
+- Added `DEVELOPMENT.md` docs.
 
 ## 0.0.2
 

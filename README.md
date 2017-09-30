@@ -124,6 +124,37 @@ You can navigate to the new HTTPS function's URL printed out by the deploy comma
 For the Realtime Database function, login to the Firebase Console and try
 changing values under `/messages/{randomValue}/original`.
 
+## Configuration
+
+Firebase SDK provides a way to set and access environment variables from
+your Firebase functions.
+
+Environment variables are set using Firebase CLI, e.g.:
+
+```bash
+firebase functions:config:set some_service.api_key="secret" some_service.url="https://api.example.com"
+```
+
+For more details see https://firebase.google.com/docs/functions/config-env.
+
+To read these values in a Firebase function use `firebaseFunctions.config()`:
+
+```dart
+import 'package:firebase_functions_interop/firebase_functions_interop.dart';
+
+void main() {
+  var httpsFunc = firebaseFunctions.https.onRequest((request, response) {
+    var apiKey = firebaseFunctions.config().get('some_service.api_key');
+    var url = firebaseFunctions.config().get('some_service.url');
+    // make API call to some_service...
+    response.send('Hello from Firebase Functions Dart Interop!');
+  });
+
+  exports.setProperty('helloWorld', httpsFunc);
+}
+```
+
+
 ## Features and bugs
 
 Please file feature requests and bugs at the [issue tracker][tracker].

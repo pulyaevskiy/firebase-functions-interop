@@ -9,6 +9,7 @@ import 'express.dart';
 final FirebaseFunctions firebaseFunctions =
     new FirebaseFunctions._(require('firebase-functions'));
 
+/// Global namespace from which all the Cloud Functions are accessed.
 class FirebaseFunctions {
   final JsFirebaseFunctions _functions;
 
@@ -17,11 +18,52 @@ class FirebaseFunctions {
   @Deprecated("Use the top-level `firebaseFunctions` variable instead.")
   factory FirebaseFunctions() => firebaseFunctions;
 
+  /// Namespace for HTTPS functions.
   Https get https => _https ??= new Https._(_functions.https);
   Https _https;
 
+  /// Namespace for Realtime Database functions.
   Database get database => _database ??= createImpl(_functions.database);
   Database _database;
+
+  /// Returns environment configuration object.
+  Config config() => new Config(_functions.config());
+}
+
+/// Provides access to Firebase environment configuration.
+///
+/// See also:
+/// - https://firebase.google.com/docs/functions/config-env
+class Config {
+  final _config;
+
+  Config(this._config);
+
+  /// Returns configuration value specified by it's [key].
+  ///
+  /// This method expects keys to be fully qualified (namespaced), e.g.
+  /// `some_service.client_secret` or `some_service.url`.
+  /// This is different from native JS implementation where namespaced
+  /// keys are broken into nested JS object structure, e.g.
+  /// `functions.config().some_service.client_secret`.
+  dynamic get(String key) {
+    var data = dartify(_config);
+    var parts = key.split('.');
+    var value;
+    for (var subKey in parts) {
+      if (data is! Map) return null;
+      value = dartify(data[subKey]);
+      if (value == null) break;
+      data = value;
+    }
+    return value;
+  }
+
+  /// Firebase-specific configuration which can be used to initialize
+  /// Firebase Admin SDK.
+  ///
+  /// This is a shortcut for calling `get('firebase')`.
+  Map<String, dynamic> get firebase => get('firebase');
 }
 
 typedef void RequestHandler(Request request, Response response);
