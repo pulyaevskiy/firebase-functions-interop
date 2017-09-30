@@ -27,7 +27,8 @@ class FirebaseFunctions {
   Database _database;
 
   /// Returns environment configuration object.
-  Config config() => new Config(_functions.config());
+  Config config() => _config ??= new Config(_functions.config());
+  Config _config;
 }
 
 /// Provides access to Firebase environment configuration.
