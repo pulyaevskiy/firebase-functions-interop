@@ -6,22 +6,25 @@ import 'package:node_interop/fs.dart';
 import 'package:js/js.dart';
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 
-final platform = new NodePlatform();
+const platform = const NodePlatform();
+const fs = const NodeFileSystem();
 final Map<String, String> env = platform.environment;
 
 App initFirebaseApp() {
-  installNodeModules();
-
+  if (!env.containsKey('FIREBASE_SERVICE_ACCOUNT_FILEPATH') ||
+      !env.containsKey('FIREBASE_DATABASE_URL') ||
+      !env.containsKey('FIREBASE_HTTP_BASE_URL')) {
+    throw new StateError("Environment variables not set.");
+  }
+  _installNodeModules();
   var admin = new FirebaseAdmin();
   return admin.initializeApp(new AppOptions(
-    credential: admin.credential.cert(appCredentials),
+    credential: admin.credential.cert(env['FIREBASE_SERVICE_ACCOUNT_FILEPATH']),
     databaseUrl: env['FIREBASE_DATABASE_URL'],
   ));
 }
 
-void installNodeModules() {
-  var fs = new NodeFileSystem();
-  var platform = new NodePlatform();
+void _installNodeModules() {
   var segments = platform.script.pathSegments.toList();
   var cwd = fs.path.dirname(platform.script.path);
   segments
@@ -29,22 +32,14 @@ void installNodeModules() {
     ..add('package.json');
   var jsFilepath = fs.path.separator + fs.path.joinAll(segments);
   var file = fs.file(jsFilepath);
-  file.writeAsStringSync(packageJson);
+  file.writeAsStringSync(_kPackageJson);
 
   ChildProcess childProcess = require('child_process');
   print('Installing node modules');
   childProcess.execSync('npm install', new ExecOptions(cwd: cwd));
 }
 
-Map<String, String> get appCredentials {
-  return {
-    'project_id': env['FIREBASE_PROJECT_ID'],
-    'client_email': env['FIREBASE_CLIENT_EMAIL'],
-    'private_key': env['FIREBASE_PRIVATE_KEY'].replaceAll(r'\n', '\n'),
-  };
-}
-
-const packageJson = '''
+const _kPackageJson = '''
 {
     "name": "test",
     "description": "Test",

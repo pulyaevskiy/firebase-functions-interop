@@ -1,5 +1,6 @@
 @TestOn('node')
 import 'package:test/test.dart';
+
 import 'setup_admin.dart';
 
 void main() {
@@ -30,5 +31,5 @@ void main() {
       }
       expect(data.val(), value.toUpperCase());
     });
-  }, timeout: new Timeout(new Duration(seconds: 10)));
+  }, timeout: const Timeout(const Duration(seconds: 10)));
 }
