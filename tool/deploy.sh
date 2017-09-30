@@ -27,7 +27,7 @@ else
     cp build/bin/clear.dart.js index.js
     firebase deploy --only functions --token "$FIREBASE_TOKEN" --project "$FIREBASE_PROJECT_ID"
 
-    firebase functions:config:set --token="$FIREBASE_TOKEN" someservice.key=123456 someservice.url="https://example.com"
+    firebase functions:config:set --token="$FIREBASE_TOKEN" --project "$FIREBASE_PROJECT_ID" someservice.key=123456 someservice.url="https://example.com"
 
     # Create new functions
     cp build/bin/index.dart.js index.js
