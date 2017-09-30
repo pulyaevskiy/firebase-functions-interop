@@ -15,3 +15,6 @@ functions/build/
 
 # Logs
 *.log
+
+# Firebase
+.firebaserc
