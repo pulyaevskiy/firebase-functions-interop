@@ -1,3 +1,7 @@
+## 0.0.4
+
+- Added `<0.1.0` constraint on `node_interop` dependency.
+
 ## 0.0.3
 
 - Added `toJson` to `DeltaSnapshot`.
