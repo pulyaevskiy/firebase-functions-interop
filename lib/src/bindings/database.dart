@@ -1,35 +1,25 @@
 part of firebase_functions_interop.bindings;
 
 @JS()
-@anonymous
-abstract class JsDatabase {
-  external JsRefBuilder ref(String path);
-  external JsType get DeltaSnapshot;
+abstract class Database {
+  external RefBuilder ref(String path);
+  external dynamic get DeltaSnapshot;
 }
 
 @JS()
-@anonymous
-abstract class JsType {
-  external dynamic get prototype;
-  external void apply(obj, args);
+abstract class RefBuilder {
+  external CloudFunction onWrite(Object handler(JsEvent event));
 }
 
 @JS()
-@anonymous
-abstract class JsRefBuilder {
-  external JsCloudFunction onWrite(Object handler(JsEvent event));
-}
-
-@JS()
-@anonymous
-abstract class JsDeltaSnapshot {
-  external JsReference get adminRef;
-  external JsDeltaSnapshot get current;
+abstract class DeltaSnapshot {
+  external Reference get adminRef;
+  external DeltaSnapshot get current;
   external String get key;
-  external JsDeltaSnapshot get previous;
-  external JsReference get ref;
+  external DeltaSnapshot get previous;
+  external Reference get ref;
   external bool changed();
-  external JsDeltaSnapshot child(String path);
+  external DeltaSnapshot child(String path);
   external bool exists();
   external bool hasChild(String path);
   external bool hasChildren();
@@ -39,9 +29,8 @@ abstract class JsDeltaSnapshot {
 }
 
 @JS()
-@anonymous
-abstract class JsReference {
-  external JsReference get parent;
-  external JsReference child(String path);
+abstract class Reference {
+  external Reference get parent;
+  external Reference child(String path);
   external dynamic set(value, [void onComplete(error, undocumented)]);
 }

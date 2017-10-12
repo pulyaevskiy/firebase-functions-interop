@@ -2,32 +2,33 @@ import 'dart:js';
 
 import 'package:node_interop/node_interop.dart';
 
-import 'bindings.dart';
+import 'bindings.dart' as js;
 import 'database.dart';
-import 'express.dart';
+
+export 'bindings.dart' show CloudFunction;
 
 final FirebaseFunctions firebaseFunctions =
     new FirebaseFunctions._(require('firebase-functions'));
 
 /// Global namespace from which all the Cloud Functions are accessed.
 class FirebaseFunctions {
-  final JsFirebaseFunctions _functions;
+  final js.FirebaseFunctions _inner;
 
-  FirebaseFunctions._(this._functions);
+  FirebaseFunctions._(this._inner);
 
   @Deprecated("Use the top-level `firebaseFunctions` variable instead.")
   factory FirebaseFunctions() => firebaseFunctions;
 
   /// Namespace for HTTPS functions.
-  Https get https => _https ??= new Https._(_functions.https);
+  Https get https => _https ??= new Https._(_inner.https);
   Https _https;
 
   /// Namespace for Realtime Database functions.
-  Database get database => _database ??= createImpl(_functions.database);
+  Database get database => _database ??= createImpl(_inner.database);
   Database _database;
 
   /// Returns environment configuration object.
-  Config config() => _config ??= new Config(_functions.config());
+  Config config() => _config ??= new Config(_inner.config());
   Config _config;
 }
 
@@ -36,9 +37,9 @@ class FirebaseFunctions {
 /// See also:
 /// - https://firebase.google.com/docs/functions/config-env
 class Config {
-  final _config;
+  final _inner;
 
-  Config(this._config);
+  Config(this._inner);
 
   /// Returns configuration value specified by it's [key].
   ///
@@ -48,12 +49,12 @@ class Config {
   /// keys are broken into nested JS object structure, e.g.
   /// `functions.config().some_service.client_secret`.
   dynamic get(String key) {
-    var data = dartify(_config);
+    var data = dartify(_inner);
     var parts = key.split('.');
     var value;
     for (var subKey in parts) {
       if (data is! Map) return null;
-      value = dartify(data[subKey]);
+      value = data[subKey];
       if (value == null) break;
       data = value;
     }
@@ -67,20 +68,14 @@ class Config {
   Map<String, dynamic> get firebase => get('firebase');
 }
 
-typedef void RequestHandler(Request request, Response response);
-
-class Https implements JsHttps {
-  final JsHttps _inner;
+class Https {
+  final js.Https _inner;
   Https._(this._inner);
 
-  JsCloudFunction onRequest(RequestHandler handler) {
-    void wrapper(JsRequest jsReq, JsResponse jsRes) {
-      var request = new Request(jsReq);
-      var response = new Response(jsRes);
-      handler(request, response);
-    }
-
-    var jsWrapper = allowInterop(wrapper);
-    return _inner.onRequest(jsWrapper);
+  /// Creates HTTPS function from [handler].
+  ///
+  ///
+  js.CloudFunction onRequest(HttpRequestListener handler) {
+    return _inner.onRequest(allowInterop(handler));
   }
 }

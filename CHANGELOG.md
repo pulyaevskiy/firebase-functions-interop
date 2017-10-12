@@ -1,3 +1,7 @@
+## 0.1.0-beta.1
+
+- Upgraded to `node_interop: 0.1.0-beta.1`.
+
 ## 0.0.4
 
 - Added `<0.1.0` constraint on `node_interop` dependency.

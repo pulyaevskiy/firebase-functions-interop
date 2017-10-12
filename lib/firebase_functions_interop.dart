@@ -11,9 +11,8 @@
 /// class to access all the functionality of Firebase Functions.
 library firebase_functions_interop;
 
-export 'package:node_interop/node_interop.dart' show exports, console, Console;
-
-export 'src/bindings.dart' show JsCloudFunction;
+//export 'src/bindings.dart';
 export 'src/core.dart';
 export 'src/database.dart' hide createImpl;
-export 'src/express.dart' show Request, Response;
+
+

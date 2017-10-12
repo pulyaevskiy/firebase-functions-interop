@@ -8,12 +8,12 @@ import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:js/js.dart';
 import 'package:node_interop/fs.dart';
 import 'package:node_interop/node_interop.dart';
+import 'package:node_interop/test.dart';
 import 'package:test/test.dart';
 
-const platform = const NodePlatform();
 const fs = const NodeFileSystem();
 
-const _kConfigFixture = '''
+const configFixture = '''
 
 function Apple(color) {
   this.color = color;
@@ -32,16 +32,18 @@ exports.data = {
 ''';
 
 void main() {
+  createJSFile('config_fixture.js', configFixture);
+
   group('Config', () {
     ConfigFixture jsConf;
     setUpAll(() {
-      var segments = platform.script.pathSegments.toList();
+      var segments = node.platform.script.pathSegments.toList();
       segments
         ..removeLast()
         ..add('config_fixture.js');
       var jsFilepath = fs.path.separator + fs.path.joinAll(segments);
       var file = fs.file(jsFilepath);
-      file.writeAsStringSync(_kConfigFixture);
+      file.writeAsStringSync(configFixture);
 
       jsConf = require('./config_fixture');
     });

@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:js' as js;
-import 'package:js/js_util.dart' as util;
 import 'package:node_interop/node_interop.dart';
 
-import 'bindings.dart';
+import 'bindings.dart' as js;
 
-Database createImpl(JsDatabase source) => new Database._(source);
+Database createImpl(js.Database source) => new Database._(source);
 
 class Database {
-  final JsDatabase _inner;
+  final js.Database _inner;
 
   Database._(this._inner);
 
@@ -24,17 +23,17 @@ class Database {
 }
 
 class RefBuilder {
-  final JsRefBuilder _inner;
+  final js.RefBuilder _inner;
 
   RefBuilder._(this._inner);
 
-  JsCloudFunction onWrite(FutureOr<Null> handler(DatabaseEvent event)) {
-    dynamic wrapper(JsEvent event) {
+  js.CloudFunction onWrite(FutureOr<Null> handler(DatabaseEvent event)) {
+    dynamic wrapper(js.JsEvent event) {
       var dartEvent = new DatabaseEvent(
         data: new DeltaSnapshot._(event.data),
         eventId: event.eventId,
         eventType: event.eventType,
-        params: jsObjectToMap(event.params),
+        params: dartify(event.params),
         resource: event.resource,
         timestamp: DateTime.parse(event.timestamp),
       );
@@ -51,7 +50,7 @@ class RefBuilder {
   }
 }
 
-class Event<T> implements JsEvent {
+class Event<T> {
   final T data;
   final String eventId;
   final String eventType;
@@ -89,7 +88,7 @@ class DatabaseEvent extends Event<DeltaSnapshot> {
 }
 
 class DeltaSnapshot {
-  final JsDeltaSnapshot _inner;
+  final js.DeltaSnapshot _inner;
 
   DeltaSnapshot._(this._inner);
   Reference get adminRef => new Reference._(_inner.adminRef);
@@ -124,7 +123,7 @@ class DeltaSnapshot {
 }
 
 class Reference {
-  final JsReference _inner;
+  final js.Reference _inner;
 
   Reference._(this._inner);
 
@@ -138,36 +137,4 @@ class Reference {
     var promise = _inner.set(jsValue);
     return jsPromiseToFuture(promise);
   }
-}
-
-/// Returns Dart representation from JS Object.
-dynamic dartify(Object jsObject) {
-  if (_isBasicType(jsObject)) {
-    return jsObject;
-  }
-
-  if (jsObject is List) {
-    return jsObject.map(dartify).toList();
-  }
-
-  // TODO: this helper doesn't "fix" nested objects, like other lists or maps...
-  return jsObjectToMap(jsObject);
-}
-
-/// Returns the JS implementation from Dart Object.
-dynamic jsify(Object dartObject) {
-  if (_isBasicType(dartObject)) {
-    return dartObject;
-  }
-
-  return util.jsify(dartObject);
-}
-
-/// Returns [:true:] if the [value] is a very basic built-in type - e.g.
-/// [null], [num], [bool] or [String]. It returns [:false:] in the other case.
-bool _isBasicType(value) {
-  if (value == null || value is num || value is bool || value is String) {
-    return true;
-  }
-  return false;
 }
