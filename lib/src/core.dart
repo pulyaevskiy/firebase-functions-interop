@@ -1,6 +1,10 @@
+// Copyright (c) 2017, Anatoly Pulyaevskiy. All rights reserved. Use of this source code
+// is governed by a BSD-style license that can be found in the LICENSE file.
+
 import 'dart:js';
 
 import 'package:node_interop/node_interop.dart';
+import 'package:node_interop/http.dart';
 
 import 'bindings.dart' as js;
 import 'database.dart';
@@ -18,6 +22,10 @@ class FirebaseFunctions {
 
   @Deprecated("Use the top-level `firebaseFunctions` variable instead.")
   factory FirebaseFunctions() => firebaseFunctions;
+
+  void export(String name, js.CloudFunction function) {
+    node.export(name, function);
+  }
 
   /// Namespace for HTTPS functions.
   Https get https => _https ??= new Https._(_inner.https);
@@ -78,4 +86,10 @@ class Https {
   js.CloudFunction onRequest(HttpRequestListener handler) {
     return _inner.onRequest(allowInterop(handler));
   }
+}
+
+HttpRequestListener translateHandler(void ioHandler(HttpRequest request)) {
+  return (IncomingMessage req, ServerResponse res) {
+    ioHandler(new HttpRequest(req, res));
+  };
 }

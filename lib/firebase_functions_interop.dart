@@ -11,8 +11,6 @@
 /// class to access all the functionality of Firebase Functions.
 library firebase_functions_interop;
 
-//export 'src/bindings.dart';
 export 'src/core.dart';
 export 'src/database.dart' hide createImpl;
-
 

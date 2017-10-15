@@ -1,3 +1,6 @@
+// Copyright (c) 2017, Anatoly Pulyaevskiy. All rights reserved. Use of this source code
+// is governed by a BSD-style license that can be found in the LICENSE file.
+
 import 'dart:async';
 import 'dart:js' as js;
 import 'package:node_interop/node_interop.dart';
@@ -28,7 +31,7 @@ class RefBuilder {
   RefBuilder._(this._inner);
 
   js.CloudFunction onWrite(FutureOr<Null> handler(DatabaseEvent event)) {
-    dynamic wrapper(js.JsEvent event) {
+    dynamic wrapper(js.Event event) {
       var dartEvent = new DatabaseEvent(
         data: new DeltaSnapshot._(event.data),
         eventId: event.eventId,
