@@ -4,14 +4,11 @@ import 'dart:async';
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
-  var httpsFunc = firebaseFunctions.https.onRequest(helloWorld);
-  var dbFunc = firebaseFunctions.database
+  firebaseFunctions['helloWorld'] =
+      firebaseFunctions.https.onRequest(helloWorld);
+  firebaseFunctions['makeUppercase'] = firebaseFunctions.database
       .ref('/messages/{pushId}/original')
       .onWrite(makeUppercase);
-
-  firebaseFunctions
-    ..export('helloWorld', httpsFunc)
-    ..export('makeUppercase', dbFunc);
 }
 
 FutureOr<Null> makeUppercase(event) {
@@ -22,7 +19,7 @@ FutureOr<Null> makeUppercase(event) {
 }
 
 void helloWorld(request, response) {
-  var config = firebaseFunctions.config();
+  var config = firebaseFunctions.config;
   var serviceKey = config.get('someservice.key');
   var serviceUrl = config.get('someservice.url');
   String name = request.query['name'];

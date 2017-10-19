@@ -4,25 +4,17 @@
 import 'dart:async';
 import 'dart:js' as js;
 import 'package:node_interop/node_interop.dart';
+import 'package:firebase_admin_interop/firebase_admin_interop.dart';
+import 'package:built_value/serializer.dart';
 
 import 'bindings.dart' as js;
 
-Database createImpl(js.Database source) => new Database._(source);
+Database createImpl() => new Database._();
 
 class Database {
-  final js.Database _inner;
+  Database._();
 
-  Database._(this._inner);
-
-  RefBuilder ref(String path) => new RefBuilder._(_inner.ref(path));
-
-  // TODO: maybe this is not really needed and we can settle with integration testing?
-  // JsDeltaSnapshot createSnapshot() {
-  //   var obj = js.context['Object']
-  //       .callMethod('create', [_inner.DeltaSnapshot.prototype]);
-  //   _inner.DeltaSnapshot.apply(obj, [null, null, null, 'foo', null]);
-  //   return obj;
-  // }
+  RefBuilder ref(String path) => new RefBuilder._(js.ref(path));
 }
 
 class RefBuilder {
@@ -30,10 +22,10 @@ class RefBuilder {
 
   RefBuilder._(this._inner);
 
-  js.CloudFunction onWrite(FutureOr<Null> handler(DatabaseEvent event)) {
+  js.CloudFunction onWrite<T>(FutureOr<Null> handler(DatabaseEvent event), [Serializer<T> serializer]) {
     dynamic wrapper(js.Event event) {
       var dartEvent = new DatabaseEvent(
-        data: new DeltaSnapshot._(event.data),
+        data: new DeltaSnapshot(event.data, serializer),
         eventId: event.eventId,
         eventType: event.eventType,
         params: dartify(event.params),
@@ -90,54 +82,30 @@ class DatabaseEvent extends Event<DeltaSnapshot> {
         );
 }
 
-class DeltaSnapshot {
-  final js.DeltaSnapshot _inner;
+class DeltaSnapshot<T> extends DataSnapshot<T> {
+  DeltaSnapshot(js.DeltaSnapshot nativeInstance, [Serializer<T> serializer])
+      : super(nativeInstance, serializer);
 
-  DeltaSnapshot._(this._inner);
-  Reference get adminRef => new Reference._(_inner.adminRef);
+  js.DeltaSnapshot get nativeInstance => super.nativeInstance;
 
-  bool changed() => _inner.changed();
+  /// Returns a [Reference] to the Database location where the triggering write
+  /// occurred. Similar to [ref], but with full read and write access instead of
+  /// end-user access.
+  Reference get adminRef => new Reference(nativeInstance.adminRef);
 
-  DeltaSnapshot child(String path) => new DeltaSnapshot._(_inner.child(path));
+  /// Tests whether data in the path has changed as a result of the triggered
+  /// write.
+  bool changed() => nativeInstance.changed();
 
-  DeltaSnapshot get current => new DeltaSnapshot._(_inner.current);
+  @override
+  DeltaSnapshot<S> child<S>(String path, [Serializer<S> serializer]) =>
+      super.child(path, serializer);
 
-  bool exists() => _inner.exists();
+  /// Gets the current [DeltaSnapshot] after the triggering write event has
+  /// occurred.
+  DeltaSnapshot get current => new DeltaSnapshot(nativeInstance.current);
 
-  bool hasChild(String path) => _inner.hasChild(path);
-
-  bool hasChildren() => _inner.hasChildren();
-
-  String get key => _inner.key;
-
-  int numChildren() => _inner.numChildren();
-
-  DeltaSnapshot get previous => new DeltaSnapshot._(_inner.previous);
-
-  Reference get ref => new Reference._(_inner.ref);
-
-  /// Returns current value which can be a `Map`, a `List` or any primitive type:
-  /// `String`, `int`, `bool`, `null`.
-  dynamic val() => dartify(_inner.val());
-
-  // NOTE: intentionally not following JS library name – using Dart convention.
-  /// Returns a JSON-serializable representation of this object.
-  Object toJson() => dartify(_inner.toJSON());
-}
-
-class Reference {
-  final js.Reference _inner;
-
-  Reference._(this._inner);
-
-  Reference child(String path) => new Reference._(_inner.child(path));
-
-  Reference get parent => new Reference._(_inner.parent);
-
-  Future<Null> set(dynamic value) {
-    var jsValue = jsify(value);
-
-    var promise = _inner.set(jsValue);
-    return jsPromiseToFuture(promise);
-  }
+  /// Gets the previous state of the [DeltaSnapshot], from before the
+  /// triggering write event.
+  DeltaSnapshot get previous => new DeltaSnapshot(nativeInstance.previous);
 }

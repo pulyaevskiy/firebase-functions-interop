@@ -19,10 +19,10 @@ App initFirebaseApp() {
   }
   installNodeModules({"firebase-admin": "~4.2.1"});
 
-  var admin = new FirebaseAdmin();
+  var admin = FirebaseAdmin.instance;
   return admin.initializeApp(
     credential:
-        admin.credential.certFromPath(env['FIREBASE_SERVICE_ACCOUNT_FILEPATH']),
+        admin.certFromPath(env['FIREBASE_SERVICE_ACCOUNT_FILEPATH']),
     databaseURL: env['FIREBASE_DATABASE_URL'],
   );
 }

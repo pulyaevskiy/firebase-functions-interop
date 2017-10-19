@@ -52,7 +52,7 @@ void main() {
     });
 
     test('JS types converted to Dart', () {
-      var conf = new Config(jsConf.data);
+      var conf = new Config();
       expect(conf.get("example_int"), 123);
       expect(conf.get("example_string"), "Firebase");
       expect(conf.get("example_bool"), isTrue);
@@ -60,13 +60,13 @@ void main() {
     });
 
     test('non-existing keys resolve to null', () {
-      var conf = new Config(jsConf.data);
+      var conf = new Config();
       expect(conf.get("no_such_key"), isNull);
       expect(conf.get("no.such.nested.key"), isNull);
     });
 
     test('firebase object is returned as a map', () {
-      var conf = new Config(jsConf.data);
+      var conf = new Config();
       expect(conf.get("firebase"), isMap);
     });
   });

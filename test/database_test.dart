@@ -12,7 +12,7 @@ void main() {
 
     setUp(() async {
       var ref = app.database().ref('/messages/test/uppercase');
-      await ref.set(null);
+      await ref.setValue(null);
       var data = await ref.once('value');
       while (data.val() != null) {
         data = await ref.once('value');
@@ -26,7 +26,7 @@ void main() {
     test('happy path integration test', () async {
       var ref = app.database().ref('/messages/test/original');
       var value = 'lowercase' + (new DateTime.now().toIso8601String());
-      await ref.set(value);
+      await ref.setValue(value);
       var ucRef = app.database().ref('/messages/test/uppercase');
       var data = await ucRef.once('value');
       while (data.val() == null) {

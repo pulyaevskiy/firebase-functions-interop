@@ -12,7 +12,7 @@ void main() {
       response.send('Hello from Dart Firebase Functions interop');
     }
   });
-  exports.setProperty('helloWorld', httpsFunc);
+//  exports.setProperty('helloWorld', httpsFunc);
 
   // Example Realtime Database cloud function from the Getting Started tutorial:
   // https://firebase.google.com/docs/functions/get-started
@@ -22,7 +22,7 @@ void main() {
     String original = event.data.val();
     print('Uppercasing $original');
     String uppercase = original.toUpperCase();
-    return event.data.ref.parent.child('uppercase').set(uppercase);
+    return event.data.ref.parent.child('uppercase').setValue(uppercase);
   });
-  exports.setProperty('makeUppercase', dbFunc);
+//  exports.setProperty('makeUppercase', dbFunc);
 }

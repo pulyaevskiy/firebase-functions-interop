@@ -1,43 +1,37 @@
 // Copyright (c) 2017, Anatoly Pulyaevskiy. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:js';
 
 import 'package:node_interop/node_interop.dart';
 import 'package:node_interop/http.dart';
+import 'package:firebase_admin_interop/js.dart' as admin;
+import 'package:expressjs_interop/expressjs_interop.dart' as express;
 
 import 'bindings.dart' as js;
 import 'database.dart';
 
 export 'bindings.dart' show CloudFunction;
 
-final FirebaseFunctions firebaseFunctions =
-    new FirebaseFunctions._(require('firebase-functions'));
+final FirebaseFunctions firebaseFunctions = new FirebaseFunctions._();
 
 /// Global namespace from which all the Cloud Functions are accessed.
 class FirebaseFunctions {
-  final js.FirebaseFunctions _inner;
+  final Https https = new Https._();
+  final Database database = createImpl();
+  final Config config = new Config();
 
-  FirebaseFunctions._(this._inner);
+  FirebaseFunctions._();
 
-  @Deprecated("Use the top-level `firebaseFunctions` variable instead.")
-  factory FirebaseFunctions() => firebaseFunctions;
-
-  void export(String name, js.CloudFunction function) {
+  void export(String name, dynamic function) {
     node.export(name, function);
   }
 
-  /// Namespace for HTTPS functions.
-  Https get https => _https ??= new Https._(_inner.https);
-  Https _https;
-
-  /// Namespace for Realtime Database functions.
-  Database get database => _database ??= createImpl(_inner.database);
-  Database _database;
-
-  /// Returns environment configuration object.
-  Config config() => _config ??= new Config(_inner.config());
-  Config _config;
+  operator []=(String key, dynamic function) {
+    assert(function is js.HttpsFunction || function is js.CloudFunction);
+    node.export(key, function);
+  }
 }
 
 /// Provides access to Firebase environment configuration.
@@ -45,9 +39,8 @@ class FirebaseFunctions {
 /// See also:
 /// - https://firebase.google.com/docs/functions/config-env
 class Config {
-  final _inner;
-
-  Config(this._inner);
+  js.Config _config;
+  js.Config get nativeInstance => _config ??= js.config();
 
   /// Returns configuration value specified by it's [key].
   ///
@@ -57,7 +50,7 @@ class Config {
   /// keys are broken into nested JS object structure, e.g.
   /// `functions.config().some_service.client_secret`.
   dynamic get(String key) {
-    var data = dartify(_inner);
+    var data = dartify(nativeInstance);
     var parts = key.split('.');
     var value;
     for (var subKey in parts) {
@@ -73,18 +66,18 @@ class Config {
   /// Firebase Admin SDK.
   ///
   /// This is a shortcut for calling `get('firebase')`.
-  Map<String, dynamic> get firebase => get('firebase');
+  admin.AppOptions get firebase => get('firebase');
 }
 
+typedef void HttpRequestListener(
+    express.Request request, express.Response response);
+
 class Https {
-  final js.Https _inner;
-  Https._(this._inner);
+  Https._();
 
   /// Creates HTTPS function from [handler].
-  ///
-  ///
-  js.CloudFunction onRequest(HttpRequestListener handler) {
-    return _inner.onRequest(allowInterop(handler));
+  js.HttpsFunction onRequest(HttpRequestListener handler) {
+    return js.onRequest(allowInterop(handler));
   }
 }
 

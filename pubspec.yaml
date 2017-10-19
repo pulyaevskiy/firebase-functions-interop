@@ -9,12 +9,14 @@ environment:
 
 dependencies:
   js: ^0.6.1
-  node_interop: '>=0.1.0-beta.3 <0.2.0'
+  node_interop: '>=0.1.0-beta.4 <0.2.0'
   expressjs_interop: ^0.0.2
+  firestore_interop: '>=0.0.1 <0.1.0'
+  firebase_admin_interop: '>=0.1.0-beta.2 <0.2.0'
+  built_value: ^4.2.1
 
 dev_dependencies:
   test: ^0.12.24
-  firebase_admin_interop: '>=0.1.0-beta.1 <0.2.0'
 
 transformers:
   - $dart2js
