@@ -9,7 +9,7 @@ environment:
 
 dependencies:
   js: ^0.6.1
-  node_interop: '>=0.1.0-beta.4 <0.2.0'
+  node_interop: '>=0.1.0-beta.5 <0.2.0'
   expressjs_interop: ^0.0.2
   firestore_interop: '>=0.0.1 <0.1.0'
   firebase_admin_interop: '>=0.1.0-beta.2 <0.2.0'

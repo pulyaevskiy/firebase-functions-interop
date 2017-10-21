@@ -7,10 +7,10 @@ pub get
 cd functions
 pub get
 npm install
-pub build bin
+pub build --mode debug bin
 
 if [ -z "$TRAVIS" ]; then
-    echo "Provisioning functions for dev environment"
+    echo "Provisioning functions for local environment"
     # The only way I know to delete existing functions is to deploy empty module:
     cp build/bin/clear.dart.js index.js
     firebase deploy --only functions

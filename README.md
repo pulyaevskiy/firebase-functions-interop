@@ -9,6 +9,20 @@ applications in Dart.
 > Please note that it's currently a proof-of-concept-preview version so it lacks
 > many features, tests and documentation. But, it's already fun to play with!
 
+## Status
+
+JS API coverage report by namespace:
+
+- [x] functions
+- [x] functions.config
+- [ ] functions.analytics
+- [ ] functions.auth
+- [x] functions.firestore :fire:
+- [x] functions.database
+- [x] functions.https
+- [ ] functions.pubsub
+- [ ] functions.storage
+
 ## Usage
 
 > Make sure you have Firebase CLI installed as well as a Firebase account

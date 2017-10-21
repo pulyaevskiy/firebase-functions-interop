@@ -9,6 +9,7 @@ import 'package:js/js.dart';
 import 'package:node_interop/node_interop.dart';
 import 'package:expressjs_interop/expressjs_interop.dart' as express;
 import 'package:firebase_admin_interop/js.dart' as admin;
+import 'package:firestore_interop/firestore_interop.dart';
 
 void initFirebaseFunctions() {
   context['FirebaseFunctions'] =
@@ -43,12 +44,12 @@ abstract class Event<T> {
   /// Type of event.
   ///
   /// Valid values are:
-  /// - providers/google.firebase.analytics/eventTypes/event.log
-  /// - providers/google.firebase.database/eventTypes/ref.write
-  /// - providers/firebase.auth/eventTypes/user.create
-  /// - providers/firebase.auth/eventTypes/user.delete
-  /// - providers/cloud.pubsub/eventTypes/topic.publish
-  /// - providers/cloud.storage/eventTypes/object.change
+  /// - `providers/google.firebase.analytics/eventTypes/event.log`
+  /// - `providers/google.firebase.database/eventTypes/ref.write`
+  /// - `providers/firebase.auth/eventTypes/user.create`
+  /// - `providers/firebase.auth/eventTypes/user.delete`
+  /// - `providers/cloud.pubsub/eventTypes/topic.publish`
+  /// - `providers/cloud.storage/eventTypes/object.change`
   external String get eventType;
 
   /// An object containing the values of the wildcards in the path parameter
@@ -187,8 +188,7 @@ abstract class DocumentDeltaSnapshot {
 
   /// Returns a DocumentReference to the database location where the triggering
   /// write occurred. This DocumentReference has admin privileges.
-  // TODO: update firebase_admin with DocumentReference
-  external dynamic get ref;
+  external DocumentReference get ref;
 
   /// The last update time for the document, formatted as a UTC string.
   external String get updateTime;
