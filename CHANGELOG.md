@@ -18,6 +18,7 @@ changes.
   as a proxy to JS native request and response objects. This should
   also make it easier to build integrations with Dart server-side web
   frameworks.
+- Gitter: [https://gitter.im/pulyaevskiy/firebase-functions-interop](https://gitter.im/pulyaevskiy/firebase-functions-interop)
 
 ## 0.0.4
 
