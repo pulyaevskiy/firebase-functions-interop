@@ -2,23 +2,21 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 @TestOn('node')
+import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 import 'package:test/test.dart';
 
 import 'setup_admin.dart';
 
 void main() {
-  var app = initFirebaseApp();
+  App app = initFirebaseApp();
 
-  group('DatabaseFunctions', () {
+  group('Database', () {
     setUp(() async {
-      var ref = app.database().ref('/messages/test/uppercase');
-      print('setValue=null');
-      await ref.setValue(null).then((_) {
-        print('DONE');
-      });
-      print('setValue=done');
+      var ref = app.database().ref('/tests/happyPath/uppercase');
+
+      await ref.setValue(null);
+      print('setValue');
       var data = await ref.once('value');
-      print(data.val());
       while (data.val() != null) {
         data = await ref.once('value');
         print(data.val());
@@ -30,19 +28,16 @@ void main() {
     });
 
     test('happy path integration test', () async {
-      var ref = app.database().ref('/messages/test/original');
+      var ref = app.database().ref('/tests/happyPath/original');
       var value = 'lowercase' + (new DateTime.now().toIso8601String());
-      print(value);
       await ref.setValue(value);
-      print(value);
-      var ucRef = app.database().ref('/messages/test/uppercase');
+      var ucRef = app.database().ref('/tests/happyPath/uppercase');
       var data = await ucRef.once('value');
-      print(data.val());
       while (data.val() == null) {
         data = await ucRef.once('value');
-        print(data.val());
       }
-      expect(data.val(), value.toUpperCase());
+      var expected = 'happyPath: ' + value.toUpperCase();
+      expect(data.val(), expected);
     });
-  }, timeout: const Timeout(const Duration(seconds: 5)));
+  }, timeout: const Timeout(const Duration(seconds: 10)));
 }

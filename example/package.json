@@ -1,0 +1,8 @@
+{
+  "name": "example",
+  "description": "Cloud Functions for Firebase",
+  "dependencies": {
+    "firebase-admin": "~5.4.2"
+  },
+  "private": true
+}

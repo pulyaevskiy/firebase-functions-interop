@@ -9,7 +9,8 @@ pubspec.lock
 doc/api/
 
 # Node
-functions/node_modules/
+node_modules
+package-lock.json
 functions/index.js
 functions/build/
 

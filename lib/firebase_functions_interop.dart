@@ -156,7 +156,7 @@ class RefBuilder {
   ///
   /// Optional [serializer], if provided, is used to deserialize value
   /// in to a Dart object.
-  js.CloudFunction onCreate<T>(FutureOr<Null> handler(DatabaseEvent event),
+  js.CloudFunction onCreate<T>(FutureOr<Null> handler(DatabaseEvent<T> event),
       [Serializer<T> serializer]) {
     dynamic wrapper(js.Event event) {
       return _handleEvent<T>(event, handler, serializer);
@@ -170,7 +170,7 @@ class RefBuilder {
   ///
   /// Optional [serializer], if provided, is used to deserialize value
   /// in to a Dart object.
-  js.CloudFunction onDelete<T>(FutureOr<Null> handler(DatabaseEvent event),
+  js.CloudFunction onDelete<T>(FutureOr<Null> handler(DatabaseEvent<T> event),
       [Serializer<T> serializer]) {
     dynamic wrapper(js.Event event) {
       return _handleEvent<T>(event, handler, serializer);
@@ -184,7 +184,7 @@ class RefBuilder {
   ///
   /// Optional [serializer], if provided, is used to deserialize value
   /// in to a Dart object.
-  js.CloudFunction onUpdate<T>(FutureOr<Null> handler(DatabaseEvent event),
+  js.CloudFunction onUpdate<T>(FutureOr<Null> handler(DatabaseEvent<T> event),
       [Serializer<T> serializer]) {
     dynamic wrapper(js.Event event) {
       return _handleEvent<T>(event, handler, serializer);
@@ -198,7 +198,7 @@ class RefBuilder {
   ///
   /// Optional [serializer], if provided, is used to deserialize value
   /// in to a Dart object.
-  js.CloudFunction onWrite<T>(FutureOr<Null> handler(DatabaseEvent event),
+  js.CloudFunction onWrite<T>(FutureOr<Null> handler(DatabaseEvent<T> event),
       [Serializer<T> serializer]) {
     dynamic wrapper(js.Event event) {
       return _handleEvent<T>(event, handler, serializer);
@@ -208,9 +208,9 @@ class RefBuilder {
   }
 
   dynamic _handleEvent<T>(
-      js.Event event, FutureOr<Null> handler(DatabaseEvent event),
+      js.Event event, FutureOr<Null> handler(DatabaseEvent<T> event),
       [Serializer<T> serializer]) {
-    var dartEvent = new DatabaseEvent(
+    var dartEvent = new DatabaseEvent<T>(
       data: new DeltaSnapshot<T>(event.data, serializer),
       eventId: event.eventId,
       eventType: event.eventType,
@@ -260,7 +260,7 @@ class Event<T> {
 }
 
 /// An [Event] triggered by Firebase Realtime Database.
-class DatabaseEvent extends Event<DeltaSnapshot> {
+class DatabaseEvent<T> extends Event<DeltaSnapshot<T>> {
   DatabaseEvent({
     DeltaSnapshot data,
     String eventId,
@@ -303,9 +303,11 @@ class DeltaSnapshot<T> extends DataSnapshot<T> {
 
   /// Gets the current [DeltaSnapshot] after the triggering write event has
   /// occurred.
-  DeltaSnapshot<T> get current => new DeltaSnapshot(nativeInstance.current);
+  DeltaSnapshot<T> get current =>
+      new DeltaSnapshot<T>(nativeInstance.current, serializer);
 
   /// Gets the previous state of the [DeltaSnapshot], from before the
   /// triggering write event.
-  DeltaSnapshot<T> get previous => new DeltaSnapshot(nativeInstance.previous);
+  DeltaSnapshot<T> get previous =>
+      new DeltaSnapshot<T>(nativeInstance.previous, serializer);
 }
