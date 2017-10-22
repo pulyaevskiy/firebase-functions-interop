@@ -1,6 +1,23 @@
 ## 0.1.0-beta.1
 
-- Upgraded to `node_interop: 0.1.0-beta.1`.
+This version marks first attempt to stabilize API layer provided
+by this library, which (ironically) means there _are_ some breaking
+changes.
+
+- Updated for `node_interop: 0.1.0-beta`.
+- Updated for `firebase_admin_interop: 0.1.0-beta`.
+- Removed `stringify` from bindings, use `jsonStringify` from
+  node_interop instead (available since `0.1.0-beta.6`).
+- Reorganized bindings in single file.
+- Finalized bindings for HTTPS and Realtime Database functions.
+- Added support for `built_value` serializers in Realtime Database
+  functions
+- HTTPS functions `onRequest` method now accepts handler function with
+  single parameter of type `HttpRequest` (from `node_interop/http`).
+  This request is fully compatible with "dart:io" and acts mostly
+  as a proxy to JS native request and response objects. This should
+  also make it easier to build integrations with Dart server-side web
+  frameworks.
 
 ## 0.0.4
 

@@ -6,6 +6,13 @@ import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 
 void main() {
+  /// You can export a function by setting a key on global [firebaseFunctions]
+  /// object.
+  ///
+  /// For HTTPS functions the key is also a URL path prefix, so in below
+  /// example `helloWorld` function will be available at `/helloWorld`
+  /// URL path and it will also handle all paths under this prefix, e.g.
+  /// `/helloWorld/any/number/of/sections`.
   firebaseFunctions['helloWorld'] =
       firebaseFunctions.https.onRequest(helloWorld);
   firebaseFunctions['makeUppercase'] = firebaseFunctions.database
@@ -13,6 +20,7 @@ void main() {
       .onWrite(makeUppercase);
 }
 
+/// Example Realtime Database function.
 FutureOr<Null> makeUppercase(DatabaseEvent<String> event) {
   var original = event.data.val();
   var pushId = event.params['testId'];
@@ -21,29 +29,29 @@ FutureOr<Null> makeUppercase(DatabaseEvent<String> event) {
   return event.data.ref.parent.child('uppercase').setValue(uppercase);
 }
 
+/// Example HTTPS function.
 Future helloWorld(HttpRequest request) async {
   try {
+    /// If you defined any config parameters you can access them as follows:
+    var config = firebaseFunctions.config;
+    var serviceKey = config.get('someservice.key');
+    var serviceUrl = config.get('someservice.url');
+    print('Service key: $serviceKey, service URL: $serviceUrl');
+
+    /// The provided [request] is fully compatible with "dart:io" `HttpRequest`
+    /// including the fact that it's a valid Dart `Stream`.
     String name = request.requestedUri.queryParameters['name'];
-    bool conf = request.requestedUri.queryParameters.containsKey('config');
-    if (conf) {
-      var config = firebaseFunctions.config;
-      var serviceKey = config.get('someservice.key');
-      var serviceUrl = config.get('someservice.url');
-      request.response.writeln('FirebaseConfig: $serviceKey, $serviceUrl');
-    } else if (name != null) {
+    if (name != null) {
+      // You can also write to Realtime Database right here:
       var appOptions = firebaseFunctions.config.firebase;
       var admin = FirebaseAdmin.instance;
       var app = admin.initializeApp(
           credential: appOptions.credential,
           databaseURL: appOptions.databaseURL);
       var database = app.database();
-      await database
-          .ref('/tests/httpsToDatabase/original')
-          .setValue(name.toUpperCase());
-      request.response.writeln('HTTPS-to-Database: ${name.toUpperCase()}');
-    } else {
-      request.response.writeln('HappyPathTest');
+      await database.ref('/tests/some-path').setValue(name);
     }
+    request.response.writeln('Hello world');
   } finally {
     request.response.close();
   }

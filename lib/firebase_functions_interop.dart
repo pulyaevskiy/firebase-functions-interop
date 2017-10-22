@@ -3,10 +3,6 @@
 
 /// Interop library for Firebase Functions NodeJS SDK.
 ///
-/// This library defines bindings to JavaScript APIs exposed by official Firebase
-/// Functions library for NodeJS, therefore it can't be used on it's own. It
-/// must be compiled to JavaScript and run under NodeJS runtime.
-///
 /// Use [firebaseFunctions] object as main entry point.
 ///
 /// To create your cloud function use corresponding namespaces on this object:
@@ -47,12 +43,19 @@ export 'package:node_interop/http.dart' show HttpRequest;
 
 export 'src/bindings.dart' show CloudFunction, HttpsFunction;
 
+/// Main library object which can be used to create and register Firebase
+/// Cloud functions.
 final FirebaseFunctions firebaseFunctions = new FirebaseFunctions._();
 
 /// Global namespace from which all Firebase Cloud Functions can be accessed.
+///
+/// Use [firebaseFunctions] as a singleton instance of this class.
 class FirebaseFunctions {
+  /// Configuration object for Firebase functions.
   final Config config = new Config();
+  /// HTTPS functions.
   final Https https = new Https._();
+  /// Realtime Database functions.
   final Database database = new Database._();
 
   FirebaseFunctions._() {
@@ -120,12 +123,12 @@ class Https {
   /// of [HttpRequest] interface from `dart:io`. This object acts as a
   /// proxy to JavaScript request and response objects.
   ///
-  /// If you need access to native objects use [HttpRequest.nativeStream] and
-  /// [HttpResponse.nativeStream] :
+  /// If you need access to native objects use [HttpRequest.nativeInstance] and
+  /// [HttpResponse.nativeInstance] :
   ///
   ///     void handler(HttpRequest request) {
-  ///       IncomingMessage nativeRequest = request.nativeStream;
-  ///       ServerResponse nativeResponse = request.response.nativeStream;
+  ///       IncomingMessage nativeRequest = request.nativeInstance;
+  ///       ServerResponse nativeResponse = request.response.nativeInstance;
   ///     }
   js.HttpsFunction onRequest(handler(HttpRequest request)) {
     void jsHandler(IncomingMessage request, ServerResponse response) {
@@ -147,9 +150,9 @@ class Database {
 
 /// The Firebase Realtime Database reference builder.
 class RefBuilder {
-  final js.RefBuilder _inner;
+  final js.RefBuilder nativeInstance;
 
-  RefBuilder._(this._inner);
+  RefBuilder._(this.nativeInstance);
 
   /// Event handler that fires every time new data is created in Firebase
   /// Realtime Database.
@@ -162,7 +165,7 @@ class RefBuilder {
       return _handleEvent<T>(event, handler, serializer);
     }
 
-    return _inner.onWrite(allowInterop(wrapper));
+    return nativeInstance.onWrite(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is deleted from Firebase
@@ -176,7 +179,7 @@ class RefBuilder {
       return _handleEvent<T>(event, handler, serializer);
     }
 
-    return _inner.onWrite(allowInterop(wrapper));
+    return nativeInstance.onWrite(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is updated in Firebase Realtime
@@ -190,7 +193,7 @@ class RefBuilder {
       return _handleEvent<T>(event, handler, serializer);
     }
 
-    return _inner.onWrite(allowInterop(wrapper));
+    return nativeInstance.onWrite(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time a Firebase Realtime Database write of
@@ -204,7 +207,7 @@ class RefBuilder {
       return _handleEvent<T>(event, handler, serializer);
     }
 
-    return _inner.onWrite(allowInterop(wrapper));
+    return nativeInstance.onWrite(allowInterop(wrapper));
   }
 
   dynamic _handleEvent<T>(

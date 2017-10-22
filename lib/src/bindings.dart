@@ -200,6 +200,3 @@ abstract class DocumentDeltaSnapshot {
   /// Gets the value for a given key.
   external dynamic get(key);
 }
-
-@JS("JSON.stringify")
-external String stringify(obj); // TODO: Move to node_interop
