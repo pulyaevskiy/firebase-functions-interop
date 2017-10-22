@@ -15,11 +15,9 @@ void main() {
       var ref = app.database().ref('/tests/happyPath/uppercase');
 
       await ref.setValue(null);
-      print('setValue');
       var data = await ref.once('value');
       while (data.val() != null) {
         data = await ref.once('value');
-        print(data.val());
       }
     });
 

@@ -10,5 +10,4 @@ before_install:
   - ./tool/deploy.sh
 
 script:
-  - pub run test
-  - pub run test --platform node
+  - pub run test -p node -j 1 -r expanded
