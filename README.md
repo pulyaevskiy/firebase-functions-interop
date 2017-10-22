@@ -1,6 +1,6 @@
 # Firebase Functions Interop Library for Dart
 
-[![Build Status](https://travis-ci.org/pulyaevskiy/firebase-functions-interop.svg?branch=master)](https://travis-ci.org/pulyaevskiy/firebase-functions-interop)
+[![Build Status](https://img.shields.io/travis-ci/pulyaevskiy/firebase-functions-interop.svg?branch=master&style=flat-square)](https://travis-ci.org/pulyaevskiy/firebase-functions-interop) [![Pub](https://img.shields.io/pub/v/firebase_functions_interop.svg?style=flat-square)](https://pub.dartlang.org/packages/firebase_functions_interop) [![Gitter](https://img.shields.io/badge/chat-on%20gitter-c73061.svg?style=flat-square)](https://gitter.im/pulyaevskiy/firebase-functions-interop)
 
 Write Firebase Cloud functions in Dart, run in NodeJS. This is an early
 preview, alpha open-source project.
