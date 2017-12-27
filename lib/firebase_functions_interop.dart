@@ -53,8 +53,10 @@ final FirebaseFunctions firebaseFunctions = new FirebaseFunctions._();
 class FirebaseFunctions {
   /// Configuration object for Firebase functions.
   final Config config = new Config();
+
   /// HTTPS functions.
   final Https https = new Https._();
+
   /// Realtime Database functions.
   final Database database = new Database._();
 
@@ -165,7 +167,7 @@ class RefBuilder {
       return _handleEvent<T>(event, handler, serializer);
     }
 
-    return nativeInstance.onWrite(allowInterop(wrapper));
+    return nativeInstance.onCreate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is deleted from Firebase
@@ -179,7 +181,7 @@ class RefBuilder {
       return _handleEvent<T>(event, handler, serializer);
     }
 
-    return nativeInstance.onWrite(allowInterop(wrapper));
+    return nativeInstance.onDelete(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is updated in Firebase Realtime
@@ -193,7 +195,7 @@ class RefBuilder {
       return _handleEvent<T>(event, handler, serializer);
     }
 
-    return nativeInstance.onWrite(allowInterop(wrapper));
+    return nativeInstance.onUpdate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time a Firebase Realtime Database write of

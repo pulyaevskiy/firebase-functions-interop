@@ -46,6 +46,9 @@ abstract class Event<T> {
   /// Valid values are:
   /// - `providers/google.firebase.analytics/eventTypes/event.log`
   /// - `providers/google.firebase.database/eventTypes/ref.write`
+  /// - `providers/google.firebase.database/eventTypes/ref.create`
+  /// - `providers/google.firebase.database/eventTypes/ref.update`
+  /// - `providers/google.firebase.database/eventTypes/ref.delete`
   /// - `providers/firebase.auth/eventTypes/user.create`
   /// - `providers/firebase.auth/eventTypes/user.delete`
   /// - `providers/cloud.pubsub/eventTypes/topic.publish`
