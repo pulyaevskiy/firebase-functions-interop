@@ -1,3 +1,7 @@
+## 0.1.0-beta.2
+
+- Fixed: RefBuilder onCreate, onUpdate and onDelete were subscribing to JS onWrite (see #5)
+
 ## 0.1.0-beta.1
 
 This version marks first attempt to stabilize API layer provided
