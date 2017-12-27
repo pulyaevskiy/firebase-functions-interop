@@ -11,6 +11,10 @@ void main() {
   firebaseFunctions['makeUppercase'] = firebaseFunctions.database
       .ref('/tests/{testId}/original')
       .onWrite(makeUppercase);
+  final ref = firebaseFunctions.database.ref('/onCreateUpdateDelete/value');
+  firebaseFunctions['onCreateTrigger'] = ref.onCreate(handleCreateUpdateDelete);
+  firebaseFunctions['onUpdateTrigger'] = ref.onUpdate(handleCreateUpdateDelete);
+  firebaseFunctions['onDeleteTrigger'] = ref.onDelete(handleCreateUpdateDelete);
 }
 
 FutureOr<Null> makeUppercase(DatabaseEvent<String> event) {
@@ -19,6 +23,11 @@ FutureOr<Null> makeUppercase(DatabaseEvent<String> event) {
   print('Uppercasing $original');
   var uppercase = pushId.toString() + ': ' + original.toUpperCase();
   return event.data.ref.parent.child('uppercase').setValue(uppercase);
+}
+
+FutureOr<Null> handleCreateUpdateDelete(DatabaseEvent<String> event) {
+  final eventType = event.eventType;
+  return event.data.ref.parent.child('lastEventType').setValue(eventType);
 }
 
 Future helloWorld(HttpRequest request) async {
