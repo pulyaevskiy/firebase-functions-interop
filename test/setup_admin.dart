@@ -17,8 +17,9 @@ App initFirebaseApp() {
 
   var admin = FirebaseAdmin.instance;
   return admin.initializeApp(
-    credential:
-        admin.certFromPath(env['FIREBASE_SERVICE_ACCOUNT_FILEPATH']),
-    databaseURL: env['FIREBASE_DATABASE_URL'],
+    new AppOptions(
+      credential: admin.certFromPath(env['FIREBASE_SERVICE_ACCOUNT_FILEPATH']),
+      databaseURL: env['FIREBASE_DATABASE_URL'],
+    ),
   );
 }

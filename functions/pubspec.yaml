@@ -10,7 +10,7 @@ environment:
 dependencies:
   firebase_functions_interop:
     path: ../
-  node_interop: ^0.1.0-beta.5
+  node_interop: ^0.1.0-beta.8
 
 transformers:
   - $dart2js

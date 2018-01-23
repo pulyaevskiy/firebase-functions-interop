@@ -34,12 +34,12 @@ import 'dart:js';
 import 'package:built_value/serializer.dart';
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 import 'package:firebase_admin_interop/js.dart' as admin;
-import 'package:node_interop/http.dart';
+import 'package:node_interop/io.dart';
 import 'package:node_interop/node_interop.dart';
 
 import 'src/bindings.dart' as js;
 
-export 'package:node_interop/http.dart' show HttpRequest;
+export 'package:node_interop/io.dart' show HttpRequest;
 
 export 'src/bindings.dart' show CloudFunction, HttpsFunction;
 
@@ -134,7 +134,7 @@ class Https {
   ///     }
   js.HttpsFunction onRequest(handler(HttpRequest request)) {
     void jsHandler(IncomingMessage request, ServerResponse response) {
-      var requestProxy = new HttpRequest(request, response);
+      var requestProxy = new NodeHttpRequest(request, response);
       handler(requestProxy);
     }
 

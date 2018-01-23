@@ -6,8 +6,10 @@ import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 
 void main() {
+  firebaseFunctions['date'] = firebaseFunctions.https.onRequest(date);
   firebaseFunctions['helloWorld'] =
       firebaseFunctions.https.onRequest(helloWorld);
+
   firebaseFunctions['makeUppercase'] = firebaseFunctions.database
       .ref('/tests/{testId}/original')
       .onWrite(makeUppercase);
@@ -28,6 +30,12 @@ FutureOr<Null> makeUppercase(DatabaseEvent<String> event) {
 FutureOr<Null> handleCreateUpdateDelete(DatabaseEvent<String> event) {
   final eventType = event.eventType;
   return event.data.ref.parent.child('lastEventType').setValue(eventType);
+}
+
+void date(HttpRequest request) {
+  DateTime now = new DateTime.now().toUtc();
+  request.response.writeln(now.toIso8601String());
+  request.response.close();
 }
 
 Future helloWorld(HttpRequest request) async {
