@@ -9,12 +9,10 @@ import 'dart:js';
 
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:js/js.dart';
-import 'package:node_interop/fs.dart';
-import 'package:node_interop/node_interop.dart';
+import 'package:node_io/node_io.dart';
+import 'package:node_interop/node.dart';
 import 'package:node_interop/test.dart';
 import 'package:test/test.dart';
-
-const fs = const NodeFileSystem();
 
 const configFixture = '''
 
@@ -40,14 +38,14 @@ void main() {
   group('Config', () {
     ConfigFixture jsConf;
     setUpAll(() {
-      var segments = node.platform.script.pathSegments.toList();
+      var segments = Platform.script.pathSegments.toList();
       segments
         ..removeLast()
         ..add('config_fixture.js');
-      var jsFilepath = fs.path.separator + fs.path.joinAll(segments);
-      var file = fs.file(jsFilepath);
+      var jsFilepath =
+          Platform.pathSeparator + segments.join(Platform.pathSeparator);
+      final file = new File(jsFilepath);
       file.writeAsStringSync(configFixture);
-
       jsConf = require('./config_fixture');
     });
 

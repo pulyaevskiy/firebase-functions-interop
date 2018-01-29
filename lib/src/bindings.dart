@@ -6,10 +6,9 @@ library firebase_functions_interop.bindings;
 
 import 'dart:js';
 import 'package:js/js.dart';
-import 'package:node_interop/node_interop.dart';
-import 'package:expressjs_interop/expressjs_interop.dart' as express;
+import 'package:node_interop/http.dart';
 import 'package:firebase_admin_interop/js.dart' as admin;
-import 'package:firestore_interop/firestore_interop.dart';
+// import 'package:firestore_interop/firestore_interop.dart';
 
 void initFirebaseFunctions() {
   context['FirebaseFunctions'] =
@@ -30,7 +29,7 @@ typedef void CloudFunction<T>(Event<T> event);
 /// Function. This type is a special JavaScript function which takes Express
 /// Request and Response objects as its only arguments.
 @JS('FirebaseFunctions.HttpsFunction')
-typedef void HttpsFunction(express.Request request, express.Response response);
+typedef void HttpsFunction(IncomingMessage request, ServerResponse response);
 
 @JS('FirebaseFunctions.Event')
 abstract class Event<T> {
