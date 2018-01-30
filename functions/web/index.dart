@@ -6,17 +6,16 @@ import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 
 void main() {
-  firebaseFunctions['date'] = firebaseFunctions.https.onRequest(date);
-  firebaseFunctions['helloWorld'] =
-      firebaseFunctions.https.onRequest(helloWorld);
+  functions['date'] = FirebaseFunctions.https.onRequest(date);
+  functions['helloWorld'] = FirebaseFunctions.https.onRequest(helloWorld);
 
-  firebaseFunctions['makeUppercase'] = firebaseFunctions.database
+  functions['makeUppercase'] = FirebaseFunctions.database
       .ref('/tests/{testId}/original')
       .onWrite(makeUppercase);
-  final ref = firebaseFunctions.database.ref('/onCreateUpdateDelete/value');
-  firebaseFunctions['onCreateTrigger'] = ref.onCreate(handleCreateUpdateDelete);
-  firebaseFunctions['onUpdateTrigger'] = ref.onUpdate(handleCreateUpdateDelete);
-  firebaseFunctions['onDeleteTrigger'] = ref.onDelete(handleCreateUpdateDelete);
+  final ref = FirebaseFunctions.database.ref('/onCreateUpdateDelete/value');
+  functions['onCreateTrigger'] = ref.onCreate(handleCreateUpdateDelete);
+  functions['onUpdateTrigger'] = ref.onUpdate(handleCreateUpdateDelete);
+  functions['onDeleteTrigger'] = ref.onDelete(handleCreateUpdateDelete);
 }
 
 FutureOr<Null> makeUppercase(DatabaseEvent<String> event) {
@@ -43,17 +42,14 @@ Future helloWorld(HttpRequest request) async {
     String name = request.requestedUri.queryParameters['name'];
     bool conf = request.requestedUri.queryParameters.containsKey('config');
     if (conf) {
-      var config = firebaseFunctions.config;
+      var config = FirebaseFunctions.config;
       var serviceKey = config.get('someservice.key');
       var serviceUrl = config.get('someservice.url');
       request.response.writeln('FirebaseConfig: $serviceKey, $serviceUrl');
     } else if (name != null) {
-      var appOptions = firebaseFunctions.config.firebase;
+      var appOptions = FirebaseFunctions.config.firebase;
       var admin = FirebaseAdmin.instance;
-      var app = admin.initializeApp(new AppOptions(
-        credential: appOptions.credential,
-        databaseURL: appOptions.databaseURL,
-      ));
+      var app = admin.initializeApp(appOptions);
       var database = app.database();
       await database
           .ref('/tests/httpsToDatabase/original')

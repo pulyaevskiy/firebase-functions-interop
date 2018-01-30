@@ -153,25 +153,25 @@ abstract class DocumentBuilder {
   /// Event handler that fires every time new data is created in Cloud
   /// Firestore.
   external CloudFunction onCreate(
-      void handler(Event<DocumentDeltaSnapshot> event));
+      void handler(Event<DeltaDocumentSnapshot> event));
 
   /// Event handler that fires every time data is deleted from Cloud Firestore.
   external CloudFunction onDelete(
-      void handler(Event<DocumentDeltaSnapshot> event));
+      void handler(Event<DeltaDocumentSnapshot> event));
 
   /// Event handler that fires every time data is updated in Cloud Firestore.
   external CloudFunction onUpdate(
-      void handler(Event<DocumentDeltaSnapshot> event));
+      void handler(Event<DeltaDocumentSnapshot> event));
 
   /// Event handler that fires every time a Cloud Firestore write of any kind
   /// (creation, update, or delete) occurs.
   external CloudFunction onWrite(
-      void handler(Event<DocumentDeltaSnapshot> event));
+      void handler(Event<DeltaDocumentSnapshot> event));
 }
 
-/// Interface representing a Cloud Firestore document delta snapshot.
-@JS('FirebaseFunctions.firestore.DocumentDeltaSnapshot')
-abstract class DocumentDeltaSnapshot {
+/// Interface representing a Cloud Firestore delta document snapshot.
+@JS('FirebaseFunctions.firestore.DeltaDocumentSnapshot')
+abstract class DeltaDocumentSnapshot implements DocumentSnapshot {
   /// The date the document was created, formatted as a UTC string.
   external String get createTime;
 
@@ -183,7 +183,7 @@ abstract class DocumentDeltaSnapshot {
 
   /// Gets the previous state of this document, from before the triggering write
   /// event.
-  external DocumentDeltaSnapshot get previous;
+  external DeltaDocumentSnapshot get previous;
 
   /// The last time the document was read, formatted as a UTC string.
   external String get readTime;

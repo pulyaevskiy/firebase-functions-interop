@@ -1,8 +1,8 @@
 targets:
-  $default:
-    sources:
-      - "lib/**"
-      - "node/**" # this doesn't work with dart2js
+  # $default:
+  #   sources:
+  #     - "lib/**"
+  #     - "node/**" # this doesn't work with dart2js
   # Uncomment below to compile with dart2js
   # Note that for dart2js `node/` must be renamed to `web/` as above configuration
   # doesn't get picked up by dart2js for some reason.
