@@ -1,0 +1,20 @@
+targets:
+  $default:
+    sources:
+      - "lib/**"
+      - "node/**" # this doesn't work with dart2js
+  # Uncomment below to compile with dart2js
+  # Note that for dart2js `node/` must be renamed to `web/` as above configuration
+  # doesn't get picked up by dart2js for some reason.
+  firebase_functions_interop_test: # Replace this with your package name.
+    builders:
+      build_web_compilers|entrypoint:
+        # These are globs for the entrypoints you want to compile.
+        generate_for:
+        - web/** # this doesn't work with dart2js
+        options:
+          compiler: dart2js
+          node_preamble: true
+          # List any dart2js specific args here, or omit it.
+          # dart2js_args:
+          # - --checked

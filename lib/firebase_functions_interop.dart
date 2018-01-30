@@ -32,14 +32,15 @@ import 'dart:async';
 import 'dart:js';
 
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
-import 'package:firebase_admin_interop/js.dart' as admin;
-import 'package:node_io/node_io.dart';
-import 'package:node_interop/node.dart';
 import 'package:node_interop/http.dart';
+import 'package:node_interop/node.dart';
 import 'package:node_interop/util.dart';
+import 'package:node_io/node_io.dart';
 
 import 'src/bindings.dart' as js;
 
+export 'package:firebase_admin_interop/firebase_admin_interop.dart'
+    show AppOptions;
 export 'package:node_io/node_io.dart' show HttpRequest;
 
 export 'src/bindings.dart' show CloudFunction, HttpsFunction;
@@ -52,6 +53,10 @@ final FirebaseFunctions firebaseFunctions = new FirebaseFunctions._();
 ///
 /// Use [firebaseFunctions] as a singleton instance of this class.
 class FirebaseFunctions {
+  FirebaseFunctions._() {
+    js.initFirebaseFunctions();
+  }
+
   /// Configuration object for Firebase functions.
   final Config config = new Config();
 
@@ -60,10 +65,6 @@ class FirebaseFunctions {
 
   /// Realtime Database functions.
   final Database database = new Database._();
-
-  FirebaseFunctions._() {
-    js.initFirebaseFunctions();
-  }
 
   /// Export [function] under specified [key].
   ///
@@ -111,7 +112,7 @@ class Config {
   /// Firebase Admin SDK.
   ///
   /// This is a shortcut for calling `get('firebase')`.
-  admin.AppOptions get firebase => get('firebase');
+  AppOptions get firebase => get('firebase');
 }
 
 /// HTTPS functions namespace.

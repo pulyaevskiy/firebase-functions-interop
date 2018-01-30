@@ -1,6 +1,8 @@
 sudo: false
 
 language: dart
+dart:
+  - dev
 
 before_install:
   - nvm install 8.1.0

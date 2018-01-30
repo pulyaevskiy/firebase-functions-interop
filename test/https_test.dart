@@ -3,7 +3,7 @@
 
 @TestOn('node')
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
-import 'package:node_interop/http.dart';
+import 'package:node_http/node_http.dart';
 import 'package:test/test.dart';
 
 import 'setup_admin.dart';

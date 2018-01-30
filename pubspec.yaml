@@ -11,16 +11,17 @@ dependencies:
   js: ^0.6.1
   node_interop: 
     git:
-      url: git@github.com:pulyaevskiy/node-interop.git
+      url: https://github.com/pulyaevskiy/node-interop.git
       ref: dart20
   node_io:
-    git:
-      url: git@github.com:pulyaevskiy/node-io.git
-      ref: master
-  # firestore_interop: '>=0.0.1 <0.1.0'
+    git: https://github.com/pulyaevskiy/node-io.git
+  node_http:
+    git: https://github.com/pulyaevskiy/node-http.git
+  firestore_interop:
+    git: https://github.com/pulyaevskiy/firestore-interop.git
   firebase_admin_interop: 
     git:
-      url: git@github.com:pulyaevskiy/firebase-admin-interop.git
+      url: https://github.com/pulyaevskiy/firebase-admin-interop.git
       ref: dart20
 
 dev_dependencies:

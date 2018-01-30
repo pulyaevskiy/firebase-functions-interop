@@ -8,7 +8,7 @@ import 'dart:js';
 import 'package:js/js.dart';
 import 'package:node_interop/http.dart';
 import 'package:firebase_admin_interop/js.dart' as admin;
-// import 'package:firestore_interop/firestore_interop.dart';
+import 'package:firestore_interop/firestore_interop.dart';
 
 void initFirebaseFunctions() {
   context['FirebaseFunctions'] =
