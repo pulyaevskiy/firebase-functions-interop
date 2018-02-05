@@ -10,7 +10,6 @@ import 'dart:js';
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:js/js.dart';
 import 'package:node_io/node_io.dart';
-import 'package:node_interop/node.dart';
 import 'package:node_interop/test.dart';
 import 'package:test/test.dart';
 
@@ -36,7 +35,7 @@ void main() {
   createFile('config_fixture.js', configFixture);
 
   group('Config', () {
-    ConfigFixture jsConf;
+    // ConfigFixture jsConf;
     setUpAll(() {
       var segments = Platform.script.pathSegments.toList();
       segments
@@ -46,7 +45,7 @@ void main() {
           Platform.pathSeparator + segments.join(Platform.pathSeparator);
       final file = new File(jsFilepath);
       file.writeAsStringSync(configFixture);
-      jsConf = require('./config_fixture');
+      // jsConf = require('./config_fixture');
     });
 
     test('JS types converted to Dart', () {

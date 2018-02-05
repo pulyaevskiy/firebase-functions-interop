@@ -4,7 +4,6 @@
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 import 'package:node_interop/node.dart';
 import 'package:node_interop/util.dart';
-import 'package:node_interop/test.dart';
 
 final Map<String, String> env = dartify(process.env);
 
@@ -14,7 +13,6 @@ App initFirebaseApp() {
       !env.containsKey('FIREBASE_HTTP_BASE_URL')) {
     throw new StateError("Environment variables not set.");
   }
-  installNodeModules({"firebase-admin": "~5.8.1"});
 
   var admin = FirebaseAdmin.instance;
   return admin.initializeApp(

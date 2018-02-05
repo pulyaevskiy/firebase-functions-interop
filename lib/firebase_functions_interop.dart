@@ -5,7 +5,8 @@
 ///
 /// Use [functions] object as main entry point.
 ///
-/// To create your cloud function use corresponding namespaces on this object:
+/// To create your cloud function use corresponding namespaces on
+/// [FirebaseFunctions] class:
 ///
 /// - [FirebaseFunctions.https] for creating HTTPS functions
 /// - [FirebaseFunctions.database] for creating Realtime Database functions
@@ -54,23 +55,23 @@ final FirebaseFunctions functions = new FirebaseFunctions._();
 @Deprecated('Use "functions" instead.')
 FirebaseFunctions get firebaseFunctions => functions;
 
+final js.FirebaseFunctions _js = require('firebase-functions');
+
 /// Global namespace for Firebase Cloud Functions functionality.
 ///
 /// Use [functions] as a singleton instance of this class to export function
 /// triggers.
 class FirebaseFunctions {
-  FirebaseFunctions._() {
-    js.initFirebaseFunctions();
-  }
+  FirebaseFunctions._();
 
   /// Configuration object for Firebase functions.
   static final Config config = new Config();
 
   /// HTTPS functions.
-  static const Https https = const Https._();
+  static const HttpsFunctions https = const HttpsFunctions._();
 
   /// Realtime Database functions.
-  static const DatabaseBuilder database = const DatabaseBuilder._();
+  static const DatabaseFunctions database = const DatabaseFunctions._();
 
   /// Export [function] under specified [key].
   ///
@@ -86,7 +87,7 @@ class FirebaseFunctions {
 /// See also:
 /// - [https://firebase.google.com/docs/functions/config-env](https://firebase.google.com/docs/functions/config-env)
 class Config {
-  final js.Config _config = js.config();
+  final js.Config _config = _js.config();
 
   /// Returns configuration value specified by it's [key].
   ///
@@ -121,8 +122,8 @@ class Config {
 }
 
 /// HTTPS functions namespace.
-class Https {
-  const Https._();
+class HttpsFunctions {
+  const HttpsFunctions._();
 
   /// Event [handler] which is run every time an HTTPS URL is hit.
   ///
@@ -137,16 +138,16 @@ class Https {
       handler(requestProxy);
     }
 
-    return js.onRequest(allowInterop(jsHandler));
+    return _js.https.onRequest(allowInterop(jsHandler));
   }
 }
 
 /// Realtime Database functions namespace.
-class DatabaseBuilder {
-  const DatabaseBuilder._();
+class DatabaseFunctions {
+  const DatabaseFunctions._();
 
-  /// Returns reference builder for specified [path].
-  RefBuilder ref(String path) => new RefBuilder._(js.ref(path));
+  /// Returns reference builder for specified [path] in Realtime Database.
+  RefBuilder ref(String path) => new RefBuilder._(_js.database.ref(path));
 }
 
 /// The Firebase Realtime Database reference builder.
@@ -215,7 +216,7 @@ class Event<T> {
   final String eventType;
 
   /// Values of the wildcards in the path parameter provided to the
-  /// [DatabaseBuilder.ref] method for a Realtime Database trigger.
+  /// [DatabaseFunctions.ref] method for a Realtime Database trigger.
   final Map<String, String> params;
 
   /// The resource that emitted the event.
@@ -286,11 +287,11 @@ class DeltaSnapshot<T> extends DataSnapshot<T> {
       new DeltaSnapshot<T>(nativeInstance.previous);
 }
 
-class FirestoreBuilder {
-  const FirestoreBuilder._();
+class FirestoreFunctions {
+  const FirestoreFunctions._();
 
   DocumentBuilder document(String path) =>
-      new DocumentBuilder._(js.document(path));
+      new DocumentBuilder._(_js.firestore.document(path));
 }
 
 class DocumentBuilder {

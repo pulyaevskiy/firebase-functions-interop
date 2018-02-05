@@ -13,12 +13,17 @@ dependencies:
     git:
       url: https://github.com/pulyaevskiy/node-interop.git
       ref: dart20
+      path: node_interop
   node_io:
-    git: https://github.com/pulyaevskiy/node-io.git
+    git: 
+      url: https://github.com/pulyaevskiy/node-interop.git
+      ref: dart20
+      path: node_io
   node_http:
-    git: https://github.com/pulyaevskiy/node-http.git
-  firestore_interop:
-    git: https://github.com/pulyaevskiy/firestore-interop.git
+    git: 
+      url: https://github.com/pulyaevskiy/node-interop.git
+      ref: dart20
+      path: node_http
   firebase_admin_interop: 
     git:
       url: https://github.com/pulyaevskiy/firebase-admin-interop.git
