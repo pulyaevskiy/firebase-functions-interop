@@ -2,12 +2,14 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 
 void main() {
   functions['date'] = FirebaseFunctions.https.onRequest(date);
   functions['helloWorld'] = FirebaseFunctions.https.onRequest(helloWorld);
+  functions['jsonTest'] = FirebaseFunctions.https.onRequest(jsonTest);
 
   functions['makeUppercase'] = FirebaseFunctions.database
       .ref('/tests/{testId}/original')
@@ -31,13 +33,19 @@ FutureOr<Null> handleCreateUpdateDelete(DatabaseEvent<String> event) {
   return event.data.ref.parent.child('lastEventType').setValue(eventType);
 }
 
-void date(HttpRequest request) {
+Future jsonTest(ExpressHttpRequest request) async {
+  final Map<String, dynamic> data = request.body;
+  request.response.write(JSON.encode(data));
+  request.response.close();
+}
+
+void date(ExpressHttpRequest request) {
   DateTime now = new DateTime.now().toUtc();
   request.response.writeln(now.toIso8601String());
   request.response.close();
 }
 
-Future helloWorld(HttpRequest request) async {
+Future helloWorld(ExpressHttpRequest request) async {
   try {
     String name = request.requestedUri.queryParameters['name'];
     bool conf = request.requestedUri.queryParameters.containsKey('config');

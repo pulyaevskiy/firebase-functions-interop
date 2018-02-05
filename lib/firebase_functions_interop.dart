@@ -41,12 +41,14 @@ import 'package:node_interop/util.dart';
 import 'package:node_io/node_io.dart';
 
 import 'src/bindings.dart' as js;
+import 'src/express.dart';
 
 export 'package:firebase_admin_interop/firebase_admin_interop.dart'
     show AppOptions;
 export 'package:node_io/node_io.dart' show HttpRequest, HttpResponse;
 
 export 'src/bindings.dart' show CloudFunction, HttpsFunction;
+export 'src/express.dart';
 
 /// Main library object which can be used to create and register Firebase
 /// Cloud functions.
@@ -132,9 +134,9 @@ class HttpsFunctions {
   /// The event handler is called with single [request] argument, instance
   /// of [HttpRequest] interface from `dart:io`. This object acts as a
   /// proxy to JavaScript request and response objects.
-  js.HttpsFunction onRequest(handler(HttpRequest request)) {
+  js.HttpsFunction onRequest(void handler(ExpressHttpRequest request)) {
     void jsHandler(IncomingMessage request, ServerResponse response) {
-      var requestProxy = new NodeHttpRequest(request, response);
+      var requestProxy = new ExpressHttpRequest(request, response);
       handler(requestProxy);
     }
 
