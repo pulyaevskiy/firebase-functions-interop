@@ -5,29 +5,14 @@ homepage: https://www.github.com/pulyaevskiy/firebase-functions-interop
 author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 
 environment:
-  sdk: '>=2.0.0-dev.19.0 <2.0.0'
+  sdk: '>=2.0.0-dev <2.0.0'
 
 dependencies:
   js: ^0.6.1
-  node_interop: 
-    git:
-      url: https://github.com/pulyaevskiy/node-interop.git
-      ref: dart20
-      path: node_interop
-  node_io:
-    git: 
-      url: https://github.com/pulyaevskiy/node-interop.git
-      ref: dart20
-      path: node_io
-  node_http:
-    git: 
-      url: https://github.com/pulyaevskiy/node-interop.git
-      ref: dart20
-      path: node_http
-  firebase_admin_interop: 
-    git:
-      url: https://github.com/pulyaevskiy/firebase-admin-interop.git
-      ref: dart20
+  node_interop: ^1.0.0-dev
+  node_io: ^1.0.0-dev
+  node_http: ^1.0.0-dev
+  firebase_admin_interop: ^1.0.0-dev
 
 dev_dependencies:
   test: ^0.12.24

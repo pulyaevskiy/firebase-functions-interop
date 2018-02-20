@@ -1,18 +1,18 @@
 // Copyright (c) 2017, Anatoly Pulyaevskiy. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-/// Interop library for Firebase Functions NodeJS SDK.
+/// Interop library for Firebase Functions Node.js SDK.
 ///
 /// Use [functions] object as main entry point.
 ///
-/// To create your cloud function use corresponding namespaces on
+/// To create your cloud function see corresponding namespaces on
 /// [FirebaseFunctions] class:
 ///
-/// - [FirebaseFunctions.https] for creating HTTPS functions
-/// - [FirebaseFunctions.database] for creating Realtime Database functions
-/// - [FirebaseFunctions.firestore] for creating Firestore functions
+/// - [FirebaseFunctions.https] for creating HTTPS triggers
+/// - [FirebaseFunctions.database] for creating Realtime Database triggers
+/// - [FirebaseFunctions.firestore] for creating Firestore triggers
 ///
-/// Here is an example of creating and exporting an HTTPS function:
+/// Here is an example of creating and exporting an HTTPS trigger:
 ///
 ///     import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 ///
@@ -38,13 +38,11 @@ import 'package:meta/meta.dart';
 import 'package:node_interop/http.dart';
 import 'package:node_interop/node.dart';
 import 'package:node_interop/util.dart';
-import 'package:node_io/node_io.dart';
 
 import 'src/bindings.dart' as js;
 import 'src/express.dart';
 
-export 'package:firebase_admin_interop/firebase_admin_interop.dart'
-    show AppOptions;
+export 'package:firebase_admin_interop/firebase_admin_interop.dart';
 export 'package:node_io/node_io.dart' show HttpRequest, HttpResponse;
 
 export 'src/bindings.dart' show CloudFunction, HttpsFunction;
@@ -132,7 +130,7 @@ class HttpsFunctions {
   /// Returns a [js.HttpsFunction] which can be exported.
   ///
   /// The event handler is called with single [request] argument, instance
-  /// of [HttpRequest] interface from `dart:io`. This object acts as a
+  /// of [ExpressHttpRequest]. This object acts as a
   /// proxy to JavaScript request and response objects.
   js.HttpsFunction onRequest(void handler(ExpressHttpRequest request)) {
     void jsHandler(IncomingMessage request, ServerResponse response) {
@@ -362,7 +360,7 @@ class DeltaDocumentSnapshot extends DocumentSnapshot {
       : null;
 }
 
-/// An [Event] triggered by Firebase Realtime Database.
+/// An [Event] triggered by Firestore Database.
 class FirestoreEvent extends Event<DeltaDocumentSnapshot> {
   FirestoreEvent({
     DeltaDocumentSnapshot data,
