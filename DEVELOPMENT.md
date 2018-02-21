@@ -2,7 +2,7 @@
 
 Requirements:
 
-* Dart SDK
+* Dart SDK 2
 * NodeJS
 * Firebase Tools (`npm install -g firebase-tools`)
 
@@ -14,7 +14,7 @@ https://firebase.google.com/docs/admin/setup
 
 Download service account key file somewhere **outside** of this Git
 repository (so that there is no chance to accidentally commit it) and
-set following environment variable to it's full path:
+set following environment variable to the file's absolute path:
 
 ```bash
 export FIREBASE_SERVICE_ACCOUNT_FILEPATH="/Users/me/full-path-to-service-account-key.json"
@@ -37,6 +37,5 @@ The test suite depends on predefined test functions which must be
 Running the tests:
 
 ```bash
-pub run test # runs tests not dependent on Node environment
-pub run test --platform=node # runs Node-specific tests
+pub run test
 ```
