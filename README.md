@@ -17,7 +17,7 @@ Here is a minimalistic "Hello world" example of a HTTPS cloud function:
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
-  firebaseFunctions['helloWorld'] =
+  functions['helloWorld'] =
       FirebaseFunctions.https.onRequest(helloWorld);
 }
 
@@ -97,7 +97,7 @@ Create `functions/node/index.dart` and type in something like this:
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
-  firebaseFunctions['helloWorld'] =
+  functions['helloWorld'] =
       FirebaseFunctions.https.onRequest(helloWorld);
 }
 
@@ -116,7 +116,7 @@ Update `functions/node/index.dart` with following:
 ```dart
 void main() {
   // ...Add after registration of helloWorld function:
-  firebaseFunctions['makeUppercase'] = FirebaseFunctions.database
+  functions['makeUppercase'] = FirebaseFunctions.database
         .ref('/messages/{messageId}/original')
         .onWrite(makeUppercase);
 }
@@ -210,7 +210,7 @@ import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:node_http/node_http.dart' as http;
 
 void main() {
-  firebaseFunctions['helloWorld'] =
+  functions['helloWorld'] =
       FirebaseFunctions.https.onRequest(helloWorld);
 }
 

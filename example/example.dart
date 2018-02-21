@@ -20,7 +20,7 @@ void main() {
 }
 
 /// Example Realtime Database function.
-FutureOr<Null> makeUppercase(DatabaseEvent<String> event) {
+FutureOr<void> makeUppercase(DatabaseEvent<String> event) {
   var original = event.data.val();
   var pushId = event.params['testId'];
   print('Uppercasing $original');
@@ -29,19 +29,23 @@ FutureOr<Null> makeUppercase(DatabaseEvent<String> event) {
 }
 
 /// Example HTTPS function.
-Future helloWorld(HttpRequest request) async {
+Future<void> helloWorld(ExpressHttpRequest request) async {
   try {
-    /// If you defined any config parameters you can access them as follows:
+    /// If there are any config parameters we can access them as follows:
     var config = FirebaseFunctions.config;
     var serviceKey = config.get('someservice.key');
     var serviceUrl = config.get('someservice.url');
+    // Don't do this on a real project:
     print('Service key: $serviceKey, service URL: $serviceUrl');
 
     /// The provided [request] is fully compatible with "dart:io" `HttpRequest`
     /// including the fact that it's a valid Dart `Stream`.
+    /// Note though that Firebase uses body-parser expressjs middleware which
+    /// decodes request body for some common content-types (json included).
+    /// In such cases use `request.body` which contains decoded body.
     String name = request.requestedUri.queryParameters['name'];
     if (name != null) {
-      // You can also write to Realtime Database right here:
+      // We can also write to Realtime Database right here:
       var appOptions = config.firebase;
       var admin = FirebaseAdmin.instance;
       var app = admin.initializeApp(appOptions);

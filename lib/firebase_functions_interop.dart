@@ -24,7 +24,7 @@
 ///
 ///     // Simple function which returns a response with a body containing
 ///     // "Hello world".
-///     void helloWorld(HttpRequest request) {
+///     void helloWorld(ExpressHttpRequest request) {
 ///       request.response.writeln("Hello world");
 ///       request.response.close();
 ///     }
