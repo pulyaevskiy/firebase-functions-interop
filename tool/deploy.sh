@@ -7,10 +7,7 @@ pub get
 cd functions
 pub get
 npm install
-pub run build_runner build \
-    --define="build_node_compilers|entrypoint=compiler=dart2js" \
-    --define="build_node_compilers|entrypoint=dart2js_args=[\"--checked\"]" \
-    --output=build/
+pub run build_runner build  --output=build/
 
 if [ -z "$TRAVIS" ]; then
     echo "Provisioning functions for local environment"

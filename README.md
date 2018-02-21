@@ -3,11 +3,6 @@
 Write Firebase Cloud functions in Dart, run in Node.js. This is an early
 development preview, open-source project.
 
-* [What is this?](#what-is-this?)
-* [Status](#status)
-* [Usage](#usage)
-* [Configuration](#configuration)
-
 ## What is this?
 
 `firebase_functions_interop` provides interoperability layer for
@@ -36,8 +31,10 @@ void helloWorld(ExpressHttpRequest request) {
 
 This is a early preview, development version which is not feature complete.
 
-Below is status report of already implemented functionality by
-namespace:
+Version 1.0.0 of this library requires Dart SDK 2 as it depends on certain
+new features available there.
+
+Below is status report of already implemented functionality by namespace:
 
 - [x] functions
 - [x] functions.config
@@ -94,7 +91,7 @@ Then run `pub get` to install dependencies.
 
 ### 3.1 Write a Web function
 
-Create `node/index.dart` and type in something like this:
+Create `functions/node/index.dart` and type in something like this:
 
 ```dart
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
@@ -114,7 +111,7 @@ Copy-pasting also works.
 
 ### 3.2 Write a Realtime Database Function (optional)
 
-Update `node/index.dart` with following:
+Update `functions/node/index.dart` with following:
 
 ```dart
 void main() {
@@ -136,33 +133,44 @@ FutureOr<void> makeUppercase(DatabaseEvent<String> event) {
 Version `1.0.0` of this library depends on Dart 2 and the new `build_runner`
 package. Integration with dart2js and DDC compilers is provided by 
 `build_node_compilers` package which should already be in `dev_dependencies`
-of `pubspec.yaml` (see step 2).
+in `pubspec.yaml` (see step 2).
 
-Create `build.yaml` file with following contents:
+Create `functions/build.yaml` file with following contents:
 
 ```yaml
 targets:
   $default:
     sources:
-      - "node/**" # this is where index.dart lives
+      - "node/**"
       - "lib/**"
+    builders:
+      build_node_compilers|entrypoint:
+        generate_for:
+        - node/**
+        options:
+          compiler: dart2js
+          # List any dart2js specific args here, or omit it.
+          dart2js_args:
+          - --checked
 ```
 
-Building functions is as simple as running `pub build`. Note that Pub by
-default assumes a "web" project and only builds `web/` folder so we need
-to explicitly tell it about `node/`:
+> By default `build_runner` compiles with DDC which is not supported by this
+> library at this point. Above configuration makes it compile Dart with dart2js.
+
+To build run following:
 
 ```bash
-$ pub build node/
+$ cd functions
+$ pub run build_runner build --output=build
 ```
 
 ### 5. Copy and deploy
 
-The result of `pub build` is located in `build/node/index.dart.js`. Replace
-default `index.js` with the built version:
+The result of `pub run` is located in `functions/build/node/index.dart.js`. 
+Replace default `index.js` with the built version:
 
 ```bash
-$ cp build/node/index.dart.js index.js
+$ cp functions/build/node/index.dart.js functions/index.js
 ```
 
 Deploy using Firebase CLI:
@@ -190,32 +198,47 @@ firebase functions:config:set some_service.api_key="secret" some_service.url="ht
 
 For more details see https://firebase.google.com/docs/functions/config-env.
 
-To read these values in a Firebase function use `firebaseFunctions.config`:
+To read these values in a Firebase function use `FirebaseFunctions.config`.
+
+Below example also uses [node_http][] package which provides a HTTP client
+powered by Node.js I/O.
+
+[node_http]: https://pub.dartlang.org/packages/node_http
 
 ```dart
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
-// Import 'node_interop/http' as it provides convenient HTTP client
-// implementation which uses Node IO system.
-import 'package:node_interop/http.dart';
+import 'package:node_http/node_http.dart' as http;
 
 void main() {
   firebaseFunctions['helloWorld'] =
-      firebaseFunctions.https.onRequest(helloWorld);
+      FirebaseFunctions.https.onRequest(helloWorld);
 }
 
-void helloWorld(HttpRequest request) async {
+void helloWorld(ExpressHttpRequest request) async {
   /// fetch env configuration
-  var config = firebaseFunctions.config;
-  var serviceKey = config.get('someservice.key');
-  var serviceUrl = config.get('someservice.url');
-  /// use HTTP client to make calls to external systems:
-  var http = new NodeClient();
+  final config = FirebaseFunctions.config;
+  final String serviceKey = config.get('someservice.key');
+  final String serviceUrl = config.get('someservice.url');
+  /// `http.get()` function is exposed by the `node_http` package.
   var response = await http.get("$serviceUrl?apiKey=$serviceKey");
   // do something with the response, e.g. forward response body to the client:
   request.response.write(response.body);
   request.response.close();
 }
 ```
+
+## HTTPS functions details
+
+Firebase uses Expressjs web framework for HTTPS functions with `body-parser`
+middleware enabled by default ([documentation][body_parser_docs]).
+
+The `ExpressHttpRequest` exposed by this library extends standard `dart:io`
+`HttpRequest` interface, which means it is also a stream of bytes. However
+if `body-parser` middleware already decoded request body then listening for
+data on the request would hang since it's already been consumed. Use
+`ExpressHttpRequest.body` field to get decoded request body in this case.
+
+[body_parser_docs]: https://firebase.google.com/docs/functions/http-events#read_values_from_the_request
 
 ## Features and bugs
 
