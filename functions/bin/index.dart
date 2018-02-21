@@ -50,9 +50,10 @@ Future helloWorld(HttpRequest request) async {
     } else if (name != null) {
       var appOptions = firebaseFunctions.config.firebase;
       var admin = FirebaseAdmin.instance;
-      var app = admin.initializeApp(
-          credential: appOptions.credential,
-          databaseURL: appOptions.databaseURL);
+      var app = admin.initializeApp(new AppOptions(
+        credential: appOptions.credential,
+        databaseURL: appOptions.databaseURL,
+      ));
       var database = app.database();
       await database
           .ref('/tests/httpsToDatabase/original')
@@ -61,6 +62,9 @@ Future helloWorld(HttpRequest request) async {
     } else {
       request.response.writeln('HappyPathTest');
     }
+  } catch (e) {
+    request.response.statusCode = 500;
+    request.response.write(e.toString());
   } finally {
     request.response.close();
   }
