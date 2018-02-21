@@ -1,7 +1,7 @@
 ## 1.0.0-dev.1.0
 
-- Depend on Dart SDK >= 2.0.0-dev.19.0.
-- Depend on firebase_admin_interop >= 1.0.0-dev.1.0 (as well as node_* packages).
+- Depends on Dart SDK >= 2.0.0-dev.19.0.
+- Depends on firebase_admin_interop >= 1.0.0-dev.1.0 (as well as node_* packages).
 - Breaking: Removed built_value support.
 - Added Firestore triggers support.
 - Deprecated firebaseFunctions, to be replaced with shorter `functions`.

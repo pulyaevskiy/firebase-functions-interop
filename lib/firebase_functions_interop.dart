@@ -17,8 +17,8 @@
 ///     import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 ///
 ///     void main() {
-///       // Registers helloWorld function under path prefix `/hello-world`
-///       functions['hello-world'] = FirebaseFunctions.https
+///       // Registers helloWorld function under path prefix `/helloWorld`
+///       functions['helloWorld'] = FirebaseFunctions.https
 ///         .onRequest(helloWorld);
 ///     }
 ///
@@ -50,7 +50,7 @@ export 'src/express.dart';
 
 /// Main library object which can be used to create and register Firebase
 /// Cloud functions.
-final FirebaseFunctions functions = new FirebaseFunctions._();
+const FirebaseFunctions functions = const FirebaseFunctions._();
 
 @Deprecated('Use "functions" instead.')
 FirebaseFunctions get firebaseFunctions => functions;
@@ -62,10 +62,10 @@ final js.FirebaseFunctions _js = require('firebase-functions');
 /// Use [functions] as a singleton instance of this class to export function
 /// triggers.
 class FirebaseFunctions {
-  FirebaseFunctions._();
+  const FirebaseFunctions._();
 
   /// Configuration object for Firebase functions.
-  static final Config config = new Config();
+  static const Config config = const Config._();
 
   /// HTTPS functions.
   static const HttpsFunctions https = const HttpsFunctions._();
@@ -87,7 +87,7 @@ class FirebaseFunctions {
 /// See also:
 /// - [https://firebase.google.com/docs/functions/config-env](https://firebase.google.com/docs/functions/config-env)
 class Config {
-  final js.Config _config = _js.config();
+  const Config._();
 
   /// Returns configuration value specified by it's [key].
   ///
@@ -98,10 +98,10 @@ class Config {
   /// `functions.config().some_service.client_secret`.
   dynamic get(String key) {
     if (key == 'firebase') {
-      return _config.firebase;
+      return _js.config().firebase;
     }
-    var data = _cache ??= dartify(_config);
-    var parts = key.split('.');
+    final List<String> parts = key.split('.');
+    var data = dartify(_js.config());
     var value;
     for (var subKey in parts) {
       if (data is! Map) return null;
@@ -112,10 +112,8 @@ class Config {
     return value;
   }
 
-  Map<String, dynamic> _cache;
-
   /// Firebase-specific configuration which can be used to initialize
-  /// Firebase Admin SDK.
+  /// Firebase Admin SDK client.
   ///
   /// This is a shortcut for calling `get('firebase')`.
   AppOptions get firebase => get('firebase');
@@ -158,34 +156,34 @@ class RefBuilder {
 
   /// Event handler that fires every time new data is created in Firebase
   /// Realtime Database.
-  js.CloudFunction onCreate<T>(FutureOr<Null> handler(DatabaseEvent<T> event)) {
+  js.CloudFunction onCreate<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
     dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
     return nativeInstance.onCreate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is deleted from Firebase
   /// Realtime Database.
-  js.CloudFunction onDelete<T>(FutureOr<Null> handler(DatabaseEvent<T> event)) {
+  js.CloudFunction onDelete<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
     dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
     return nativeInstance.onDelete(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is updated in Firebase Realtime
   /// Database.
-  js.CloudFunction onUpdate<T>(FutureOr<Null> handler(DatabaseEvent<T> event)) {
+  js.CloudFunction onUpdate<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
     dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
     return nativeInstance.onUpdate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time a Firebase Realtime Database write of
   /// any kind (creation, update, or delete) occurs.
-  js.CloudFunction onWrite<T>(FutureOr<Null> handler(DatabaseEvent<T> event)) {
+  js.CloudFunction onWrite<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
     dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
     return nativeInstance.onWrite(allowInterop(wrapper));
   }
 
   dynamic _handleEvent<T>(
-      js.Event event, FutureOr<Null> handler(DatabaseEvent<T> event)) {
+      js.Event event, FutureOr<void> handler(DatabaseEvent<T> event)) {
     var dartEvent = new DatabaseEvent<T>(
       data: new DeltaSnapshot<T>(event.data),
       eventId: event.eventId,
@@ -301,31 +299,31 @@ class DocumentBuilder {
   DocumentBuilder._(this.nativeInstance);
 
   /// Event handler that fires every time new data is created in Cloud Firestore.
-  js.CloudFunction onCreate(FutureOr<Null> handler(FirestoreEvent event)) {
+  js.CloudFunction onCreate(FutureOr<void> handler(FirestoreEvent event)) {
     dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
     return nativeInstance.onCreate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is deleted from Cloud Firestore.
-  js.CloudFunction onDelete(FutureOr<Null> handler(FirestoreEvent event)) {
+  js.CloudFunction onDelete(FutureOr<void> handler(FirestoreEvent event)) {
     dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
     return nativeInstance.onDelete(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is updated in Cloud Firestore.
-  js.CloudFunction onUpdate(FutureOr<Null> handler(FirestoreEvent event)) {
+  js.CloudFunction onUpdate(FutureOr<void> handler(FirestoreEvent event)) {
     dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
     return nativeInstance.onUpdate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time a Cloud Firestore write of any
   /// kind (creation, update, or delete) occurs.
-  js.CloudFunction onWrite(FutureOr<Null> handler(FirestoreEvent event)) {
+  js.CloudFunction onWrite(FutureOr<void> handler(FirestoreEvent event)) {
     dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
     return nativeInstance.onWrite(allowInterop(wrapper));
   }
 
-  dynamic _handleEvent(js.Event jsEvent, FutureOr<Null> handler(Event event)) {
+  dynamic _handleEvent(js.Event jsEvent, FutureOr<void> handler(Event event)) {
     final FirestoreEvent event = new FirestoreEvent(
       data: new DeltaDocumentSnapshot(jsEvent.data),
       eventId: jsEvent.eventId,

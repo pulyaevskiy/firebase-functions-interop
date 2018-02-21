@@ -9,6 +9,9 @@ import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 void main() {
   functions['date'] = FirebaseFunctions.https.onRequest(date);
   functions['helloWorld'] = FirebaseFunctions.https.onRequest(helloWorld);
+  functions['config'] = FirebaseFunctions.https.onRequest(config);
+  functions['httpsToDatabase'] =
+      FirebaseFunctions.https.onRequest(httpsToDatabase);
   functions['jsonTest'] = FirebaseFunctions.https.onRequest(jsonTest);
 
   functions['makeUppercase'] = FirebaseFunctions.database
@@ -45,16 +48,33 @@ void date(ExpressHttpRequest request) {
   request.response.close();
 }
 
-Future helloWorld(ExpressHttpRequest request) async {
+void helloWorld(ExpressHttpRequest request) {
+  try {
+    request.response.writeln('HappyPathTest');
+  } finally {
+    request.response.close();
+  }
+}
+
+void config(ExpressHttpRequest request) {
+  try {
+    var config = FirebaseFunctions.config;
+    Map body = {
+      'key': config.get('someservice.key'),
+      'url': config.get('someservice.url'),
+      'enabled': config.get('someservice.enabled'),
+      'noSuchKey': config.get('no.such.key'),
+    };
+    request.response.writeln(JSON.encode(body));
+  } finally {
+    request.response.close();
+  }
+}
+
+Future httpsToDatabase(ExpressHttpRequest request) async {
   try {
     String name = request.requestedUri.queryParameters['name'];
-    bool conf = request.requestedUri.queryParameters.containsKey('config');
-    if (conf) {
-      var config = FirebaseFunctions.config;
-      var serviceKey = config.get('someservice.key');
-      var serviceUrl = config.get('someservice.url');
-      request.response.writeln('FirebaseConfig: $serviceKey, $serviceUrl');
-    } else if (name != null) {
+    if (name != null) {
       var appOptions = FirebaseFunctions.config.firebase;
       var admin = FirebaseAdmin.instance;
       var app = admin.initializeApp(appOptions);
@@ -62,9 +82,7 @@ Future helloWorld(ExpressHttpRequest request) async {
       await database
           .ref('/tests/httpsToDatabase/original')
           .setValue(name.toUpperCase());
-      request.response.writeln('HTTPS-to-Database: ${name.toUpperCase()}');
-    } else {
-      request.response.writeln('HappyPathTest');
+      request.response.writeln('httpsToDatabase: ok');
     }
   } finally {
     request.response.close();

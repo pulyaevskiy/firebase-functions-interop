@@ -27,19 +27,12 @@ void main() {
       expect(response.body, 'HappyPathTest\n');
     });
 
-    test('get config', () async {
-      var host = env['FIREBASE_HTTP_BASE_URL'];
-      var response = await http.get('$host/helloWorld?config');
-      expect(response.statusCode, 200);
-      expect(response.body, 'FirebaseConfig: 123456, https://example.com\n');
-    });
-
     test('save to database', () async {
       var host = env['FIREBASE_HTTP_BASE_URL'];
       var time = new DateTime.now().millisecondsSinceEpoch.toString();
-      var response = await http.get('$host/helloWorld?name=Firebase$time');
+      var response = await http.get('$host/httpsToDatabase?name=Firebase$time');
       expect(response.statusCode, 200);
-      expect(response.body, 'HTTPS-to-Database: FIREBASE$time\n');
+      expect(response.body, 'httpsToDatabase: ok\n');
 
       var snapshot = await app
           .database()
