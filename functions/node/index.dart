@@ -84,6 +84,9 @@ Future httpsToDatabase(ExpressHttpRequest request) async {
           .setValue(name.toUpperCase());
       request.response.writeln('httpsToDatabase: ok');
     }
+  } catch (e) {
+    request.response.statusCode = 500;
+    request.response.write(e.toString());
   } finally {
     request.response.close();
   }
