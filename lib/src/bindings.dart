@@ -4,16 +4,26 @@
 @JS()
 library firebase_functions_interop.bindings;
 
-import 'dart:js';
 import 'package:js/js.dart';
-import 'package:node_interop/node_interop.dart';
-import 'package:expressjs_interop/expressjs_interop.dart' as express;
+import 'package:node_interop/http.dart';
 import 'package:firebase_admin_interop/js.dart' as admin;
-import 'package:firestore_interop/firestore_interop.dart';
 
-void initFirebaseFunctions() {
-  context['FirebaseFunctions'] =
-      context.callMethod('require', ['firebase-functions']);
+@JS()
+@anonymous
+abstract class FirebaseFunctions {
+  /// Store and retrieve project configuration data such as third-party API keys
+  /// or other settings.
+  ///
+  /// You can set configuration values using the Firebase CLI as described in
+  /// [Environment Configuration](https://firebase.google.com/docs/functions/config-env).
+  external Config config();
+
+  external HttpsFunctions get https;
+  external DatabaseFunctions get database;
+  external FirestoreFunctions get firestore;
+
+  /// Constructor for Firebase [Event] objects.
+  external dynamic get Event;
 }
 
 /// The Cloud Function type for all non-HTTPS triggers.
@@ -21,7 +31,6 @@ void initFirebaseFunctions() {
 /// This should be exported from your JavaScript file to define a Cloud Function.
 /// This type is a special JavaScript function which takes a generic [Event]
 /// object as its only argument.
-@JS('FirebaseFunctions.CloudFunction')
 typedef void CloudFunction<T>(Event<T> event);
 
 /// The Cloud Function type for HTTPS triggers.
@@ -29,10 +38,10 @@ typedef void CloudFunction<T>(Event<T> event);
 /// This should be exported from your JavaScript file to define a Cloud
 /// Function. This type is a special JavaScript function which takes Express
 /// Request and Response objects as its only arguments.
-@JS('FirebaseFunctions.HttpsFunction')
-typedef void HttpsFunction(express.Request request, express.Response response);
+typedef void HttpsFunction(IncomingMessage request, ServerResponse response);
 
-@JS('FirebaseFunctions.Event')
+@JS()
+@anonymous
 abstract class Event<T> {
   /// Data returned for the event. The nature of the data depends on the event
   /// type.
@@ -80,15 +89,7 @@ abstract class Event<T> {
   external String get timestamp;
 }
 
-/// Store and retrieve project configuration data such as third-party API keys
-/// or other settings.
-///
-/// You can set configuration values using the Firebase CLI as described in
-/// [Environment Configuration](https://firebase.google.com/docs/functions/config-env).
-@JS('FirebaseFunctions.config')
-external Config config();
-
-@JS('FirebaseFunctions.config.Config')
+@JS()
 @anonymous
 abstract class Config {
   /// The Firebase configuration object which can be used to initialize the
@@ -96,24 +97,31 @@ abstract class Config {
   external admin.AppOptions get firebase;
 }
 
-/// Event handler which is run every time an HTTPS URL is hit.
-///
-/// The event handler is called with Express Request and Response objects as its
-/// only arguments.
-@JS('FirebaseFunctions.https.onRequest')
-external HttpsFunction onRequest(HttpRequestListener handler);
+@JS()
+@anonymous
+abstract class HttpsFunctions {
+  /// Event handler which is run every time an HTTPS URL is hit.
+  ///
+  /// The event handler is called with Express Request and Response objects as its
+  /// only arguments.
+  external HttpsFunction onRequest(HttpRequestListener handler);
+}
 
-/// Registers a function that triggers on Firebase Realtime Database write
-/// events.
-///
-/// This method behaves very similarly to the method of the same name in the
-/// client and Admin Firebase SDKs. Any change to the Database that affects the
-/// data at or below the provided path will fire an event in Cloud Functions.
-@JS('FirebaseFunctions.database.ref')
-external RefBuilder ref(String path);
+@JS()
+@anonymous
+abstract class DatabaseFunctions {
+  /// Registers a function that triggers on Firebase Realtime Database write
+  /// events.
+  ///
+  /// This method behaves very similarly to the method of the same name in the
+  /// client and Admin Firebase SDKs. Any change to the Database that affects the
+  /// data at or below the provided path will fire an event in Cloud Functions.
+  external RefBuilder ref(String path);
+}
 
 /// The Firebase Realtime Database reference builder interface.
-@JS('FirebaseFunctions.database.RefBuilder')
+@JS()
+@anonymous
 abstract class RefBuilder {
   /// Event handler that fires every time new data is created in Firebase
   /// Realtime Database.
@@ -133,7 +141,8 @@ abstract class RefBuilder {
 }
 
 /// Interface representing a Firebase Realtime Database delta snapshot.
-@JS('FirebaseFunctions.database.DeltaSnapshot')
+@JS()
+@anonymous
 abstract class DeltaSnapshot extends admin.DataSnapshot {
   external admin.Reference get adminRef;
   external DeltaSnapshot get current;
@@ -143,36 +152,41 @@ abstract class DeltaSnapshot extends admin.DataSnapshot {
   external DeltaSnapshot child(String path);
 }
 
-/// Registers a function that triggers on Cloud Firestore write events to
-/// the [document].
-@JS('FirebaseFunctions.firestore.document')
-external DocumentBuilder document(String document);
+@JS()
+@anonymous
+abstract class FirestoreFunctions {
+  /// Registers a function that triggers on Cloud Firestore write events to
+  /// the [document].
+  external DocumentBuilder document(String document);
+}
 
 /// The Cloud Firestore document builder interface.
-@JS('FirebaseFunctions.firestore.DocumentBuilder')
+@JS()
+@anonymous
 abstract class DocumentBuilder {
   /// Event handler that fires every time new data is created in Cloud
   /// Firestore.
   external CloudFunction onCreate(
-      void handler(Event<DocumentDeltaSnapshot> event));
+      void handler(Event<DeltaDocumentSnapshot> event));
 
   /// Event handler that fires every time data is deleted from Cloud Firestore.
   external CloudFunction onDelete(
-      void handler(Event<DocumentDeltaSnapshot> event));
+      void handler(Event<DeltaDocumentSnapshot> event));
 
   /// Event handler that fires every time data is updated in Cloud Firestore.
   external CloudFunction onUpdate(
-      void handler(Event<DocumentDeltaSnapshot> event));
+      void handler(Event<DeltaDocumentSnapshot> event));
 
   /// Event handler that fires every time a Cloud Firestore write of any kind
   /// (creation, update, or delete) occurs.
   external CloudFunction onWrite(
-      void handler(Event<DocumentDeltaSnapshot> event));
+      void handler(Event<DeltaDocumentSnapshot> event));
 }
 
-/// Interface representing a Cloud Firestore document delta snapshot.
-@JS('FirebaseFunctions.firestore.DocumentDeltaSnapshot')
-abstract class DocumentDeltaSnapshot {
+/// Interface representing a Cloud Firestore delta document snapshot.
+@JS()
+@anonymous
+abstract class DeltaDocumentSnapshot implements admin.DocumentSnapshot {
   /// The date the document was created, formatted as a UTC string.
   external String get createTime;
 
@@ -184,14 +198,14 @@ abstract class DocumentDeltaSnapshot {
 
   /// Gets the previous state of this document, from before the triggering write
   /// event.
-  external DocumentDeltaSnapshot get previous;
+  external DeltaDocumentSnapshot get previous;
 
   /// The last time the document was read, formatted as a UTC string.
   external String get readTime;
 
   /// Returns a DocumentReference to the database location where the triggering
   /// write occurred. This DocumentReference has admin privileges.
-  external DocumentReference get ref;
+  external admin.DocumentReference get ref;
 
   /// The last update time for the document, formatted as a UTC string.
   external String get updateTime;

@@ -5,14 +5,12 @@ version: 0.0.0
 author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 
 environment:
-  sdk: '>=1.20.1 <2.0.0'
+  sdk: '>=2.0.0-dev <2.0.0'
 
 dependencies:
   firebase_functions_interop:
     path: ../
-  node_interop: ^0.1.0-beta.8
 
-transformers:
-  - $dart2js
-  - node_interop
-  
+dev_dependencies:
+  build_runner: ^0.7.9
+  build_node_compilers: ^0.1.0

@@ -1,0 +1,14 @@
+targets:
+  $default:
+    sources:
+      - "node/**"
+      - "lib/**"
+    builders:
+      build_node_compilers|entrypoint:
+        generate_for:
+        - node/** # this doesn't work with dart2js
+        options:
+          compiler: dart2js
+          # List any dart2js specific args here, or omit it.
+          dart2js_args:
+          - --checked

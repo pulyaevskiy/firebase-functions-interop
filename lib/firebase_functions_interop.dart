@@ -1,22 +1,24 @@
 // Copyright (c) 2017, Anatoly Pulyaevskiy. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-/// Interop library for Firebase Functions NodeJS SDK.
+/// Interop library for Firebase Functions Node.js SDK.
 ///
-/// Use [firebaseFunctions] object as main entry point.
+/// Use [functions] object as main entry point.
 ///
-/// To create your cloud function use corresponding namespaces on this object:
+/// To create your cloud function see corresponding namespaces on
+/// [FirebaseFunctions] class:
 ///
-/// - [firebaseFunctions.https] for creating HTTPS functions
-/// - [firebaseFunctions.database] for creating Realtime Database functions
+/// - [FirebaseFunctions.https] for creating HTTPS triggers
+/// - [FirebaseFunctions.database] for creating Realtime Database triggers
+/// - [FirebaseFunctions.firestore] for creating Firestore triggers
 ///
-/// Here is an example of creating and exporting an HTTPS function:
+/// Here is an example of creating and exporting an HTTPS trigger:
 ///
 ///     import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 ///
 ///     void main() {
-///       // Registers helloWorld function under path prefix `/hello-world`
-///       firebaseFunctions['hello-world'] = firebaseFunctions.https
+///       // Registers helloWorld function under path prefix `/helloWorld`
+///       functions['helloWorld'] = FirebaseFunctions.https
 ///         .onRequest(helloWorld);
 ///     }
 ///
@@ -31,45 +33,52 @@ library firebase_functions_interop;
 import 'dart:async';
 import 'dart:js';
 
-import 'package:built_value/serializer.dart';
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
-import 'package:firebase_admin_interop/js.dart' as admin;
-import 'package:node_interop/io.dart';
-import 'package:node_interop/node_interop.dart';
+import 'package:meta/meta.dart';
+import 'package:node_interop/http.dart';
+import 'package:node_interop/node.dart';
+import 'package:node_interop/util.dart';
 
 import 'src/bindings.dart' as js;
+import 'src/express.dart';
 
-export 'package:node_interop/io.dart' show HttpRequest;
+export 'package:firebase_admin_interop/firebase_admin_interop.dart';
+export 'package:node_io/node_io.dart' show HttpRequest, HttpResponse;
 
 export 'src/bindings.dart' show CloudFunction, HttpsFunction;
+export 'src/express.dart';
 
 /// Main library object which can be used to create and register Firebase
 /// Cloud functions.
-final FirebaseFunctions firebaseFunctions = new FirebaseFunctions._();
+const FirebaseFunctions functions = const FirebaseFunctions._();
 
-/// Global namespace from which all Firebase Cloud Functions can be accessed.
+@Deprecated('Use "functions" instead.')
+FirebaseFunctions get firebaseFunctions => functions;
+
+final js.FirebaseFunctions _js = require('firebase-functions');
+
+/// Global namespace for Firebase Cloud Functions functionality.
 ///
-/// Use [firebaseFunctions] as a singleton instance of this class.
+/// Use [functions] as a singleton instance of this class to export function
+/// triggers.
 class FirebaseFunctions {
+  const FirebaseFunctions._();
+
   /// Configuration object for Firebase functions.
-  final Config config = new Config();
+  static const Config config = const Config._();
 
   /// HTTPS functions.
-  final Https https = new Https._();
+  static const HttpsFunctions https = const HttpsFunctions._();
 
   /// Realtime Database functions.
-  final Database database = new Database._();
-
-  FirebaseFunctions._() {
-    js.initFirebaseFunctions();
-  }
+  static const DatabaseFunctions database = const DatabaseFunctions._();
 
   /// Export [function] under specified [key].
   ///
   /// For HTTPS functions the [key] defines URL path prefix.
   operator []=(String key, dynamic function) {
     assert(function is js.HttpsFunction || function is js.CloudFunction);
-    node.export(key, function);
+    setExport(key, function);
   }
 }
 
@@ -78,8 +87,7 @@ class FirebaseFunctions {
 /// See also:
 /// - [https://firebase.google.com/docs/functions/config-env](https://firebase.google.com/docs/functions/config-env)
 class Config {
-  js.Config _config;
-  js.Config get nativeInstance => _config ??= js.config();
+  const Config._();
 
   /// Returns configuration value specified by it's [key].
   ///
@@ -90,10 +98,10 @@ class Config {
   /// `functions.config().some_service.client_secret`.
   dynamic get(String key) {
     if (key == 'firebase') {
-      return nativeInstance.firebase;
+      return _js.config().firebase;
     }
-    var data = _cache ??= dartify(nativeInstance);
-    var parts = key.split('.');
+    final List<String> parts = key.split('.');
+    var data = dartify(_js.config());
     var value;
     for (var subKey in parts) {
       if (data is! Map) return null;
@@ -104,50 +112,40 @@ class Config {
     return value;
   }
 
-  Map<String, dynamic> _cache;
-
   /// Firebase-specific configuration which can be used to initialize
-  /// Firebase Admin SDK.
+  /// Firebase Admin SDK client.
   ///
   /// This is a shortcut for calling `get('firebase')`.
-  admin.AppOptions get firebase => get('firebase');
+  AppOptions get firebase => get('firebase');
 }
 
 /// HTTPS functions namespace.
-class Https {
-  Https._();
+class HttpsFunctions {
+  const HttpsFunctions._();
 
   /// Event [handler] which is run every time an HTTPS URL is hit.
   ///
   /// Returns a [js.HttpsFunction] which can be exported.
   ///
   /// The event handler is called with single [request] argument, instance
-  /// of [HttpRequest] interface from `dart:io`. This object acts as a
+  /// of [ExpressHttpRequest]. This object acts as a
   /// proxy to JavaScript request and response objects.
-  ///
-  /// If you need access to native objects use [HttpRequest.nativeInstance] and
-  /// [HttpResponse.nativeInstance] :
-  ///
-  ///     void handler(HttpRequest request) {
-  ///       IncomingMessage nativeRequest = request.nativeInstance;
-  ///       ServerResponse nativeResponse = request.response.nativeInstance;
-  ///     }
-  js.HttpsFunction onRequest(handler(HttpRequest request)) {
+  js.HttpsFunction onRequest(void handler(ExpressHttpRequest request)) {
     void jsHandler(IncomingMessage request, ServerResponse response) {
-      var requestProxy = new NodeHttpRequest(request, response);
+      var requestProxy = new ExpressHttpRequest(request, response);
       handler(requestProxy);
     }
 
-    return js.onRequest(allowInterop(jsHandler));
+    return _js.https.onRequest(allowInterop(jsHandler));
   }
 }
 
 /// Realtime Database functions namespace.
-class Database {
-  Database._();
+class DatabaseFunctions {
+  const DatabaseFunctions._();
 
-  /// Returns reference builder for specified [path].
-  RefBuilder ref(String path) => new RefBuilder._(js.ref(path));
+  /// Returns reference builder for specified [path] in Realtime Database.
+  RefBuilder ref(String path) => new RefBuilder._(_js.database.ref(path));
 }
 
 /// The Firebase Realtime Database reference builder.
@@ -158,65 +156,36 @@ class RefBuilder {
 
   /// Event handler that fires every time new data is created in Firebase
   /// Realtime Database.
-  ///
-  /// Optional [serializer], if provided, is used to deserialize value
-  /// in to a Dart object.
-  js.CloudFunction onCreate<T>(FutureOr<Null> handler(DatabaseEvent<T> event),
-      [Serializer<T> serializer]) {
-    dynamic wrapper(js.Event event) {
-      return _handleEvent<T>(event, handler, serializer);
-    }
-
+  js.CloudFunction onCreate<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
+    dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
     return nativeInstance.onCreate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is deleted from Firebase
   /// Realtime Database.
-  ///
-  /// Optional [serializer], if provided, is used to deserialize value
-  /// in to a Dart object.
-  js.CloudFunction onDelete<T>(FutureOr<Null> handler(DatabaseEvent<T> event),
-      [Serializer<T> serializer]) {
-    dynamic wrapper(js.Event event) {
-      return _handleEvent<T>(event, handler, serializer);
-    }
-
+  js.CloudFunction onDelete<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
+    dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
     return nativeInstance.onDelete(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is updated in Firebase Realtime
   /// Database.
-  ///
-  /// Optional [serializer], if provided, is used to deserialize value
-  /// in to a Dart object.
-  js.CloudFunction onUpdate<T>(FutureOr<Null> handler(DatabaseEvent<T> event),
-      [Serializer<T> serializer]) {
-    dynamic wrapper(js.Event event) {
-      return _handleEvent<T>(event, handler, serializer);
-    }
-
+  js.CloudFunction onUpdate<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
+    dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
     return nativeInstance.onUpdate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time a Firebase Realtime Database write of
   /// any kind (creation, update, or delete) occurs.
-  ///
-  /// Optional [serializer], if provided, is used to deserialize value
-  /// in to a Dart object.
-  js.CloudFunction onWrite<T>(FutureOr<Null> handler(DatabaseEvent<T> event),
-      [Serializer<T> serializer]) {
-    dynamic wrapper(js.Event event) {
-      return _handleEvent<T>(event, handler, serializer);
-    }
-
+  js.CloudFunction onWrite<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
+    dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
     return nativeInstance.onWrite(allowInterop(wrapper));
   }
 
   dynamic _handleEvent<T>(
-      js.Event event, FutureOr<Null> handler(DatabaseEvent<T> event),
-      [Serializer<T> serializer]) {
+      js.Event event, FutureOr<void> handler(DatabaseEvent<T> event)) {
     var dartEvent = new DatabaseEvent<T>(
-      data: new DeltaSnapshot<T>(event.data, serializer),
+      data: new DeltaSnapshot<T>(event.data),
       eventId: event.eventId,
       eventType: event.eventType,
       params: dartify(event.params),
@@ -225,7 +194,7 @@ class RefBuilder {
     );
     var result = handler(dartEvent);
     if (result is Future) {
-      return futureToJsPromise(result);
+      return futureToPromise(result);
     }
     return null;
   }
@@ -245,7 +214,7 @@ class Event<T> {
   final String eventType;
 
   /// Values of the wildcards in the path parameter provided to the
-  /// [Database.ref] method for a Realtime Database trigger.
+  /// [DatabaseFunctions.ref] method for a Realtime Database trigger.
   final Map<String, String> params;
 
   /// The resource that emitted the event.
@@ -267,7 +236,7 @@ class Event<T> {
 /// An [Event] triggered by Firebase Realtime Database.
 class DatabaseEvent<T> extends Event<DeltaSnapshot<T>> {
   DatabaseEvent({
-    DeltaSnapshot data,
+    DeltaSnapshot<T> data,
     String eventId,
     String eventType,
     Map<String, String> params,
@@ -286,9 +255,10 @@ class DatabaseEvent<T> extends Event<DeltaSnapshot<T>> {
 
 /// Represents a Firebase Realtime Database delta snapshot.
 class DeltaSnapshot<T> extends DataSnapshot<T> {
-  DeltaSnapshot(js.DeltaSnapshot nativeInstance, [Serializer<T> serializer])
-      : super(nativeInstance, serializer);
+  DeltaSnapshot(js.DeltaSnapshot nativeInstance) : super(nativeInstance);
 
+  @override
+  @protected
   js.DeltaSnapshot get nativeInstance => super.nativeInstance;
 
   /// Returns a [Reference] to the Database location where the triggering write
@@ -303,16 +273,107 @@ class DeltaSnapshot<T> extends DataSnapshot<T> {
   bool changed() => nativeInstance.changed();
 
   @override
-  DeltaSnapshot<S> child<S>(String path, [Serializer<S> serializer]) =>
-      super.child(path, serializer);
+  DeltaSnapshot<S> child<S>(String path) => super.child(path);
 
   /// Gets the current [DeltaSnapshot] after the triggering write event has
   /// occurred.
-  DeltaSnapshot<T> get current =>
-      new DeltaSnapshot<T>(nativeInstance.current, serializer);
+  DeltaSnapshot<T> get current => new DeltaSnapshot<T>(nativeInstance.current);
 
   /// Gets the previous state of the [DeltaSnapshot], from before the
   /// triggering write event.
   DeltaSnapshot<T> get previous =>
-      new DeltaSnapshot<T>(nativeInstance.previous, serializer);
+      new DeltaSnapshot<T>(nativeInstance.previous);
+}
+
+class FirestoreFunctions {
+  const FirestoreFunctions._();
+
+  DocumentBuilder document(String path) =>
+      new DocumentBuilder._(_js.firestore.document(path));
+}
+
+class DocumentBuilder {
+  @protected
+  final js.DocumentBuilder nativeInstance;
+
+  DocumentBuilder._(this.nativeInstance);
+
+  /// Event handler that fires every time new data is created in Cloud Firestore.
+  js.CloudFunction onCreate(FutureOr<void> handler(FirestoreEvent event)) {
+    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+    return nativeInstance.onCreate(allowInterop(wrapper));
+  }
+
+  /// Event handler that fires every time data is deleted from Cloud Firestore.
+  js.CloudFunction onDelete(FutureOr<void> handler(FirestoreEvent event)) {
+    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+    return nativeInstance.onDelete(allowInterop(wrapper));
+  }
+
+  /// Event handler that fires every time data is updated in Cloud Firestore.
+  js.CloudFunction onUpdate(FutureOr<void> handler(FirestoreEvent event)) {
+    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+    return nativeInstance.onUpdate(allowInterop(wrapper));
+  }
+
+  /// Event handler that fires every time a Cloud Firestore write of any
+  /// kind (creation, update, or delete) occurs.
+  js.CloudFunction onWrite(FutureOr<void> handler(FirestoreEvent event)) {
+    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+    return nativeInstance.onWrite(allowInterop(wrapper));
+  }
+
+  dynamic _handleEvent(js.Event jsEvent, FutureOr<void> handler(Event event)) {
+    final FirestoreEvent event = new FirestoreEvent(
+      data: new DeltaDocumentSnapshot(jsEvent.data),
+      eventId: jsEvent.eventId,
+      eventType: jsEvent.eventType,
+      params: dartify(jsEvent.params),
+      resource: jsEvent.resource,
+      timestamp: DateTime.parse(jsEvent.timestamp),
+    );
+    var result = handler(event);
+    if (result is Future) {
+      return futureToPromise(result);
+    }
+    return null;
+  }
+}
+
+class DeltaDocumentSnapshot extends DocumentSnapshot {
+  DeltaDocumentSnapshot(js.DeltaDocumentSnapshot nativeInstance)
+      : super(nativeInstance, new Firestore(nativeInstance.ref.firestore));
+
+  @override
+  @protected
+  js.DeltaDocumentSnapshot get nativeInstance => super.nativeInstance;
+
+  /// Previous state of the document before the triggering write event.
+  DeltaDocumentSnapshot get previous =>
+      new DeltaDocumentSnapshot(nativeInstance.previous);
+
+  /// The last time the document was read, can be `null`.
+  DateTime get readTime => (nativeInstance.readTime != null)
+      ? DateTime.parse(nativeInstance.readTime)
+      : null;
+}
+
+/// An [Event] triggered by Firestore Database.
+class FirestoreEvent extends Event<DeltaDocumentSnapshot> {
+  FirestoreEvent({
+    DeltaDocumentSnapshot data,
+    String eventId,
+    String eventType,
+    Map<String, String> params,
+    String resource,
+    DateTime timestamp,
+  })
+      : super(
+          data: data,
+          eventId: eventId,
+          eventType: eventType,
+          params: params,
+          resource: resource,
+          timestamp: timestamp,
+        );
 }

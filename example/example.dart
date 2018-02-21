@@ -6,16 +6,15 @@ import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 
 void main() {
-  /// You can export a function by setting a key on global [firebaseFunctions]
+  /// You can export a function by setting a key on global [functions]
   /// object.
   ///
   /// For HTTPS functions the key is also a URL path prefix, so in below
   /// example `helloWorld` function will be available at `/helloWorld`
   /// URL path and it will also handle all paths under this prefix, e.g.
   /// `/helloWorld/any/number/of/sections`.
-  firebaseFunctions['helloWorld'] =
-      firebaseFunctions.https.onRequest(helloWorld);
-  firebaseFunctions['makeUppercase'] = firebaseFunctions.database
+  functions['helloWorld'] = FirebaseFunctions.https.onRequest(helloWorld);
+  functions['makeUppercase'] = FirebaseFunctions.database
       .ref('/tests/{testId}/original')
       .onWrite(makeUppercase);
 }
@@ -33,7 +32,7 @@ FutureOr<Null> makeUppercase(DatabaseEvent<String> event) {
 Future helloWorld(HttpRequest request) async {
   try {
     /// If you defined any config parameters you can access them as follows:
-    var config = firebaseFunctions.config;
+    var config = FirebaseFunctions.config;
     var serviceKey = config.get('someservice.key');
     var serviceUrl = config.get('someservice.url');
     print('Service key: $serviceKey, service URL: $serviceUrl');
@@ -43,11 +42,9 @@ Future helloWorld(HttpRequest request) async {
     String name = request.requestedUri.queryParameters['name'];
     if (name != null) {
       // You can also write to Realtime Database right here:
-      var appOptions = firebaseFunctions.config.firebase;
+      var appOptions = config.firebase;
       var admin = FirebaseAdmin.instance;
-      var app = admin.initializeApp(new AppOptions(
-          credential: appOptions.credential,
-          databaseURL: appOptions.databaseURL));
+      var app = admin.initializeApp(appOptions);
       var database = app.database();
       await database.ref('/tests/some-path').setValue(name);
     }
