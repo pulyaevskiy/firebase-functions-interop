@@ -3,39 +3,34 @@
 Requirements:
 
 * Dart SDK 2
-* NodeJS
-* Firebase Tools (`npm install -g firebase-tools`)
+* Node.js
+* Firebase Tools (`npm install -g firebase-tools` or `yarn global add firebase-tools`)
 
 ## Running tests
 
-To run the tests locally you'll need to create Firebase Service Account
-used by Firebase Admin SDK. Instructions can be found here:
-https://firebase.google.com/docs/admin/setup
+To run the tests locally you'll need to:
 
-Download service account key file somewhere **outside** of this Git
-repository (so that there is no chance to accidentally commit it) and
-set following environment variable to the file's absolute path:
+* [Create a Firebase project](https://console.firebase.google.com/) for testing
+    * Use `firebase use --add` to add it to this project
 
-```bash
-export FIREBASE_SERVICE_ACCOUNT_FILEPATH="/Users/me/full-path-to-service-account-key.json"
-```
+* Download [Service Account file](https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk) (and database URL)
+    * Download the service account key file somewhere **outside** of this Git
+      repository (so that there is no chance to accidentally commit it)
 
-Set a couple more environment variables:
+* Set the environment variables:
+    * Use the absolute path of the service account file, with the database URL you found above:
+    * ```bash
+      export FIREBASE_SERVICE_ACCOUNT_FILEPATH="/home/me/full-path-to-service-account-key.json"
+      export FIREBASE_DATABASE_URL="https://<project-id>.firebaseio.com"
+      export FIREBASE_HTTP_BASE_URL="https://us-central1-<project-id>.cloudfunctions.net"
+      ```
 
-```
-export FIREBASE_DATABASE_URL="https://your-project-id.firebaseio.com"
-export FIREBASE_HTTP_BASE_URL="https://us-central-your-project-id.cloudfunctions.net"
-```
+* Deploy the test suite:
+    * ```bash
+      sh tool/deploy.sh
+      ```
 
-The test suite depends on predefined test functions which must be
-(re)deployed before running the tests:
-
-```bash
-./tool/deploy.sh
-```
-
-Running the tests:
-
-```bash
-pub run test
-```
+* Run the tests:
+    * ```bash
+      pub run test
+      ```

@@ -73,6 +73,9 @@ class FirebaseFunctions {
   /// Realtime Database functions.
   static const DatabaseFunctions database = const DatabaseFunctions._();
 
+  /// Firestore functions
+  static const FirestoreFunctions firestore = const FirestoreFunctions._();
+
   /// Export [function] under specified [key].
   ///
   /// For HTTPS functions the [key] defines URL path prefix.
@@ -242,8 +245,7 @@ class DatabaseEvent<T> extends Event<DeltaSnapshot<T>> {
     Map<String, String> params,
     String resource,
     DateTime timestamp,
-  })
-      : super(
+  }) : super(
           data: data,
           eventId: eventId,
           eventType: eventType,
@@ -367,8 +369,7 @@ class FirestoreEvent extends Event<DeltaDocumentSnapshot> {
     Map<String, String> params,
     String resource,
     DateTime timestamp,
-  })
-      : super(
+  }) : super(
           data: data,
           eventId: eventId,
           eventType: eventType,
