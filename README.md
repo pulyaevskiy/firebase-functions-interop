@@ -248,13 +248,15 @@ void main() {
 }
 
 FutureOr<void> makeNamesUppercase(FirestoreEvent event) {
-  var original = event.data.data.getString("name");
-  print('Uppercasing $original');
+  if(event.data.data.getString("uppercasedName") == null) {
+    var original = event.data.data.getString("name");
+    print('Uppercasing $original');
 
-  UpdateData newData = new UpdateData();
-  newData.setString("uppercasedName", original);
+    UpdateData newData = new UpdateData();
+    newData.setString("uppercasedName", original);
 
-  return event.data.reference.updateData(newData);
+    return event.data.reference.updateData(newData);
+  }
 }
 ```
 
@@ -316,27 +318,4 @@ data on the request would hang since it's already been consumed. Use
 
 Please file feature requests and bugs at the [issue tracker](https://github.com/pulyaevskiy/firebase-functions-interop/issues/new).
 
-## Testing
-
-To test `firebase_functions_interop`, you must first deploy the `functions` folder to a Firebase project, set the config keys, and deploy:
-
-```bash
-$ cd functions
-$ firebase functions:config:set someservice.key="123456" someservice.url="https://example.com" someservice.enabled="true"
-$ npm run deploy
-```
-
-Next, back in the root folder, you can run `pub run test` with the following environment variable:
-
-* `FIREBASE_SERVICE_ACCOUNT_FILEPATH`: File path to the [Firebase Admin SDK Service Account](https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk) (click "Generate New Private Key")
-* `FIREBASE_DATABASE_URL`: Database URL (can be seen from the link above)
-* `FIREBASE_HTTP_BASE_URL`: Base URL for Functions (usually in the format of `https://us-central1-<project-id>.cloudfunctions.net`)
-
-For instance:
-
-```bash
-$ FIREBASE_SERVICE_ACCOUNT_FILEPATH=test-app-service-account.json \
-  FIREBASE_DATABASE_URL=https://test-app.firebaseio.com \
-  FIREBASE_HTTP_BASE_URL=https://us-central1-test-app.cloudfunctions.net \
-  pub run test
-```
+See [the development file](DEVELOPMENT.md) for instructions on running the test suite.
