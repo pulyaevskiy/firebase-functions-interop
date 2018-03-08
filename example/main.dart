@@ -18,7 +18,8 @@ void main() {
       .ref('/tests/{testId}/original')
       .onWrite(makeUppercase);
   functions['makeNamesUppercase'] = FirebaseFunctions.firestore
-      .document('/users/{userId}').onWrite(makeNamesUppercase)
+      .document('/users/{userId}')
+      .onWrite(makeNamesUppercase);
 }
 
 /// Example Realtime Database function.
@@ -31,7 +32,7 @@ FutureOr<void> makeUppercase(DatabaseEvent<String> event) {
 }
 
 FutureOr<void> makeNamesUppercase(FirestoreEvent event) {
-  if(event.data.data.getString("uppercasedName") == null) {
+  if (event.data.data.getString("uppercasedName") == null) {
     var original = event.data.data.getString("name");
     print('Uppercasing $original');
 

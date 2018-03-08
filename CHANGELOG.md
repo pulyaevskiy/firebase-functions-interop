@@ -1,3 +1,8 @@
+## 1.0.0-dev.2.0
+
+- Fixed: expose Firestore functions namespace in `FirebaseFunctions.firestore` (#8).
+- Other: update readme and development docs (#8).
+
 ## 1.0.0-dev.1.0
 
 - Depends on Dart SDK >= 2.0.0-dev.19.0.
