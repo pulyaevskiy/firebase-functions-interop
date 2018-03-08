@@ -10,7 +10,7 @@ before_script:
   - node --version
   - npm install
   - npm install -g firebase-tools
-  - sh tool/deploy.sh
+  - ./tool/deploy.sh
 
 script:
   - pub run test -p node -j 1 -r expanded
