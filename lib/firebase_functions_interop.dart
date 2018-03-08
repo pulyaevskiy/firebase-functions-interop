@@ -76,6 +76,9 @@ class FirebaseFunctions {
   /// Firestore functions
   static const FirestoreFunctions firestore = const FirestoreFunctions._();
 
+  /// Pubsub functions
+  static const PubsubFunctions pubsub = const PubsubFunctions._();
+
   /// Export [function] under specified [key].
   ///
   /// For HTTPS functions the [key] defines URL path prefix.
@@ -377,4 +380,52 @@ class FirestoreEvent extends Event<DeltaDocumentSnapshot> {
           resource: resource,
           timestamp: timestamp,
         );
+}
+
+class PubsubFunctions {
+  const PubsubFunctions._();
+
+  TopicBuilder topic(String path) => new TopicBuilder._(_js.pubsub.topic(path));
+}
+
+class TopicBuilder {
+  @protected
+  final js.TopicBuilder nativeInstance;
+
+  TopicBuilder._(this.nativeInstance);
+
+  /// Event handler that fires every time an event is public in Pubsub.
+  js.CloudFunction onPublish(FutureOr<void> handler(Message message)) {
+    dynamic wrapper(js.Message jsMessage) => _handleEvent(jsMessage, handler);
+    return nativeInstance.onPublish(allowInterop(wrapper));
+  }
+
+  dynamic _handleEvent(
+      js.Message jsMessage, FutureOr<void> handler(Message message)) {
+    final Message message = new Message(jsMessage);
+    var result = handler(message);
+    if (result is Future) {
+      return futureToPromise(result);
+    }
+    return null;
+  }
+}
+
+class Message {
+  Message(js.Message this.nativeInstance);
+
+  @protected
+  final js.Message nativeInstance;
+
+  /// User-defined attributes published with the message, if any.
+  Map<String, String> get attributes => nativeInstance.attributes;
+
+  /// The data payload of this message object as a base64-encoded string.
+  String get data => nativeInstance.data;
+
+  /// The JSON data payload of this message object, if any.
+  dynamic get json => nativeInstance.json;
+
+  /// Returns a JSON-serializable representation of this object.
+  dynamic toJSON() => nativeInstance.toJSON();
 }

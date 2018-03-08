@@ -19,8 +19,12 @@ abstract class FirebaseFunctions {
   external Config config();
 
   external HttpsFunctions get https;
+
   external DatabaseFunctions get database;
+
   external FirestoreFunctions get firestore;
+
+  external PubsubFunctions get pubsub;
 
   /// Constructor for Firebase [Event] objects.
   external dynamic get Event;
@@ -145,9 +149,13 @@ abstract class RefBuilder {
 @anonymous
 abstract class DeltaSnapshot extends admin.DataSnapshot {
   external admin.Reference get adminRef;
+
   external DeltaSnapshot get current;
+
   external DeltaSnapshot get previous;
+
   external bool changed();
+
   @override
   external DeltaSnapshot child(String path);
 }
@@ -216,4 +224,37 @@ abstract class DeltaDocumentSnapshot implements admin.DocumentSnapshot {
 
   /// Gets the value for a given key.
   external dynamic get(key);
+}
+
+@JS()
+@anonymous
+abstract class PubsubFunctions {
+  /// Registers a function that triggers on Pubsub write events to
+  /// the [topic].
+  external TopicBuilder topic(String topic);
+}
+
+/// The Pubsub topic builder interface.
+@JS()
+@anonymous
+abstract class TopicBuilder {
+  /// Event handler that fires every time an event is public in Pubsub.
+  external CloudFunction onPublish(void handler(Message message));
+}
+
+/// Interface representing a Google Cloud Pub/Sub message.
+@JS()
+@anonymous
+abstract class Message {
+  /// User-defined attributes published with the message, if any.
+  external Map<String, String> get attributes;
+
+  /// The data payload of this message object as a base64-encoded string.
+  external String get data;
+
+  /// The JSON data payload of this message object, if any.
+  external dynamic get json;
+
+  /// Returns a JSON-serializable representation of this object.
+  external dynamic toJSON();
 }
