@@ -1,4 +1,5 @@
 # Files and directories created by pub
+.dart_tool
 .packages
 .pub/
 build/
@@ -15,7 +16,7 @@ doc/api/
 # Node
 node_modules/
 package-lock.json
-functions/index.js
+yarn.lock
 functions/build/
 
 # Logs
