@@ -21,7 +21,7 @@ void main() {
       .document('/users/{userId}')
       .onWrite(makeNamesUppercase);
   functions['subscribe'] = FirebaseFunctions.pubsub
-      .topic('my-topic').onWrite(subscribe)
+      .topic('my-topic').onPublish(subscribe);
 }
 
 /// Example Realtime Database function.

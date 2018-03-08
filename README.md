@@ -265,7 +265,7 @@ FutureOr<void> makeNamesUppercase(FirestoreEvent event) {
 ```dart
 void main() {
   functions['subscribe'] = FirebaseFunctions.pubsub
-      .topic('my-topic').onWrite(subscribe)
+      .topic('my-topic').onPublish(subscribe);
 }
 
 FutureOr<void> subscribe(Message message) {
