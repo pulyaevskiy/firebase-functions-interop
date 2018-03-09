@@ -239,7 +239,7 @@ abstract class PubsubFunctions {
 @anonymous
 abstract class TopicBuilder {
   /// Event handler that fires every time an event is public in Pubsub.
-  external CloudFunction onPublish(void handler(Message message));
+  external CloudFunction onPublish(void handler(Event<Message> event));
 }
 
 /// Interface representing a Google Cloud Pub/Sub message.
@@ -247,7 +247,7 @@ abstract class TopicBuilder {
 @anonymous
 abstract class Message {
   /// User-defined attributes published with the message, if any.
-  external Map<String, String> get attributes;
+  external dynamic get attributes;
 
   /// The data payload of this message object as a base64-encoded string.
   external String get data;

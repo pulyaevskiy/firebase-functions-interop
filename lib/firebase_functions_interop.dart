@@ -328,7 +328,8 @@ class DocumentBuilder {
     return nativeInstance.onWrite(allowInterop(wrapper));
   }
 
-  dynamic _handleEvent(js.Event jsEvent, FutureOr<void> handler(Event event)) {
+  dynamic _handleEvent(
+      js.Event jsEvent, FutureOr<void> handler(FirestoreEvent event)) {
     final FirestoreEvent event = new FirestoreEvent(
       data: new DeltaDocumentSnapshot(jsEvent.data),
       eventId: jsEvent.eventId,
@@ -395,15 +396,23 @@ class TopicBuilder {
   TopicBuilder._(this.nativeInstance);
 
   /// Event handler that fires every time an event is public in Pubsub.
-  js.CloudFunction onPublish(FutureOr<void> handler(Message message)) {
-    dynamic wrapper(js.Message jsMessage) => _handleEvent(jsMessage, handler);
+  js.CloudFunction onPublish(FutureOr<void> handler(PubsubEvent event)) {
+    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
     return nativeInstance.onPublish(allowInterop(wrapper));
   }
 
+  /// Event handler that fires every time an event is public in Pubsub.
   dynamic _handleEvent(
-      js.Message jsMessage, FutureOr<void> handler(Message message)) {
-    final Message message = new Message(jsMessage);
-    var result = handler(message);
+      js.Event jsEvent, FutureOr<void> handler(PubsubEvent event)) {
+    final PubsubEvent event = new PubsubEvent(
+      data: new Message(jsEvent.data),
+      eventId: jsEvent.eventId,
+      eventType: jsEvent.eventType,
+      params: dartify(jsEvent.params),
+      resource: jsEvent.resource,
+      timestamp: DateTime.parse(jsEvent.timestamp),
+    );
+    var result = handler(event);
     if (result is Future) {
       return futureToPromise(result);
     }
@@ -418,14 +427,32 @@ class Message {
   final js.Message nativeInstance;
 
   /// User-defined attributes published with the message, if any.
-  Map<String, String> get attributes => nativeInstance.attributes;
+  Map<String, String> get attributes => dartify(nativeInstance.attributes);
 
   /// The data payload of this message object as a base64-encoded string.
   String get data => nativeInstance.data;
 
   /// The JSON data payload of this message object, if any.
-  dynamic get json => nativeInstance.json;
+  dynamic get json => dartify(nativeInstance.json);
 
   /// Returns a JSON-serializable representation of this object.
-  dynamic toJSON() => nativeInstance.toJSON();
+  dynamic toJson() => dartify(nativeInstance.toJSON());
+}
+
+class PubsubEvent extends Event<Message> {
+  PubsubEvent({
+    Message data,
+    String eventId,
+    String eventType,
+    Map<String, String> params,
+    String resource,
+    DateTime timestamp,
+  }) : super(
+          data: data,
+          eventId: eventId,
+          eventType: eventType,
+          params: params,
+          resource: resource,
+          timestamp: timestamp,
+        );
 }
