@@ -268,8 +268,8 @@ void main() {
       .topic('my-topic').onPublish(subscribe);
 }
 
-FutureOr<void> subscribe(Message message) {
-  print(message.json["name"]);
+FutureOr<void> subscribe(PubsubEvent event) {
+  print(event.data.json["name"]);
 }
 ```
 
