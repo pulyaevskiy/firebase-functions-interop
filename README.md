@@ -43,7 +43,7 @@ Below is status report of already implemented functionality by namespace:
 - [x] functions.firestore :fire:
 - [x] functions.database
 - [x] functions.https
-- [ ] functions.pubsub
+- [x] functions.pubsub
 - [ ] functions.storage
 
 
@@ -257,6 +257,19 @@ FutureOr<void> makeNamesUppercase(FirestoreEvent event) {
 
     return event.data.reference.updateData(newData);
   }
+}
+```
+
+### Pubsub Functions
+
+```dart
+void main() {
+  functions['subscribe'] = FirebaseFunctions.pubsub
+      .topic('my-topic').onPublish(subscribe);
+}
+
+FutureOr<void> subscribe(PubsubEvent event) {
+  print(event.data.json["name"]);
 }
 ```
 

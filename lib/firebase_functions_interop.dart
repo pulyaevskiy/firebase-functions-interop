@@ -76,6 +76,9 @@ class FirebaseFunctions {
   /// Firestore functions
   static const FirestoreFunctions firestore = const FirestoreFunctions._();
 
+  /// Pubsub functions
+  static const PubsubFunctions pubsub = const PubsubFunctions._();
+
   /// Export [function] under specified [key].
   ///
   /// For HTTPS functions the [key] defines URL path prefix.
@@ -325,7 +328,8 @@ class DocumentBuilder {
     return nativeInstance.onWrite(allowInterop(wrapper));
   }
 
-  dynamic _handleEvent(js.Event jsEvent, FutureOr<void> handler(Event event)) {
+  dynamic _handleEvent(
+      js.Event jsEvent, FutureOr<void> handler(FirestoreEvent event)) {
     final FirestoreEvent event = new FirestoreEvent(
       data: new DeltaDocumentSnapshot(jsEvent.data),
       eventId: jsEvent.eventId,
@@ -364,6 +368,80 @@ class DeltaDocumentSnapshot extends DocumentSnapshot {
 class FirestoreEvent extends Event<DeltaDocumentSnapshot> {
   FirestoreEvent({
     DeltaDocumentSnapshot data,
+    String eventId,
+    String eventType,
+    Map<String, String> params,
+    String resource,
+    DateTime timestamp,
+  }) : super(
+          data: data,
+          eventId: eventId,
+          eventType: eventType,
+          params: params,
+          resource: resource,
+          timestamp: timestamp,
+        );
+}
+
+class PubsubFunctions {
+  const PubsubFunctions._();
+
+  TopicBuilder topic(String path) => new TopicBuilder._(_js.pubsub.topic(path));
+}
+
+class TopicBuilder {
+  @protected
+  final js.TopicBuilder nativeInstance;
+
+  TopicBuilder._(this.nativeInstance);
+
+  /// Event handler that fires every time an event is published in Pubsub.
+  js.CloudFunction onPublish(FutureOr<void> handler(PubsubEvent event)) {
+    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+    return nativeInstance.onPublish(allowInterop(wrapper));
+  }
+
+  dynamic _handleEvent(
+      js.Event jsEvent, FutureOr<void> handler(PubsubEvent event)) {
+    final PubsubEvent event = new PubsubEvent(
+      data: new Message(jsEvent.data),
+      eventId: jsEvent.eventId,
+      eventType: jsEvent.eventType,
+      params: dartify(jsEvent.params),
+      resource: jsEvent.resource,
+      timestamp: DateTime.parse(jsEvent.timestamp),
+    );
+    var result = handler(event);
+    if (result is Future) {
+      return futureToPromise(result);
+    }
+    return null;
+  }
+}
+
+class Message {
+  Message(js.Message this.nativeInstance);
+
+  @protected
+  final js.Message nativeInstance;
+
+  /// User-defined attributes published with the message, if any.
+  Map<String, String> get attributes =>
+      new Map<String, String>.from(dartify(nativeInstance.attributes));
+
+  /// The data payload of this message object as a base64-encoded string.
+  String get data => nativeInstance.data;
+
+  /// The JSON data payload of this message object, if any.
+  dynamic get json => dartify(nativeInstance.json);
+
+  /// Returns a JSON-serializable representation of this object.
+  dynamic toJson() => dartify(nativeInstance.toJSON());
+}
+
+class PubsubEvent extends Event<Message> {
+  PubsubEvent({
+    Message data,
     String eventId,
     String eventType,
     Map<String, String> params,
