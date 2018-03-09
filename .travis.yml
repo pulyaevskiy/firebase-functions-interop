@@ -15,6 +15,8 @@ before_script:
   - npm install
   - npm install -g firebase-tools
   - ./tool/deploy.sh
+  - source /home/travis/google-cloud-sdk/path.bash.inc # Add gcloud to $PATH
 
 script:
+
   - pub run test -p node -j 1 -r expanded
