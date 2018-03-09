@@ -26,6 +26,8 @@ abstract class FirebaseFunctions {
 
   external PubsubFunctions get pubsub;
 
+  external StorageFunctions get storage;
+
   /// Constructor for Firebase [Event] objects.
   external dynamic get Event;
 }
@@ -238,7 +240,7 @@ abstract class PubsubFunctions {
 @JS()
 @anonymous
 abstract class TopicBuilder {
-  /// Event handler that fires every time an event is public in Pubsub.
+  /// Event handler that fires every time an event is publish in Pubsub.
   external CloudFunction onPublish(void handler(Event<Message> event));
 }
 
@@ -257,4 +259,81 @@ abstract class Message {
 
   /// Returns a JSON-serializable representation of this object.
   external dynamic toJSON();
+}
+
+@JS()
+@anonymous
+abstract class StorageFunctions {
+  /// Registers a Cloud Function scoped to a specific storage [bucket].
+  external BucketBuilder bucket(String bucket);
+
+  /// Registers a Cloud Function scoped to the default storage bucket for the project.
+  external ObjectBuilder object();
+}
+
+/// The Storage bucket builder interface.
+@JS()
+@anonymous
+abstract class BucketBuilder {
+  /// Storage object builder interface scoped to the specified storage bucket.
+  external ObjectBuilder object();
+}
+
+/// The Storage object builder interface.
+@JS()
+@anonymous
+abstract class ObjectBuilder {
+  /// Event handler which fires every time a Google Cloud Storage change occurs.
+  external CloudFunction onChange(void handler(Event<ObjectMetadata> event));
+}
+
+/// Interface representing a Google Google Cloud Storage object metadata object.
+@JS()
+@anonymous
+abstract class ObjectMetadata {
+  external String get bucket;
+
+  external String get cacheControl;
+
+  external int get componentCount;
+
+  external String get contentDisposition;
+
+  external String get contentEncoding;
+
+  external String get contentLanguage;
+
+  external String get contentType;
+
+  external dynamic get customerEncryption;
+
+  external String get generation;
+
+  external String get id;
+
+  external String get kind;
+
+  external String get md5Hash;
+
+  external String get mediaLink;
+
+  external Map<String, dynamic> get metadata;
+
+  external String get metageneration;
+
+  external String get name;
+
+  external String get resourceState;
+
+  external String get selfLink;
+
+  external String get size;
+
+  external String get storageClass;
+
+  external String get timeCreated;
+
+  external String get timeDeleted;
+
+  external String get updated;
 }

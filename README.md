@@ -44,7 +44,7 @@ Below is status report of already implemented functionality by namespace:
 - [x] functions.database
 - [x] functions.https
 - [x] functions.pubsub
-- [ ] functions.storage
+- [x] functions.storage
 
 
 ## Usage
@@ -264,13 +264,27 @@ FutureOr<void> makeNamesUppercase(FirestoreEvent event) {
 
 ```dart
 void main() {
-  functions['subscribe'] = FirebaseFunctions.pubsub
-      .topic('my-topic').onPublish(subscribe);
+  functions['logPubsub'] = FirebaseFunctions.pubsub
+      .topic('my-topic').onPublish(logPubsub);
 }
 
-FutureOr<void> subscribe(PubsubEvent event) {
+void logPubsub(PubsubEvent event) {
   print(event.data.json["name"]);
 }
+```
+
+### Storage Functions
+
+```dart
+void main() {
+  functions['logStorage'] = FirebaseFunctions.storage
+      .object().onChange(logStorage);
+}
+
+void logStorage (StorageEvent event){
+  print(event.data.name);
+}
+
 ```
 
 ## Configuration
