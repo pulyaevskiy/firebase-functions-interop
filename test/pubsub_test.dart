@@ -30,8 +30,14 @@ void main() {
           .database()
           .ref('/tests/pubsubToDatabase')
           .once<String>('value');
+      while (snapshot.val() != payload) {
+        snapshot = await app
+            .database()
+            .ref('/tests/pubsubToDatabase')
+            .once<String>('value');
+      }
       expect(snapshot.val(), payload);
-    });
+    }, timeout: const Timeout(const Duration(seconds: 10)));
   });
 }
 
