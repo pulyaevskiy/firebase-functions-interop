@@ -79,6 +79,9 @@ class FirebaseFunctions {
   /// Pubsub functions
   static const PubsubFunctions pubsub = const PubsubFunctions._();
 
+  // Storage functions
+  static const StorageFunctions storage = const StorageFunctions._();
+
   /// Export [function] under specified [key].
   ///
   /// For HTTPS functions the [key] defines URL path prefix.
@@ -442,6 +445,130 @@ class Message {
 class PubsubEvent extends Event<Message> {
   PubsubEvent({
     Message data,
+    String eventId,
+    String eventType,
+    Map<String, String> params,
+    String resource,
+    DateTime timestamp,
+  }) : super(
+          data: data,
+          eventId: eventId,
+          eventType: eventType,
+          params: params,
+          resource: resource,
+          timestamp: timestamp,
+        );
+}
+
+class StorageFunctions {
+  const StorageFunctions._();
+
+  /// Registers a Cloud Function scoped to a specific storage [bucket].
+  BucketBuilder bucket(String path) =>
+      new BucketBuilder._(_js.storage.bucket(path));
+
+  /// Registers a Cloud Function scoped to the default storage bucket for the project.
+  ObjectBuilder object() => new ObjectBuilder._(_js.storage.object());
+}
+
+class BucketBuilder {
+  @protected
+  final js.BucketBuilder nativeInstance;
+
+  BucketBuilder._(this.nativeInstance);
+
+  /// Storage object builder interface scoped to the specified storage bucket.
+  ObjectBuilder object() {
+    return new ObjectBuilder._(nativeInstance.object());
+  }
+}
+
+class ObjectBuilder {
+  @protected
+  final js.ObjectBuilder nativeInstance;
+
+  ObjectBuilder._(this.nativeInstance);
+
+  /// Event handler which fires every time a Google Cloud Storage change occurs.
+  js.CloudFunction onChange(FutureOr<void> handler(StorageEvent event)) {
+    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+    return nativeInstance.onChange(allowInterop(wrapper));
+  }
+
+  dynamic _handleEvent(
+      js.Event jsEvent, FutureOr<void> handler(StorageEvent event)) {
+    final StorageEvent event = new StorageEvent(
+      data: new ObjectMetadata(jsEvent.data),
+      eventId: jsEvent.eventId,
+      eventType: jsEvent.eventType,
+      params: dartify(jsEvent.params),
+      resource: jsEvent.resource,
+      timestamp: DateTime.parse(jsEvent.timestamp),
+    );
+    var result = handler(event);
+    if (result is Future) {
+      return futureToPromise(result);
+    }
+    return null;
+  }
+}
+
+class ObjectMetadata {
+  ObjectMetadata(js.ObjectMetadata this.nativeInstance);
+
+  @protected
+  final js.ObjectMetadata nativeInstance;
+
+  String get bucket => nativeInstance.bucket;
+
+  String get cacheControl => nativeInstance.cacheControl;
+
+  int get componentCount => nativeInstance.componentCount;
+
+  String get contentDisposition => nativeInstance.contentDisposition;
+
+  String get contentEncoding => nativeInstance.contentEncoding;
+
+  String get contentLanguage => nativeInstance.contentLanguage;
+
+  String get contentType => nativeInstance.contentType;
+
+  dynamic get customerEncryption => dartify(nativeInstance.customerEncryption);
+
+  String get generation => nativeInstance.generation;
+
+  String get id => nativeInstance.id;
+
+  String get kind => nativeInstance.kind;
+
+  String get md5Hash => nativeInstance.md5Hash;
+
+  String get mediaLink => nativeInstance.mediaLink;
+
+  dynamic get metadata => dartify(nativeInstance.mediaLink);
+
+  String get metageneration => nativeInstance.metageneration;
+
+  String get name => nativeInstance.name;
+
+  String get resourceState => nativeInstance.resourceState;
+
+  String get selfLink => nativeInstance.selfLink;
+
+  String get size => nativeInstance.size;
+
+  String get storageClass => nativeInstance.storageClass;
+
+  String get timeCreated => nativeInstance.timeCreated;
+
+  String get timeDeleted => nativeInstance.timeDeleted;
+
+  String get updated => nativeInstance.updated;
+}
+
+class StorageEvent extends Event<ObjectMetadata> {
+  StorageEvent({
+    ObjectMetadata data,
     String eventId,
     String eventType,
     Map<String, String> params,

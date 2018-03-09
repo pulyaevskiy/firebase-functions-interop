@@ -20,8 +20,10 @@ void main() {
   functions['makeNamesUppercase'] = FirebaseFunctions.firestore
       .document('/users/{userId}')
       .onWrite(makeNamesUppercase);
-  functions['subscribe'] =
-      FirebaseFunctions.pubsub.topic('my-topic').onPublish(subscribe);
+  functions['logPubsub'] =
+      FirebaseFunctions.pubsub.topic('my-topic').onPublish(logPubsub);
+  functions['logStorage'] =
+      FirebaseFunctions.storage.object().onChange(logStorage);
 }
 
 /// Example Realtime Database function.
@@ -47,8 +49,13 @@ FutureOr<void> makeNamesUppercase(FirestoreEvent event) {
 }
 
 /// Example Pubsub
-FutureOr<void> subscribe(PubsubEvent event) {
+void logPubsub(PubsubEvent event) {
   print(event.data.json["name"]);
+}
+
+/// Example Storage
+void logStorage (StorageEvent event){
+  print(event.data.name);
 }
 
 /// Example HTTPS function.
