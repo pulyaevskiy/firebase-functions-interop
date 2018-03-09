@@ -37,7 +37,7 @@ void main() {
             .once<String>('value');
       }
       expect(snapshot.val(), payload);
-    }, timeout: const Timeout(const Duration(seconds: 10)));
+    }, timeout: const Timeout(const Duration(seconds: 20)));
   });
 }
 
