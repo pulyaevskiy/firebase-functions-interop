@@ -305,8 +305,7 @@ abstract class ObjectMetadata {
 
   external String get contentType;
 
-  // TODO: Possibly change type
-  external dynamic get customerEncryption;
+  external CustomerEncryption get customerEncryption;
 
   external String get generation;
 
@@ -318,7 +317,7 @@ abstract class ObjectMetadata {
 
   external String get mediaLink;
 
-  external dynamic get metadata;
+  external Map<String, dynamic> get metadata;
 
   external String get metageneration;
 
@@ -337,4 +336,13 @@ abstract class ObjectMetadata {
   external String get timeDeleted;
 
   external String get updated;
+}
+
+@JS()
+@anonymous
+class CustomerEncryption {
+  final String encryptionAlgorithm;
+  final String keySha256;
+
+  CustomerEncryption({this.encryptionAlgorithm, this.keySha256});
 }

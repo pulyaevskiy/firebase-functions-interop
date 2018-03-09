@@ -45,7 +45,8 @@ import 'src/express.dart';
 export 'package:firebase_admin_interop/firebase_admin_interop.dart';
 export 'package:node_io/node_io.dart' show HttpRequest, HttpResponse;
 
-export 'src/bindings.dart' show CloudFunction, HttpsFunction;
+export 'src/bindings.dart'
+    show CloudFunction, HttpsFunction, CustomerEncryption;
 export 'src/express.dart';
 
 /// Main library object which can be used to create and register Firebase
@@ -478,9 +479,7 @@ class BucketBuilder {
   BucketBuilder._(this.nativeInstance);
 
   /// Storage object builder interface scoped to the specified storage bucket.
-  ObjectBuilder object() {
-    return new ObjectBuilder._(nativeInstance.object());
-  }
+  ObjectBuilder object() => new ObjectBuilder._(nativeInstance.object());
 }
 
 class ObjectBuilder {
@@ -533,7 +532,12 @@ class ObjectMetadata {
 
   String get contentType => nativeInstance.contentType;
 
-  dynamic get customerEncryption => dartify(nativeInstance.customerEncryption);
+  js.CustomerEncryption get customerEncryption {
+    final dartified = dartify(nativeInstance.customerEncryption);
+    return new js.CustomerEncryption(
+        encryptionAlgorithm: dartified['encryptionAlgorithm'],
+        keySha256: dartified['keySha256']);
+  }
 
   String get generation => nativeInstance.generation;
 
@@ -545,7 +549,7 @@ class ObjectMetadata {
 
   String get mediaLink => nativeInstance.mediaLink;
 
-  dynamic get metadata => dartify(nativeInstance.mediaLink);
+  Map<String, dynamic> get metadata => dartify(nativeInstance.metadata);
 
   String get metageneration => nativeInstance.metageneration;
 
@@ -559,11 +563,17 @@ class ObjectMetadata {
 
   String get storageClass => nativeInstance.storageClass;
 
-  String get timeCreated => nativeInstance.timeCreated;
+  DateTime get timeCreated => nativeInstance.timeCreated == null
+      ? null
+      : DateTime.parse(nativeInstance.timeCreated);
 
-  String get timeDeleted => nativeInstance.timeDeleted;
+  DateTime get timeDeleted => nativeInstance.timeDeleted == null
+      ? null
+      : DateTime.parse(nativeInstance.timeDeleted);
 
-  String get updated => nativeInstance.updated;
+  DateTime get updated => nativeInstance.updated == null
+      ? null
+      : DateTime.parse(nativeInstance.updated);
 }
 
 class StorageEvent extends Event<ObjectMetadata> {
