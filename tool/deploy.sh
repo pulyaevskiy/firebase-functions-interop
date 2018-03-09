@@ -24,6 +24,7 @@ else
     source /home/travis/google-cloud-sdk/path.bash.inc # Add gcloud to $PATH
     gcloud version
     gcloud auth activate-service-account --key-file "$FIREBASE_SERVICE_ACCOUNT_FILEPATH"
+    gcloud config set project "$FIREBASE_PROJECT_ID"
 
     firebase functions:config:set --token="$FIREBASE_TOKEN" --project "$FIREBASE_PROJECT_ID" someservice.key=123456 someservice.url="https://example.com" someservice.enabled=true
 
