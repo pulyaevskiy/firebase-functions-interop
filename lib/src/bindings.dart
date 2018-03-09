@@ -305,7 +305,7 @@ abstract class ObjectMetadata {
 
   external String get contentType;
 
-  external CustomerEncryption get customerEncryption;
+  external dynamic get customerEncryption;
 
   external String get generation;
 
@@ -336,13 +336,4 @@ abstract class ObjectMetadata {
   external String get timeDeleted;
 
   external String get updated;
-}
-
-@JS()
-@anonymous
-class CustomerEncryption {
-  final String encryptionAlgorithm;
-  final String keySha256;
-
-  CustomerEncryption({this.encryptionAlgorithm, this.keySha256});
 }

@@ -45,8 +45,7 @@ import 'src/express.dart';
 export 'package:firebase_admin_interop/firebase_admin_interop.dart';
 export 'package:node_io/node_io.dart' show HttpRequest, HttpResponse;
 
-export 'src/bindings.dart'
-    show CloudFunction, HttpsFunction, CustomerEncryption;
+export 'src/bindings.dart' show CloudFunction, HttpsFunction;
 export 'src/express.dart';
 
 /// Main library object which can be used to create and register Firebase
@@ -532,11 +531,14 @@ class ObjectMetadata {
 
   String get contentType => nativeInstance.contentType;
 
-  js.CustomerEncryption get customerEncryption {
+  CustomerEncryption get customerEncryption {
     final dartified = dartify(nativeInstance.customerEncryption);
-    return new js.CustomerEncryption(
-        encryptionAlgorithm: dartified['encryptionAlgorithm'],
-        keySha256: dartified['keySha256']);
+
+    return dartified == null
+        ? null
+        : new CustomerEncryption(
+            encryptionAlgorithm: dartified['encryptionAlgorithm'],
+            keySha256: dartified['keySha256']);
   }
 
   String get generation => nativeInstance.generation;
@@ -592,4 +594,11 @@ class StorageEvent extends Event<ObjectMetadata> {
           resource: resource,
           timestamp: timestamp,
         );
+}
+
+class CustomerEncryption {
+  final String encryptionAlgorithm;
+  final String keySha256;
+
+  CustomerEncryption({this.encryptionAlgorithm, this.keySha256});
 }
