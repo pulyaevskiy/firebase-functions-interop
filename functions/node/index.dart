@@ -21,6 +21,9 @@ void main() {
   functions['onCreateTrigger'] = ref.onCreate(handleCreateUpdateDelete);
   functions['onUpdateTrigger'] = ref.onUpdate(handleCreateUpdateDelete);
   functions['onDeleteTrigger'] = ref.onDelete(handleCreateUpdateDelete);
+
+  functions['pubsubToDatabase'] =
+      FirebaseFunctions.pubsub.topic('testTopic').onPublish(pubsubToDatabase);
 }
 
 FutureOr<Null> makeUppercase(DatabaseEvent<String> event) {
@@ -90,4 +93,14 @@ Future httpsToDatabase(ExpressHttpRequest request) async {
   } finally {
     request.response.close();
   }
+}
+
+FutureOr<void> pubsubToDatabase(PubsubEvent event) {
+  var data = new Map<String, String>.from(event.data.json);
+  var payload = data['payload'];
+  var appOptions = FirebaseFunctions.config.firebase;
+  var admin = FirebaseAdmin.instance;
+  var app = admin.initializeApp(appOptions);
+  var database = app.database();
+  return database.ref('/tests/pubsubToDatabase').setValue(payload);
 }
