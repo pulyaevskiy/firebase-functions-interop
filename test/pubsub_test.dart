@@ -14,7 +14,7 @@ import 'setup_admin.dart';
 void main() {
   App app = initFirebaseApp();
 
-  group('HTTPS', () {
+  group('Pubsub', () {
     tearDownAll(() async {
       await app.delete();
     });
@@ -22,7 +22,7 @@ void main() {
     test('save to database', () async {
       var payload = new DateTime.now().toUtc().toIso8601String();
       var command =
-          'gcloud beta pubsub topics publish testTopic \'{"payload":"$payload"}\'';
+          'gcloud beta pubsub topics publish testTopic --message \'{"payload":"$payload"}\'';
       var exitCode = await exec(command);
       expect(exitCode, 0);
 
@@ -46,8 +46,11 @@ Future<int> exec(String command) {
   childProcess.exec(command, new ExecOptions(),
       allowInterop((error, stdout, stderr) {
     int result = (error == null) ? 0 : error.code;
-    print(stdout);
-    print(stderr);
+    if (error != null) {
+      print(error);
+      print(stdout);
+      print(stderr);
+    }
     completer.complete(result);
   }));
   return completer.future;
