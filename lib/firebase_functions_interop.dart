@@ -427,7 +427,8 @@ class Message {
   final js.Message nativeInstance;
 
   /// User-defined attributes published with the message, if any.
-  Map<String, String> get attributes => dartify(nativeInstance.attributes);
+  Map<String, String> get attributes =>
+      new Map<String, String>.from(dartify(nativeInstance.attributes));
 
   /// The data payload of this message object as a base64-encoded string.
   String get data => nativeInstance.data;

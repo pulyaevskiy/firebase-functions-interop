@@ -247,7 +247,7 @@ abstract class TopicBuilder {
 @anonymous
 abstract class Message {
   /// User-defined attributes published with the message, if any.
-  external dynamic get attributes;
+  external Map<String, String> get attributes;
 
   /// The data payload of this message object as a base64-encoded string.
   external String get data;
