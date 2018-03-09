@@ -22,7 +22,7 @@ void main() {
     test('save to database', () async {
       var payload = new DateTime.now().toUtc().toIso8601String();
       var command =
-          'gcloud beta pubsub topics publish testTopic --message \'{"payload":"$payload"}\'';
+          'gcloud -q beta pubsub topics publish testTopic --message \'{"payload":"$payload"}\'';
       var exitCode = await exec(command);
       expect(exitCode, 0);
 
@@ -46,9 +46,9 @@ Future<int> exec(String command) {
   childProcess.exec(command, new ExecOptions(),
       allowInterop((error, stdout, stderr) {
     int result = (error == null) ? 0 : error.code;
+    print(stdout);
     if (error != null) {
       print(error);
-      print(stdout);
       print(stderr);
     }
     completer.complete(result);
