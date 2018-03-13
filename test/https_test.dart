@@ -13,6 +13,7 @@ import 'setup_admin.dart';
 void main() {
   App app = initFirebaseApp();
   NodeClient http = new NodeClient(keepAlive: false);
+  var baseUrl = env['FIREBASE_HTTP_BASE_URL'] + '/httpsTests';
 
   group('HTTPS', () {
     tearDownAll(() async {
@@ -21,16 +22,15 @@ void main() {
     });
 
     test('get request', () async {
-      var host = env['FIREBASE_HTTP_BASE_URL'];
-      var response = await http.get('$host/helloWorld');
+      var response = await http.get('$baseUrl/helloWorld');
       expect(response.statusCode, 200);
       expect(response.body, 'HappyPathTest\n');
     });
 
     test('save to database', () async {
-      var host = env['FIREBASE_HTTP_BASE_URL'];
       var time = new DateTime.now().millisecondsSinceEpoch.toString();
-      var response = await http.get('$host/httpsToDatabase?name=Firebase$time');
+      var response =
+          await http.get('$baseUrl/httpsToDatabase?name=Firebase$time');
       expect(response.statusCode, 200);
       expect(response.body, 'httpsToDatabase: ok\n');
 
@@ -42,8 +42,7 @@ void main() {
     });
 
     test('get json body', () async {
-      var host = env['FIREBASE_HTTP_BASE_URL'];
-      var response = await http.post('$host/jsonTest',
+      var response = await http.post('$baseUrl/jsonTest',
           headers: {'Content-Type': 'application/json'},
           body: JSON.encode({"helloJSON": "hi"}));
       expect(response.statusCode, 200);
