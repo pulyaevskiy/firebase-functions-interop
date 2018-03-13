@@ -7,12 +7,7 @@ import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 
 void main() {
-  functions['date'] = FirebaseFunctions.https.onRequest(date);
-  functions['helloWorld'] = FirebaseFunctions.https.onRequest(helloWorld);
-  functions['config'] = FirebaseFunctions.https.onRequest(config);
-  functions['httpsToDatabase'] =
-      FirebaseFunctions.https.onRequest(httpsToDatabase);
-  functions['jsonTest'] = FirebaseFunctions.https.onRequest(jsonTest);
+  functions['httpsTests'] = FirebaseFunctions.https.onRequest(httpsTests);
 
   functions['makeUppercase'] = FirebaseFunctions.database
       .ref('/tests/{testId}/original')
@@ -26,32 +21,36 @@ void main() {
       FirebaseFunctions.pubsub.topic('testTopic').onPublish(pubsubToDatabase);
 }
 
-FutureOr<Null> makeUppercase(DatabaseEvent<String> event) {
-  var original = event.data.val();
-  var pushId = event.params['testId'];
-  print('Uppercasing $original');
-  var uppercase = pushId.toString() + ': ' + original.toUpperCase();
-  return event.data.ref.parent.child('uppercase').setValue(uppercase);
+httpsTests(ExpressHttpRequest request) {
+  switch (request.uri.path) {
+    case '/jsonTest':
+      return jsonTest(request);
+    case '/date':
+      return date(request);
+    case '/helloWorld':
+      return helloWorld(request);
+    case '/config':
+      return config(request);
+    case '/httpsToDatabase':
+      return httpsToDatabase(request);
+    default:
+      request.response.close();
+  }
 }
 
-FutureOr<Null> handleCreateUpdateDelete(DatabaseEvent<String> event) {
-  final eventType = event.eventType;
-  return event.data.ref.parent.child('lastEventType').setValue(eventType);
-}
-
-Future jsonTest(ExpressHttpRequest request) async {
+jsonTest(ExpressHttpRequest request) {
   final Map<String, dynamic> data = request.body;
   request.response.write(JSON.encode(data));
   request.response.close();
 }
 
-void date(ExpressHttpRequest request) {
+date(ExpressHttpRequest request) {
   DateTime now = new DateTime.now().toUtc();
   request.response.writeln(now.toIso8601String());
   request.response.close();
 }
 
-void helloWorld(ExpressHttpRequest request) {
+helloWorld(ExpressHttpRequest request) {
   try {
     request.response.writeln('HappyPathTest');
   } finally {
@@ -74,7 +73,7 @@ void config(ExpressHttpRequest request) {
   }
 }
 
-Future httpsToDatabase(ExpressHttpRequest request) async {
+Future<void> httpsToDatabase(ExpressHttpRequest request) async {
   try {
     String name = request.requestedUri.queryParameters['name'];
     if (name != null) {
@@ -93,6 +92,19 @@ Future httpsToDatabase(ExpressHttpRequest request) async {
   } finally {
     request.response.close();
   }
+}
+
+FutureOr<void> makeUppercase(DatabaseEvent<String> event) {
+  var original = event.data.val();
+  var pushId = event.params['testId'];
+  print('Uppercasing $original');
+  var uppercase = pushId.toString() + ': ' + original.toUpperCase();
+  return event.data.ref.parent.child('uppercase').setValue(uppercase);
+}
+
+FutureOr<Null> handleCreateUpdateDelete(DatabaseEvent<String> event) {
+  final eventType = event.eventType;
+  return event.data.ref.parent.child('lastEventType').setValue(eventType);
 }
 
 FutureOr<void> pubsubToDatabase(PubsubEvent event) {
