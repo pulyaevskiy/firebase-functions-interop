@@ -21,7 +21,8 @@ void main() {
       FirebaseFunctions.pubsub.topic('testTopic').onPublish(pubsubToDatabase);
 }
 
-httpsTests(ExpressHttpRequest request) {
+FutureOr<void> httpsTests(ExpressHttpRequest request) {
+  print(request.uri.path);
   switch (request.uri.path) {
     case '/jsonTest':
       return jsonTest(request);
@@ -35,6 +36,7 @@ httpsTests(ExpressHttpRequest request) {
       return httpsToDatabase(request);
     default:
       request.response.close();
+      return null;
   }
 }
 
@@ -58,7 +60,7 @@ helloWorld(ExpressHttpRequest request) {
   }
 }
 
-void config(ExpressHttpRequest request) {
+config(ExpressHttpRequest request) {
   try {
     var config = FirebaseFunctions.config;
     Map body = {
@@ -73,7 +75,7 @@ void config(ExpressHttpRequest request) {
   }
 }
 
-Future<void> httpsToDatabase(ExpressHttpRequest request) async {
+FutureOr<void> httpsToDatabase(ExpressHttpRequest request) async {
   try {
     String name = request.requestedUri.queryParameters['name'];
     if (name != null) {
@@ -91,6 +93,7 @@ Future<void> httpsToDatabase(ExpressHttpRequest request) async {
     request.response.write(e.toString());
   } finally {
     request.response.close();
+    return null;
   }
 }
 
