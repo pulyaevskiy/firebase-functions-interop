@@ -44,7 +44,7 @@ void main() {
     test('get json body', () async {
       var response = await http.post('$baseUrl/jsonTest',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.encode({"helloJSON": "hi"}));
+          body: json.encode({"helloJSON": "hi"}));
       expect(response.statusCode, 200);
       expect(response.body, '{"helloJSON":"hi"}');
     });

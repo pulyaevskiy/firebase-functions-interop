@@ -514,69 +514,108 @@ class ObjectBuilder {
   }
 }
 
-// TODO: Add field description
+/// Interface representing a Google Google Cloud Storage object metadata object.
 class ObjectMetadata {
   ObjectMetadata(js.ObjectMetadata this.nativeInstance);
 
   @protected
   final js.ObjectMetadata nativeInstance;
 
+  /// Storage bucket that contains the object.
   String get bucket => nativeInstance.bucket;
 
+  /// The value of the `Cache-Control` header, used to determine whether Internet
+  /// caches are allowed to cache public data for an object.
   String get cacheControl => nativeInstance.cacheControl;
 
+  /// Specifies the number of originally uploaded objects from which a composite
+  /// object was created.
   int get componentCount => nativeInstance.componentCount;
 
+  /// The value of the `Content-Disposition` header, used to specify presentation
+  /// information about the data being transmitted.
   String get contentDisposition => nativeInstance.contentDisposition;
 
+  /// Content encoding to indicate that an object is compressed (for example,
+  /// with gzip compression) while maintaining its Content-Type.
   String get contentEncoding => nativeInstance.contentEncoding;
 
+  /// ISO 639-1 language code of the content.
   String get contentLanguage => nativeInstance.contentLanguage;
 
+  /// The object's content type, also known as the MIME type.
   String get contentType => nativeInstance.contentType;
 
+  /// The object's CRC32C hash. All Google Cloud Storage objects have a CRC32C
+  /// hash or MD5 hash.
+  String get crc32c => nativeInstance.crc32c;
+
+  /// Customer-supplied encryption key.
   CustomerEncryption get customerEncryption {
     final dartified = dartify(nativeInstance.customerEncryption);
-
-    return dartified == null
-        ? null
-        : new CustomerEncryption(
-            encryptionAlgorithm: dartified['encryptionAlgorithm'],
-            keySha256: dartified['keySha256']);
+    if (dartified == null) return null;
+    return new CustomerEncryption(
+      encryptionAlgorithm: dartified['encryptionAlgorithm'],
+      keySha256: dartified['keySha256'],
+    );
   }
 
+  /// Generation version number that changes each time the object is overwritten.
   String get generation => nativeInstance.generation;
 
+  /// The ID of the object, including the bucket name, object name, and generation
+  /// number.
   String get id => nativeInstance.id;
 
+  /// The kind of the object, which is always `storage#object`.
   String get kind => nativeInstance.kind;
 
+  /// MD5 hash for the object. All Google Cloud Storage objects have a CRC32C hash
+  /// or MD5 hash.
   String get md5Hash => nativeInstance.md5Hash;
 
+  /// Media download link.
   String get mediaLink => nativeInstance.mediaLink;
 
+  /// User-provided metadata.
   Map<String, dynamic> get metadata => dartify(nativeInstance.metadata);
 
+  /// Meta-generation version number that changes each time the object's metadata
+  /// is updated.
   String get metageneration => nativeInstance.metageneration;
 
+  /// The object's name.
   String get name => nativeInstance.name;
 
+  /// The current state of this object resource.
+  ///
+  /// The value can be either "exists" (for object creation and updates) or
+  /// "not_exists" (for object deletion and moves).
   String get resourceState => nativeInstance.resourceState;
 
+  /// Link to access the object, assuming you have sufficient permissions.
   String get selfLink => nativeInstance.selfLink;
 
+  /// The value of the `Content-Length` header, used to determine the length of
+  /// this object data in bytes.
   String get size => nativeInstance.size;
 
+  /// Storage class of this object.
   String get storageClass => nativeInstance.storageClass;
 
+  /// The creation time of this object.
   DateTime get timeCreated => nativeInstance.timeCreated == null
       ? null
       : DateTime.parse(nativeInstance.timeCreated);
 
+  /// The deletion time of this object.
+  ///
+  /// Returned only if this version of the object has been deleted.
   DateTime get timeDeleted => nativeInstance.timeDeleted == null
       ? null
       : DateTime.parse(nativeInstance.timeDeleted);
 
+  /// The modification time of this object.
   DateTime get updated => nativeInstance.updated == null
       ? null
       : DateTime.parse(nativeInstance.updated);

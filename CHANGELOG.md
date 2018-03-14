@@ -1,3 +1,7 @@
+## 1.0.0-dev.3.0
+
+- Added: Pubsub (#10), Storage (#12) and Auth (#17) triggers support.
+
 ## 1.0.0-dev.2.0
 
 - Fixed: expose Firestore functions namespace in `FirebaseFunctions.firestore` (#8).

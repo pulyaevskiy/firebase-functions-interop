@@ -290,54 +290,92 @@ abstract class ObjectBuilder {
 }
 
 /// Interface representing a Google Google Cloud Storage object metadata object.
-// TODO: Add field description
 @JS()
 @anonymous
 abstract class ObjectMetadata {
+  /// Storage bucket that contains the object.
   external String get bucket;
 
+  /// The value of the `Cache-Control` header, used to determine whether Internet
+  /// caches are allowed to cache public data for an object.
   external String get cacheControl;
 
+  /// Specifies the number of originally uploaded objects from which a composite
+  /// object was created.
   external int get componentCount;
 
+  /// The value of the `Content-Disposition` header, used to specify presentation
+  /// information about the data being transmitted.
   external String get contentDisposition;
 
+  /// Content encoding to indicate that an object is compressed (for example,
+  /// with gzip compression) while maintaining its Content-Type.
   external String get contentEncoding;
 
+  /// ISO 639-1 language code of the content.
   external String get contentLanguage;
 
+  /// The object's content type, also known as the MIME type.
   external String get contentType;
 
+  /// The object's CRC32C hash. All Google Cloud Storage objects have a CRC32C
+  /// hash or MD5 hash.
+  external String get crc32c;
+
+  /// Customer-supplied encryption key.
   external dynamic get customerEncryption;
 
+  /// Generation version number that changes each time the object is overwritten.
   external String get generation;
 
+  /// The ID of the object, including the bucket name, object name, and generation
+  /// number.
   external String get id;
 
+  /// The kind of the object, which is always `storage#object`.
   external String get kind;
 
+  /// MD5 hash for the object. All Google Cloud Storage objects have a CRC32C hash
+  /// or MD5 hash.
   external String get md5Hash;
 
+  /// Media download link.
   external String get mediaLink;
 
+  /// User-provided metadata.
   external Map<String, dynamic> get metadata;
 
+  /// Meta-generation version number that changes each time the object's metadata
+  /// is updated.
   external String get metageneration;
 
+  /// The object's name.
   external String get name;
 
+  /// The current state of this object resource.
+  ///
+  /// The value can be either "exists" (for object creation and updates) or
+  /// "not_exists" (for object deletion and moves).
   external String get resourceState;
 
+  /// Link to access the object, assuming you have sufficient permissions.
   external String get selfLink;
 
+  /// The value of the `Content-Length` header, used to determine the length of
+  /// this object data in bytes.
   external String get size;
 
+  /// Storage class of this object.
   external String get storageClass;
 
+  /// The creation time of this object in RFC 3339 format.
   external String get timeCreated;
 
+  /// The deletion time of the object in RFC 3339 format. Returned only if this
+  /// version of the object has been deleted.
   external String get timeDeleted;
 
+  /// The modification time of this object.
   external String get updated;
 }
 

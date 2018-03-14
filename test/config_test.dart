@@ -14,7 +14,7 @@ void main() {
       var baseUrl = env['FIREBASE_HTTP_BASE_URL'] + '/httpsTests';
       var response = await http.get('$baseUrl/config');
       expect(response.statusCode, 200);
-      final Map result = JSON.decode(response.body);
+      final Map result = json.decode(response.body);
       expect(result['key'], '123456');
       expect(result['url'], 'https://example.com');
       expect(result['enabled'], 'true');

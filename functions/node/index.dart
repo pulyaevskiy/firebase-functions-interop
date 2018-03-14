@@ -42,7 +42,7 @@ FutureOr<void> httpsTests(ExpressHttpRequest request) {
 
 jsonTest(ExpressHttpRequest request) {
   final Map<String, dynamic> data = request.body;
-  request.response.write(JSON.encode(data));
+  request.response.write(json.encode(data));
   request.response.close();
 }
 
@@ -69,7 +69,7 @@ config(ExpressHttpRequest request) {
       'enabled': config.get('someservice.enabled'),
       'noSuchKey': config.get('no.such.key'),
     };
-    request.response.writeln(JSON.encode(body));
+    request.response.writeln(json.encode(body));
   } finally {
     request.response.close();
   }
