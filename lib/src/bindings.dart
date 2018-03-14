@@ -28,6 +28,8 @@ abstract class FirebaseFunctions {
 
   external StorageFunctions get storage;
 
+  external AuthFunctions get auth;
+
   /// Constructor for Firebase [Event] objects.
   external dynamic get Event;
 }
@@ -288,6 +290,7 @@ abstract class ObjectBuilder {
 }
 
 /// Interface representing a Google Google Cloud Storage object metadata object.
+// TODO: Add field description
 @JS()
 @anonymous
 abstract class ObjectMetadata {
@@ -336,4 +339,55 @@ abstract class ObjectMetadata {
   external String get timeDeleted;
 
   external String get updated;
+}
+
+/// Namespace for Firebase Authentication functions.
+@JS()
+@anonymous
+abstract class AuthFunctions {
+  /// Registers a Cloud Function to handle user authentication events.
+  external UserBuilder user();
+}
+
+/// The Firebase Authentication user builder interface.
+@JS()
+@anonymous
+abstract class UserBuilder {
+  /// Event handler that fires every time a Firebase Authentication user is created.
+  external CloudFunction onCreate(void handler(Event<UserRecord> event));
+
+  /// Event handler that fires every time a Firebase Authentication user is deleted.
+  external CloudFunction onDelete(void handler(Event<UserRecord> event));
+}
+
+/// Interface representing a user.
+@JS()
+@anonymous
+abstract class UserRecord {
+  /// Whether or not the user is disabled.
+  external bool get disabled;
+
+  /// The user's display name.
+  external String get displayName;
+
+  /// The user's primary email, if set.
+  external String get email;
+
+  /// Whether or not the user's primary email is verified.
+  external bool get emailVerified;
+
+  /// Additional metadata about the user.
+  external admin.UserMetadata get metadata;
+
+  /// The user's photo URL.
+  external String get photoURL;
+
+  /// An array of providers (for example, Google, Facebook) linked to the user.
+  external List<admin.UserInfo> get providerData;
+
+  /// The user's uid.
+  external String get uid;
+
+  /// Returns the serialized JSON representation of this object.
+  external dynamic toJSON();
 }

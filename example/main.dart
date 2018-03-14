@@ -24,6 +24,7 @@ void main() {
       FirebaseFunctions.pubsub.topic('my-topic').onPublish(logPubsub);
   functions['logStorage'] =
       FirebaseFunctions.storage.object().onChange(logStorage);
+  functions['logAuth'] = FirebaseFunctions.auth.user().onCreate(logAuth);
 }
 
 /// Example Realtime Database function.
@@ -54,8 +55,13 @@ void logPubsub(PubsubEvent event) {
 }
 
 /// Example Storage
-void logStorage (StorageEvent event){
+void logStorage(StorageEvent event) {
   print(event.data.name);
+}
+
+/// Example Auth
+void logAuth(AuthEvent event) {
+  print(event.data.email);
 }
 
 /// Example HTTPS function.
