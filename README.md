@@ -39,7 +39,7 @@ Below is status report of already implemented functionality by namespace:
 - [x] functions
 - [x] functions.config
 - [ ] functions.analytics
-- [ ] functions.auth
+- [x] functions.auth
 - [x] functions.firestore :fire:
 - [x] functions.database
 - [x] functions.https
@@ -284,7 +284,19 @@ void main() {
 void logStorage (StorageEvent event){
   print(event.data.name);
 }
+```
 
+### Auth Functions
+
+```dart
+void main() {
+  functions['logAuth'] = FirebaseFunctions.storage
+      .user().onCreate(logAuth);
+}
+
+void logAuth(AuthEvent event) {
+  print(event.data.email);
+}
 ```
 
 ## Configuration

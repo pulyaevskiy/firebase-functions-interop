@@ -79,8 +79,11 @@ class FirebaseFunctions {
   /// Pubsub functions
   static const PubsubFunctions pubsub = const PubsubFunctions._();
 
-  // Storage functions
+  /// Storage functions
   static const StorageFunctions storage = const StorageFunctions._();
+
+  /// Namespace for Firebase Authentication functions.
+  static const AuthFunctions auth = const AuthFunctions._();
 
   /// Export [function] under specified [key].
   ///
@@ -511,6 +514,7 @@ class ObjectBuilder {
   }
 }
 
+// TODO: Add field description
 class ObjectMetadata {
   ObjectMetadata(js.ObjectMetadata this.nativeInstance);
 
@@ -601,4 +605,102 @@ class CustomerEncryption {
   final String keySha256;
 
   CustomerEncryption({this.encryptionAlgorithm, this.keySha256});
+}
+
+/// Namespace for Firebase Authentication functions.
+class AuthFunctions {
+  const AuthFunctions._();
+
+  /// Registers a Cloud Function to handle user authentication events.
+  UserBuilder user() => new UserBuilder._(_js.auth.user());
+}
+
+/// The Firebase Authentication user builder interface.
+class UserBuilder {
+  @protected
+  final js.UserBuilder nativeInstance;
+
+  UserBuilder._(this.nativeInstance);
+
+  /// Event handler that fires every time a Firebase Authentication user is created.
+  js.CloudFunction onCreate(FutureOr<void> handler(AuthEvent event)) {
+    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+    return nativeInstance.onCreate(allowInterop(wrapper));
+  }
+
+  /// Event handler that fires every time a Firebase Authentication user is deleted.
+  js.CloudFunction onDelete(FutureOr<void> handler(AuthEvent event)) {
+    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+    return nativeInstance.onDelete(allowInterop(wrapper));
+  }
+
+  dynamic _handleEvent(
+      js.Event jsEvent, FutureOr<void> handler(AuthEvent event)) {
+    final AuthEvent event = new AuthEvent(
+      data: new UserRecord(jsEvent.data),
+      eventId: jsEvent.eventId,
+      eventType: jsEvent.eventType,
+      params: dartify(jsEvent.params),
+      resource: jsEvent.resource,
+      timestamp: DateTime.parse(jsEvent.timestamp),
+    );
+    var result = handler(event);
+    if (result is Future) {
+      return futureToPromise(result);
+    }
+    return null;
+  }
+}
+
+/// Interface representing a user.
+class UserRecord {
+  UserRecord(js.UserRecord this.nativeInstance);
+
+  @protected
+  final js.UserRecord nativeInstance;
+
+  /// Whether or not the user is disabled.
+  bool get disabled => nativeInstance.disabled;
+
+  /// The user's display name.
+  String get displayName => nativeInstance.displayName;
+
+  /// The user's primary email, if set.
+  String get email => nativeInstance.email;
+
+  /// Whether or not the user's primary email is verified.
+  bool get emailVerified => nativeInstance.emailVerified;
+
+  /// Additional metadata about the user.
+  UserMetadata get metadata => nativeInstance.metadata;
+
+  /// The user's photo URL.
+  String get photoURL => nativeInstance.photoURL;
+
+  /// An array of providers (for example, Google, Facebook) linked to the user.
+  List<UserInfo> get providerData => nativeInstance.providerData;
+
+  /// The user's uid.
+  String get uid => nativeInstance.uid;
+
+  /// Returns a JSON-serializable representation of this object.
+  dynamic toJson() => dartify(nativeInstance.toJSON());
+}
+
+class AuthEvent extends Event<UserRecord> {
+  AuthEvent({
+    UserRecord data,
+    String eventId,
+    String eventType,
+    Map<String, String> params,
+    String resource,
+    DateTime timestamp,
+  }) : super(
+          data: data,
+          eventId: eventId,
+          eventType: eventType,
+          params: params,
+          resource: resource,
+          timestamp: timestamp,
+        );
 }
