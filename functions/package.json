@@ -14,8 +14,9 @@
     "logs": "firebase functions:log"
   },
   "dependencies": {
-    "firebase-admin": "^5.8.1",
-    "firebase-functions": "^0.8.1"
+    "firebase-admin": "5.10.0",
+    "firebase-functions": "0.9.1",
+    "@google-cloud/firestore": "0.13.0"
   },
   "private": true
 }

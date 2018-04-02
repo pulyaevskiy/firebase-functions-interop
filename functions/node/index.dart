@@ -34,6 +34,8 @@ FutureOr<void> httpsTests(ExpressHttpRequest request) {
       return config(request);
     case '/httpsToDatabase':
       return httpsToDatabase(request);
+    case '/httpsToFirestore':
+      return httpsToFirestore(request);
     default:
       request.response.close();
       return null;
@@ -87,6 +89,29 @@ FutureOr<void> httpsToDatabase(ExpressHttpRequest request) async {
           .ref('/tests/httpsToDatabase/original')
           .setValue(name.toUpperCase());
       request.response.writeln('httpsToDatabase: ok');
+    }
+  } catch (e) {
+    request.response.statusCode = 500;
+    request.response.write(e.toString());
+  } finally {
+    request.response.close();
+    return null;
+  }
+}
+
+FutureOr<void> httpsToFirestore(ExpressHttpRequest request) async {
+  try {
+    String name = request.requestedUri.queryParameters['name'];
+    if (name != null) {
+      var appOptions = FirebaseFunctions.config.firebase;
+      var admin = FirebaseAdmin.instance;
+      var app = admin.initializeApp(appOptions);
+      var firestore = app.firestore();
+      var doc = new DocumentData();
+      doc.setGeoPoint('location', new GeoPoint(23.03, 19.84));
+      doc.setString('name', name);
+      await firestore.document('/tests/httpsToFirestore').setData(doc);
+      request.response.writeln('httpsToFirestore: ok');
     }
   } catch (e) {
     request.response.statusCode = 500;
