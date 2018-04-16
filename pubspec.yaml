@@ -1,6 +1,6 @@
 name: firebase_functions_interop
 description: Write Firebase Cloud Functions in Dart
-version: 1.0.0-dev.3.0
+version: 1.0.0-dev.4.0
 homepage: https://www.github.com/pulyaevskiy/firebase-functions-interop
 author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 

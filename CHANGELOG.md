@@ -1,3 +1,16 @@
+## 1.0.0-dev.4.0
+
+- Breaking: Upgraded to Functions SDK 1.0.1 and Admin SDK 5.12.0
+  Official migration guide is located here: https://firebase.google.com/docs/functions/beta-v1-diff
+  Changes in this library are identical and slightly adapted to Dart
+  semantics:
+  * `admin.config().firebase` field has been removed
+  * Background functions (that is everything except HTTPS) now
+    expect two arguments `data` and `context` instead of single `event`
+    argument. For details see migration guide or updated examples in
+    `example/` folder.
+
+
 ## 1.0.0-dev.3.0
 
 - Added: Pubsub (#10), Storage (#12) and Auth (#17) triggers support.

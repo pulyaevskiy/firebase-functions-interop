@@ -8,6 +8,8 @@ import 'package:js/js.dart';
 import 'package:node_interop/http.dart';
 import 'package:firebase_admin_interop/js.dart' as admin;
 
+export 'package:firebase_admin_interop/js.dart';
+
 @JS()
 @anonymous
 abstract class FirebaseFunctions {
@@ -39,7 +41,7 @@ abstract class FirebaseFunctions {
 /// This should be exported from your JavaScript file to define a Cloud Function.
 /// This type is a special JavaScript function which takes a generic [Event]
 /// object as its only argument.
-typedef void CloudFunction<T>(Event<T> event);
+typedef void CloudFunction<T>(data, EventContext context);
 
 /// The Cloud Function type for HTTPS triggers.
 ///
@@ -48,62 +50,69 @@ typedef void CloudFunction<T>(Event<T> event);
 /// Request and Response objects as its only arguments.
 typedef void HttpsFunction(IncomingMessage request, ServerResponse response);
 
+/// The Functions interface for events that change state, such as
+/// Realtime Database or Cloud Firestore `onWrite` and `onUpdate`.
 @JS()
 @anonymous
-abstract class Event<T> {
-  /// Data returned for the event. The nature of the data depends on the event
-  /// type.
-  external T get data;
+abstract class Change<T> {
+  /// Represents the state after the event.
+  external T get after;
+
+  /// Represents the state prior to the event.
+  external T get before;
+}
+
+/// The context in which an event occurred.
+///
+/// An EventContext describes:
+///
+///   * The time an event occurred.
+///   * A unique identifier of the event.
+///   * The resource on which the event occurred, if applicable.
+///   * Authorization of the request that triggered the event, if applicable
+///     and available.
+@JS()
+@anonymous
+abstract class EventContext {
+  /// Authentication information for the user that triggered the function.
+  ///
+  /// For an unauthenticated user, this field is null. For event types that do
+  /// not provide user information (all except Realtime Database) or for
+  /// Firebase admin users, this field will not exist.
+  external EventAuthInfo get auth;
+
+  /// The level of permissions for a user.
+  ///
+  /// Valid values are: `ADMIN`, `USER`, `UNAUTHENTICATED` and `null`.
+  external String get authType;
 
   /// The event’s unique identifier.
   external String get eventId;
 
   /// Type of event.
-  ///
-  /// Valid values are:
-  /// - `providers/google.firebase.analytics/eventTypes/event.log`
-  /// - `providers/google.firebase.database/eventTypes/ref.write`
-  /// - `providers/google.firebase.database/eventTypes/ref.create`
-  /// - `providers/google.firebase.database/eventTypes/ref.update`
-  /// - `providers/google.firebase.database/eventTypes/ref.delete`
-  /// - `providers/firebase.auth/eventTypes/user.create`
-  /// - `providers/firebase.auth/eventTypes/user.delete`
-  /// - `providers/cloud.pubsub/eventTypes/topic.publish`
-  /// - `providers/cloud.storage/eventTypes/object.change`
   external String get eventType;
 
   /// An object containing the values of the wildcards in the path parameter
-  /// provided to the [Database.ref] method for a Realtime Database trigger.
+  /// provided to the ref() method for a Realtime Database trigger.
   external dynamic get params;
 
   /// The resource that emitted the event.
-  ///
-  /// Valid values are:
-  ///
-  /// - Analytics — projects/<projectId>/events/<analyticsEventType>
-  /// - Realtime Database — projects/_/instances/<databaseInstance>/refs/<databasePath>
-  /// - Storage — projects/_/buckets/<bucketName>/objects/<fileName>#<generation>
-  /// - Authentication — projects/<projectId>
-  /// - Pub/Sub — projects/<projectId>/topics/<topicName>
-  ///
-  /// Because Realtime Database instances and Cloud Storage buckets are globally
-  /// unique and not tied to the project, their resources start with projects/_.
-  /// Underscore is not a valid project name.
   external String get resource;
 
-  /// Timestamp for the event.
-  ///
-  /// Formatted as an [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) string.
+  /// Timestamp for the event as an RFC 3339 string.
   external String get timestamp;
 }
 
 @JS()
 @anonymous
-abstract class Config {
-  /// The Firebase configuration object which can be used to initialize the
-  /// Firebase Admin Node.js SDK.
-  external admin.AppOptions get firebase;
+abstract class EventAuthInfo {
+  external String get uid;
+  external String get token;
 }
+
+@JS()
+@anonymous
+abstract class Config {}
 
 @JS()
 @anonymous
@@ -133,35 +142,23 @@ abstract class DatabaseFunctions {
 abstract class RefBuilder {
   /// Event handler that fires every time new data is created in Firebase
   /// Realtime Database.
-  external CloudFunction onCreate(dynamic handler(Event<DeltaSnapshot> event));
+  external CloudFunction onCreate(
+      dynamic handler(admin.DataSnapshot data, EventContext context));
 
   /// Event handler that fires every time data is deleted from Firebase Realtime
   /// Database.
-  external CloudFunction onDelete(dynamic handler(Event<DeltaSnapshot> event));
+  external CloudFunction onDelete(
+      dynamic handler(admin.DataSnapshot data, EventContext context));
 
   /// Event handler that fires every time data is updated in Firebase Realtime
   /// Database.
-  external CloudFunction onUpdate(dynamic handler(Event<DeltaSnapshot> event));
+  external CloudFunction onUpdate(
+      dynamic handler(Change<admin.DataSnapshot> data, EventContext context));
 
   /// Event handler that fires every time a Firebase Realtime Database write of
   /// any kind (creation, update, or delete) occurs.
-  external CloudFunction onWrite(dynamic handler(Event<DeltaSnapshot> event));
-}
-
-/// Interface representing a Firebase Realtime Database delta snapshot.
-@JS()
-@anonymous
-abstract class DeltaSnapshot extends admin.DataSnapshot {
-  external admin.Reference get adminRef;
-
-  external DeltaSnapshot get current;
-
-  external DeltaSnapshot get previous;
-
-  external bool changed();
-
-  @override
-  external DeltaSnapshot child(String path);
+  external CloudFunction onWrite(
+      dynamic handler(Change<admin.DataSnapshot> data, EventContext context));
 }
 
 @JS()
@@ -179,55 +176,22 @@ abstract class DocumentBuilder {
   /// Event handler that fires every time new data is created in Cloud
   /// Firestore.
   external CloudFunction onCreate(
-      void handler(Event<DeltaDocumentSnapshot> event));
+      dynamic handler(admin.DocumentSnapshot data, EventContext context));
 
   /// Event handler that fires every time data is deleted from Cloud Firestore.
   external CloudFunction onDelete(
-      void handler(Event<DeltaDocumentSnapshot> event));
+      dynamic handler(admin.DocumentSnapshot data, EventContext context));
 
   /// Event handler that fires every time data is updated in Cloud Firestore.
   external CloudFunction onUpdate(
-      void handler(Event<DeltaDocumentSnapshot> event));
+      dynamic handler(
+          Change<admin.DocumentSnapshot> data, EventContext context));
 
   /// Event handler that fires every time a Cloud Firestore write of any kind
   /// (creation, update, or delete) occurs.
   external CloudFunction onWrite(
-      void handler(Event<DeltaDocumentSnapshot> event));
-}
-
-/// Interface representing a Cloud Firestore delta document snapshot.
-@JS()
-@anonymous
-abstract class DeltaDocumentSnapshot implements admin.DocumentSnapshot {
-  /// The date the document was created, formatted as a UTC string.
-  external String get createTime;
-
-  /// Returns `true` if this DocumentDeltaSnapshot contains any data.
-  external bool get exists;
-
-  /// Extracts a document ID from a DocumentDeltaSnapshot.
-  external String get id;
-
-  /// Gets the previous state of this document, from before the triggering write
-  /// event.
-  external DeltaDocumentSnapshot get previous;
-
-  /// The last time the document was read, formatted as a UTC string.
-  external String get readTime;
-
-  /// Returns a DocumentReference to the database location where the triggering
-  /// write occurred. This DocumentReference has admin privileges.
-  external admin.DocumentReference get ref;
-
-  /// The last update time for the document, formatted as a UTC string.
-  external String get updateTime;
-
-  /// Returns the data fields in their state after the triggering write event
-  /// has occurred.
-  external dynamic data();
-
-  /// Gets the value for a given key.
-  external dynamic get(key);
+      dynamic handler(
+          Change<admin.DocumentSnapshot> data, EventContext context));
 }
 
 @JS()
@@ -243,7 +207,8 @@ abstract class PubsubFunctions {
 @anonymous
 abstract class TopicBuilder {
   /// Event handler that fires every time an event is publish in Pubsub.
-  external CloudFunction onPublish(void handler(Event<Message> event));
+  external CloudFunction onPublish(
+      dynamic handler(Message data, EventContext context));
 }
 
 /// Interface representing a Google Cloud Pub/Sub message.
@@ -285,8 +250,38 @@ abstract class BucketBuilder {
 @JS()
 @anonymous
 abstract class ObjectBuilder {
-  /// Event handler which fires every time a Google Cloud Storage change occurs.
-  external CloudFunction onChange(void handler(Event<ObjectMetadata> event));
+  /// Event handler sent only when a bucket has enabled object versioning.
+  ///
+  /// This event indicates that the live version of an object has become an
+  /// archived version, either because it was archived or because it was
+  /// overwritten by the upload of an object of the same name.
+  external CloudFunction onArchive(
+      void handler(ObjectMetadata data, EventContext context));
+
+  /// Event handler which fires every time a Google Cloud Storage deletion
+  /// occurs.
+  ///
+  /// Sent when an object has been permanently deleted. This includes objects
+  /// that are overwritten or are deleted as part of the bucket's lifecycle
+  /// configuration. For buckets with object versioning enabled, this is not
+  /// sent when an object is archived, even if archival occurs via the
+  /// storage.objects.delete method.
+  external CloudFunction onDelete(
+      void handler(ObjectMetadata data, EventContext context));
+
+  /// Event handler which fires every time a Google Cloud Storage object
+  /// creation occurs.
+  ///
+  /// Sent when a new object (or a new generation of an existing object) is
+  /// successfully created in the bucket. This includes copying or rewriting an
+  /// existing object. A failed upload does not trigger this event.
+  external CloudFunction onFinalize(
+      void handler(ObjectMetadata data, EventContext context));
+
+  /// Event handler which fires every time the metadata of an existing object
+  /// changes.
+  external CloudFunction onMetadataUpdate(
+      void handler(ObjectMetadata data, EventContext context));
 }
 
 /// Interface representing a Google Google Cloud Storage object metadata object.
@@ -392,10 +387,12 @@ abstract class AuthFunctions {
 @anonymous
 abstract class UserBuilder {
   /// Event handler that fires every time a Firebase Authentication user is created.
-  external CloudFunction onCreate(void handler(Event<UserRecord> event));
+  external CloudFunction onCreate(
+      void handler(UserRecord data, EventContext context));
 
   /// Event handler that fires every time a Firebase Authentication user is deleted.
-  external CloudFunction onDelete(void handler(Event<UserRecord> event));
+  external CloudFunction onDelete(
+      void handler(UserRecord data, EventContext context));
 }
 
 /// Interface representing a user.

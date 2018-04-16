@@ -4,7 +4,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
-import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 
 void main() {
   functions['httpsTests'] = FirebaseFunctions.https.onRequest(httpsTests);
@@ -12,10 +11,6 @@ void main() {
   functions['makeUppercase'] = FirebaseFunctions.database
       .ref('/tests/{testId}/original')
       .onWrite(makeUppercase);
-  final ref = FirebaseFunctions.database.ref('/onCreateUpdateDelete/value');
-  functions['onCreateTrigger'] = ref.onCreate(handleCreateUpdateDelete);
-  functions['onUpdateTrigger'] = ref.onUpdate(handleCreateUpdateDelete);
-  functions['onDeleteTrigger'] = ref.onDelete(handleCreateUpdateDelete);
 
   functions['pubsubToDatabase'] =
       FirebaseFunctions.pubsub.topic('testTopic').onPublish(pubsubToDatabase);
@@ -81,9 +76,8 @@ FutureOr<void> httpsToDatabase(ExpressHttpRequest request) async {
   try {
     String name = request.requestedUri.queryParameters['name'];
     if (name != null) {
-      var appOptions = FirebaseFunctions.config.firebase;
       var admin = FirebaseAdmin.instance;
-      var app = admin.initializeApp(appOptions);
+      var app = admin.initializeApp();
       var database = app.database();
       await database
           .ref('/tests/httpsToDatabase/original')
@@ -103,9 +97,8 @@ FutureOr<void> httpsToFirestore(ExpressHttpRequest request) async {
   try {
     String name = request.requestedUri.queryParameters['name'];
     if (name != null) {
-      var appOptions = FirebaseFunctions.config.firebase;
       var admin = FirebaseAdmin.instance;
-      var app = admin.initializeApp(appOptions);
+      var app = admin.initializeApp();
       var firestore = app.firestore();
       var doc = new DocumentData();
       doc.setGeoPoint('location', new GeoPoint(23.03, 19.84));
@@ -122,25 +115,21 @@ FutureOr<void> httpsToFirestore(ExpressHttpRequest request) async {
   }
 }
 
-FutureOr<void> makeUppercase(DatabaseEvent<String> event) {
-  var original = event.data.val();
-  var pushId = event.params['testId'];
+FutureOr<void> makeUppercase(
+    Change<DataSnapshot<String>> change, EventContext context) {
+  var data = change.after;
+  var original = data.val();
+  var pushId = context.params['testId'];
   print('Uppercasing $original');
   var uppercase = pushId.toString() + ': ' + original.toUpperCase();
-  return event.data.ref.parent.child('uppercase').setValue(uppercase);
+  return data.ref.parent.child('uppercase').setValue(uppercase);
 }
 
-FutureOr<Null> handleCreateUpdateDelete(DatabaseEvent<String> event) {
-  final eventType = event.eventType;
-  return event.data.ref.parent.child('lastEventType').setValue(eventType);
-}
-
-FutureOr<void> pubsubToDatabase(PubsubEvent event) {
-  var data = new Map<String, String>.from(event.data.json);
+FutureOr<void> pubsubToDatabase(Message message, EventContext context) {
+  var data = new Map<String, String>.from(message.json);
   var payload = data['payload'];
-  var appOptions = FirebaseFunctions.config.firebase;
   var admin = FirebaseAdmin.instance;
-  var app = admin.initializeApp(appOptions);
+  var app = admin.initializeApp();
   var database = app.database();
   return database.ref('/tests/pubsubToDatabase').setValue(payload);
 }
