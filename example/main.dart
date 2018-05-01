@@ -3,7 +3,6 @@
 
 import 'dart:async';
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
-import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 
 void main() {
   /// You can export a function by setting a key on global [functions]
@@ -23,45 +22,52 @@ void main() {
   functions['logPubsub'] =
       FirebaseFunctions.pubsub.topic('my-topic').onPublish(logPubsub);
   functions['logStorage'] =
-      FirebaseFunctions.storage.object().onChange(logStorage);
+      FirebaseFunctions.storage.object().onFinalize(logStorage);
   functions['logAuth'] = FirebaseFunctions.auth.user().onCreate(logAuth);
 }
 
 /// Example Realtime Database function.
-FutureOr<void> makeUppercase(DatabaseEvent<String> event) {
-  var original = event.data.val();
-  var pushId = event.params['testId'];
+FutureOr<void> makeUppercase(
+    Change<DataSnapshot<String>> change, EventContext context) {
+  final DataSnapshot<String> snapshot = change.after;
+  var original = snapshot.val();
+  var pushId = context.params['testId'];
   print('Uppercasing $original');
   var uppercase = pushId.toString() + ': ' + original.toUpperCase();
-  return event.data.ref.parent.child('uppercase').setValue(uppercase);
+  return snapshot.ref.parent.child('uppercase').setValue(uppercase);
 }
 
 /// Example Firestore
-FutureOr<void> makeNamesUppercase(FirestoreEvent event) {
-  if (event.data.data.getString("uppercasedName") == null) {
-    var original = event.data.data.getString("name");
+FutureOr<void> makeNamesUppercase(
+    Change<DocumentSnapshot> change, EventContext context) {
+  // Since this is an update of the same document we must guard against
+  // infinite cycle of this function writing, reading and writing again.
+  final snapshot = change.after;
+  if (snapshot.data.getString("uppercasedName") == null) {
+    var original = snapshot.data.getString("name");
     print('Uppercasing $original');
 
     UpdateData newData = new UpdateData();
     newData.setString("uppercasedName", original);
 
-    return event.data.reference.updateData(newData);
+    return snapshot.reference.updateData(newData);
   }
+  return null;
 }
 
 /// Example Pubsub
-void logPubsub(PubsubEvent event) {
-  print(event.data.json["name"]);
+void logPubsub(Message message, EventContext context) {
+  print(message.json["name"]);
 }
 
 /// Example Storage
-void logStorage(StorageEvent event) {
-  print(event.data.name);
+void logStorage(ObjectMetadata data, EventContext contet) {
+  print(data.name);
 }
 
 /// Example Auth
-void logAuth(AuthEvent event) {
-  print(event.data.email);
+void logAuth(UserRecord data, EventContext context) {
+  print(data.email);
 }
 
 /// Example HTTPS function.
@@ -82,9 +88,8 @@ Future<void> helloWorld(ExpressHttpRequest request) async {
     String name = request.requestedUri.queryParameters['name'];
     if (name != null) {
       // We can also write to Realtime Database right here:
-      var appOptions = config.firebase;
       var admin = FirebaseAdmin.instance;
-      var app = admin.initializeApp(appOptions);
+      var app = admin.initializeApp();
       var database = app.database();
       await database.ref('/tests/some-path').setValue(name);
     }

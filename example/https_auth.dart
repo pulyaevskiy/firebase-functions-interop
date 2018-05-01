@@ -22,10 +22,8 @@ Future secured(ExpressHttpRequest request) async {
     String auth = request.headers.value('authorization');
     if (auth != null && auth.startsWith('Bearer ')) {
       print('Authorization header found.');
-      var config = FirebaseFunctions.config;
-      var appOptions = config.firebase;
       var admin = FirebaseAdmin.instance;
-      var app = admin.initializeApp(appOptions);
+      var app = admin.initializeApp();
 
       String idToken = auth.split(' ').last;
       DecodedIdToken decodedToken =

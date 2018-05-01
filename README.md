@@ -3,6 +3,12 @@
 Write Firebase Cloud functions in Dart, run in Node.js. This is an early
 development preview, open-source project.
 
+> From version `1.0.0-dev.4.0` this library depends on the official Functions SDK
+> version `1.0.0` or higher which introduced some **breaking changes**. See
+> [UPGRADING.md][] for more details and instructions.
+
+[UPGRADING.md]: https://github.com/pulyaevskiy/firebase-functions-interop/blob/master/UPGRADING.md
+
 ## What is this?
 
 `firebase_functions_interop` provides interoperability layer for

@@ -45,7 +45,7 @@ import 'src/express.dart';
 export 'package:firebase_admin_interop/firebase_admin_interop.dart';
 export 'package:node_io/node_io.dart' show HttpRequest, HttpResponse;
 
-export 'src/bindings.dart' show CloudFunction, HttpsFunction;
+export 'src/bindings.dart' show CloudFunction, HttpsFunction, EventAuthInfo;
 export 'src/express.dart';
 
 /// Main library object which can be used to create and register Firebase
@@ -56,6 +56,11 @@ const FirebaseFunctions functions = const FirebaseFunctions._();
 FirebaseFunctions get firebaseFunctions => functions;
 
 final js.FirebaseFunctions _js = require('firebase-functions');
+
+typedef DataEventHandler<T> = FutureOr<void> Function(
+    T data, EventContext context);
+typedef ChangeEventHandler<T> = FutureOr<void> Function(
+    Change<T> data, EventContext context);
 
 /// Global namespace for Firebase Cloud Functions functionality.
 ///
@@ -109,9 +114,6 @@ class Config {
   /// keys are broken into nested JS object structure, e.g.
   /// `functions.config().some_service.client_secret`.
   dynamic get(String key) {
-    if (key == 'firebase') {
-      return _js.config().firebase;
-    }
     final List<String> parts = key.split('.');
     var data = dartify(_js.config());
     var value;
@@ -123,12 +125,72 @@ class Config {
     }
     return value;
   }
+}
 
-  /// Firebase-specific configuration which can be used to initialize
-  /// Firebase Admin SDK client.
+/// Container for events that change state, such as Realtime Database or
+/// Cloud Firestore `onWrite` and `onUpdate`.
+class Change<T> {
+  Change(this.after, this.before);
+
+  /// The state after the event.
+  final T after;
+
+  /// The state prior to the event.
+  final T before;
+}
+
+/// The context in which an event occurred.
+///
+/// An EventContext describes:
+///
+///   * The time an event occurred.
+///   * A unique identifier of the event.
+///   * The resource on which the event occurred, if applicable.
+///   * Authorization of the request that triggered the event, if applicable
+///     and available.
+class EventContext {
+  EventContext._(this.auth, this.authType, this.eventId, this.eventType,
+      this.params, this.resource, this.timestamp);
+
+  factory EventContext(js.EventContext data) {
+    return new EventContext._(
+      data.auth,
+      data.authType,
+      data.eventId,
+      data.eventType,
+      dartify(data.params),
+      data.resource,
+      DateTime.parse(data.timestamp),
+    );
+  }
+
+  /// Authentication information for the user that triggered the function.
   ///
-  /// This is a shortcut for calling `get('firebase')`.
-  AppOptions get firebase => get('firebase');
+  /// For an unauthenticated user, this field is null. For event types that do
+  /// not provide user information (all except Realtime Database) or for
+  /// Firebase admin users, this field will not exist.
+  final js.EventAuthInfo auth;
+
+  /// The level of permissions for a user.
+  ///
+  /// Valid values are: `ADMIN`, `USER`, `UNAUTHENTICATED` and `null`.
+  final String authType;
+
+  /// The event’s unique identifier.
+  final String eventId;
+
+  /// Type of event.
+  final String eventType;
+
+  /// An object containing the values of the wildcards in the path parameter
+  /// provided to the ref() method for a Realtime Database trigger.
+  final Map<String, String> params;
+
+  /// The resource that emitted the event.
+  final String resource;
+
+  /// Timestamp for the event.
+  final DateTime timestamp;
 }
 
 /// HTTPS functions namespace.
@@ -168,132 +230,58 @@ class RefBuilder {
 
   /// Event handler that fires every time new data is created in Firebase
   /// Realtime Database.
-  js.CloudFunction onCreate<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
-    dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
+  js.CloudFunction onCreate<T>(DataEventHandler<DataSnapshot<T>> handler) {
+    dynamic wrapper(js.DataSnapshot data, js.EventContext context) =>
+        _handleDataEvent<T>(data, context, handler);
     return nativeInstance.onCreate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is deleted from Firebase
   /// Realtime Database.
-  js.CloudFunction onDelete<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
-    dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
+  js.CloudFunction onDelete<T>(DataEventHandler<DataSnapshot<T>> handler) {
+    dynamic wrapper(js.DataSnapshot data, js.EventContext context) =>
+        _handleDataEvent<T>(data, context, handler);
     return nativeInstance.onDelete(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is updated in Firebase Realtime
   /// Database.
-  js.CloudFunction onUpdate<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
-    dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
+  js.CloudFunction onUpdate<T>(ChangeEventHandler<DataSnapshot<T>> handler) {
+    dynamic wrapper(js.Change<js.DataSnapshot> data, js.EventContext context) =>
+        _handleChangeEvent<T>(data, context, handler);
     return nativeInstance.onUpdate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time a Firebase Realtime Database write of
   /// any kind (creation, update, or delete) occurs.
-  js.CloudFunction onWrite<T>(FutureOr<void> handler(DatabaseEvent<T> event)) {
-    dynamic wrapper(js.Event event) => _handleEvent<T>(event, handler);
+  js.CloudFunction onWrite<T>(ChangeEventHandler<DataSnapshot<T>> handler) {
+    dynamic wrapper(js.Change<js.DataSnapshot> data, js.EventContext context) =>
+        _handleChangeEvent<T>(data, context, handler);
     return nativeInstance.onWrite(allowInterop(wrapper));
   }
 
-  dynamic _handleEvent<T>(
-      js.Event event, FutureOr<void> handler(DatabaseEvent<T> event)) {
-    var dartEvent = new DatabaseEvent<T>(
-      data: new DeltaSnapshot<T>(event.data),
-      eventId: event.eventId,
-      eventType: event.eventType,
-      params: dartify(event.params),
-      resource: event.resource,
-      timestamp: DateTime.parse(event.timestamp),
-    );
-    var result = handler(dartEvent);
+  dynamic _handleDataEvent<T>(js.DataSnapshot data, js.EventContext jsContext,
+      FutureOr<void> handler(DataSnapshot data, EventContext context)) {
+    var snapshot = new DataSnapshot(data);
+    var context = new EventContext(jsContext);
+    var result = handler(snapshot, context);
     if (result is Future) {
       return futureToPromise(result);
     }
     return null;
   }
-}
 
-/// Represents generic [Event] triggered by a Firebase service.
-class Event<T> {
-  /// Data returned for the event.
-  ///
-  /// The nature of the data depends on the [eventType].
-  final T data;
-
-  /// Unique identifier of this event.
-  final String eventId;
-
-  /// Type of this event.
-  final String eventType;
-
-  /// Values of the wildcards in the path parameter provided to the
-  /// [DatabaseFunctions.ref] method for a Realtime Database trigger.
-  final Map<String, String> params;
-
-  /// The resource that emitted the event.
-  final String resource;
-
-  /// Timestamp for this event.
-  final DateTime timestamp;
-
-  Event({
-    this.data,
-    this.eventId,
-    this.eventType,
-    this.params,
-    this.resource,
-    this.timestamp,
-  });
-}
-
-/// An [Event] triggered by Firebase Realtime Database.
-class DatabaseEvent<T> extends Event<DeltaSnapshot<T>> {
-  DatabaseEvent({
-    DeltaSnapshot<T> data,
-    String eventId,
-    String eventType,
-    Map<String, String> params,
-    String resource,
-    DateTime timestamp,
-  }) : super(
-          data: data,
-          eventId: eventId,
-          eventType: eventType,
-          params: params,
-          resource: resource,
-          timestamp: timestamp,
-        );
-}
-
-/// Represents a Firebase Realtime Database delta snapshot.
-class DeltaSnapshot<T> extends DataSnapshot<T> {
-  DeltaSnapshot(js.DeltaSnapshot nativeInstance) : super(nativeInstance);
-
-  @override
-  @protected
-  js.DeltaSnapshot get nativeInstance => super.nativeInstance;
-
-  /// Returns a [Reference] to the Database location where the triggering write
-  /// occurred. Similar to [ref], but with full read and write access instead of
-  /// end-user access.
-  Reference get adminRef =>
-      _adminRef ??= new Reference(nativeInstance.adminRef);
-  Reference _adminRef;
-
-  /// Tests whether data in the path has changed as a result of the triggered
-  /// write.
-  bool changed() => nativeInstance.changed();
-
-  @override
-  DeltaSnapshot<S> child<S>(String path) => super.child(path);
-
-  /// Gets the current [DeltaSnapshot] after the triggering write event has
-  /// occurred.
-  DeltaSnapshot<T> get current => new DeltaSnapshot<T>(nativeInstance.current);
-
-  /// Gets the previous state of the [DeltaSnapshot], from before the
-  /// triggering write event.
-  DeltaSnapshot<T> get previous =>
-      new DeltaSnapshot<T>(nativeInstance.previous);
+  dynamic _handleChangeEvent<T>(js.Change<js.DataSnapshot> data,
+      js.EventContext jsContext, ChangeEventHandler<DataSnapshot<T>> handler) {
+    var after = new DataSnapshot(data.after);
+    var before = new DataSnapshot(data.before);
+    var context = new EventContext(jsContext);
+    var result = handler(new Change<DataSnapshot<T>>(after, before), context);
+    if (result is Future) {
+      return futureToPromise(result);
+    }
+    return null;
+  }
 }
 
 class FirestoreFunctions {
@@ -310,83 +298,60 @@ class DocumentBuilder {
   DocumentBuilder._(this.nativeInstance);
 
   /// Event handler that fires every time new data is created in Cloud Firestore.
-  js.CloudFunction onCreate(FutureOr<void> handler(FirestoreEvent event)) {
-    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+  js.CloudFunction onCreate(DataEventHandler<DocumentSnapshot> handler) {
+    dynamic wrapper(js.DocumentSnapshot data, js.EventContext context) =>
+        _handleEvent(data, context, handler);
     return nativeInstance.onCreate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is deleted from Cloud Firestore.
-  js.CloudFunction onDelete(FutureOr<void> handler(FirestoreEvent event)) {
-    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+  js.CloudFunction onDelete(DataEventHandler<DocumentSnapshot> handler) {
+    dynamic wrapper(js.DocumentSnapshot data, js.EventContext context) =>
+        _handleEvent(data, context, handler);
     return nativeInstance.onDelete(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is updated in Cloud Firestore.
-  js.CloudFunction onUpdate(FutureOr<void> handler(FirestoreEvent event)) {
-    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+  js.CloudFunction onUpdate(ChangeEventHandler<DocumentSnapshot> handler) {
+    dynamic wrapper(
+            js.Change<js.DocumentSnapshot> data, js.EventContext context) =>
+        _handleChangeEvent(data, context, handler);
     return nativeInstance.onUpdate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time a Cloud Firestore write of any
   /// kind (creation, update, or delete) occurs.
-  js.CloudFunction onWrite(FutureOr<void> handler(FirestoreEvent event)) {
-    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+  js.CloudFunction onWrite(ChangeEventHandler<DocumentSnapshot> handler) {
+    dynamic wrapper(
+            js.Change<js.DocumentSnapshot> data, js.EventContext context) =>
+        _handleChangeEvent(data, context, handler);
     return nativeInstance.onWrite(allowInterop(wrapper));
   }
 
-  dynamic _handleEvent(
-      js.Event jsEvent, FutureOr<void> handler(FirestoreEvent event)) {
-    final FirestoreEvent event = new FirestoreEvent(
-      data: new DeltaDocumentSnapshot(jsEvent.data),
-      eventId: jsEvent.eventId,
-      eventType: jsEvent.eventType,
-      params: dartify(jsEvent.params),
-      resource: jsEvent.resource,
-      timestamp: DateTime.parse(jsEvent.timestamp),
-    );
-    var result = handler(event);
+  dynamic _handleEvent(js.DocumentSnapshot data, js.EventContext jsContext,
+      DataEventHandler<DocumentSnapshot> handler) {
+    final firestore = new Firestore(data.ref.firestore);
+    final snapshot = new DocumentSnapshot(data, firestore);
+    final context = new EventContext(jsContext);
+    var result = handler(snapshot, context);
     if (result is Future) {
       return futureToPromise(result);
     }
     return null;
   }
-}
 
-class DeltaDocumentSnapshot extends DocumentSnapshot {
-  DeltaDocumentSnapshot(js.DeltaDocumentSnapshot nativeInstance)
-      : super(nativeInstance, new Firestore(nativeInstance.ref.firestore));
-
-  @override
-  @protected
-  js.DeltaDocumentSnapshot get nativeInstance => super.nativeInstance;
-
-  /// Previous state of the document before the triggering write event.
-  DeltaDocumentSnapshot get previous =>
-      new DeltaDocumentSnapshot(nativeInstance.previous);
-
-  /// The last time the document was read, can be `null`.
-  DateTime get readTime => (nativeInstance.readTime != null)
-      ? DateTime.parse(nativeInstance.readTime)
-      : null;
-}
-
-/// An [Event] triggered by Firestore Database.
-class FirestoreEvent extends Event<DeltaDocumentSnapshot> {
-  FirestoreEvent({
-    DeltaDocumentSnapshot data,
-    String eventId,
-    String eventType,
-    Map<String, String> params,
-    String resource,
-    DateTime timestamp,
-  }) : super(
-          data: data,
-          eventId: eventId,
-          eventType: eventType,
-          params: params,
-          resource: resource,
-          timestamp: timestamp,
-        );
+  dynamic _handleChangeEvent<T>(js.Change<js.DocumentSnapshot> data,
+      js.EventContext jsContext, ChangeEventHandler<DocumentSnapshot> handler) {
+    final firestore = new Firestore(data.after.ref.firestore);
+    var after = new DocumentSnapshot(data.after, firestore);
+    var before = new DocumentSnapshot(data.before, firestore);
+    var context = new EventContext(jsContext);
+    var result = handler(new Change<DocumentSnapshot>(after, before), context);
+    if (result is Future) {
+      return futureToPromise(result);
+    }
+    return null;
+  }
 }
 
 class PubsubFunctions {
@@ -402,22 +367,17 @@ class TopicBuilder {
   TopicBuilder._(this.nativeInstance);
 
   /// Event handler that fires every time an event is published in Pubsub.
-  js.CloudFunction onPublish(FutureOr<void> handler(PubsubEvent event)) {
-    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+  js.CloudFunction onPublish(DataEventHandler<Message> handler) {
+    dynamic wrapper(js.Message jsData, js.EventContext jsContext) =>
+        _handleEvent(jsData, jsContext, handler);
     return nativeInstance.onPublish(allowInterop(wrapper));
   }
 
-  dynamic _handleEvent(
-      js.Event jsEvent, FutureOr<void> handler(PubsubEvent event)) {
-    final PubsubEvent event = new PubsubEvent(
-      data: new Message(jsEvent.data),
-      eventId: jsEvent.eventId,
-      eventType: jsEvent.eventType,
-      params: dartify(jsEvent.params),
-      resource: jsEvent.resource,
-      timestamp: DateTime.parse(jsEvent.timestamp),
-    );
-    var result = handler(event);
+  dynamic _handleEvent(js.Message jsData, js.EventContext jsContext,
+      DataEventHandler<Message> handler) {
+    final message = new Message(jsData);
+    final context = new EventContext(jsContext);
+    var result = handler(message, context);
     if (result is Future) {
       return futureToPromise(result);
     }
@@ -443,24 +403,6 @@ class Message {
 
   /// Returns a JSON-serializable representation of this object.
   dynamic toJson() => dartify(nativeInstance.toJSON());
-}
-
-class PubsubEvent extends Event<Message> {
-  PubsubEvent({
-    Message data,
-    String eventId,
-    String eventType,
-    Map<String, String> params,
-    String resource,
-    DateTime timestamp,
-  }) : super(
-          data: data,
-          eventId: eventId,
-          eventType: eventType,
-          params: params,
-          resource: resource,
-          timestamp: timestamp,
-        );
 }
 
 class StorageFunctions {
@@ -490,23 +432,56 @@ class ObjectBuilder {
 
   ObjectBuilder._(this.nativeInstance);
 
-  /// Event handler which fires every time a Google Cloud Storage change occurs.
-  js.CloudFunction onChange(FutureOr<void> handler(StorageEvent event)) {
-    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
-    return nativeInstance.onChange(allowInterop(wrapper));
+  /// Event handler sent only when a bucket has enabled object versioning.
+  ///
+  /// This event indicates that the live version of an object has become an
+  /// archived version, either because it was archived or because it was
+  /// overwritten by the upload of an object of the same name.
+  js.CloudFunction onArchive(DataEventHandler<ObjectMetadata> handler) {
+    dynamic wrapper(js.ObjectMetadata data, js.EventContext context) =>
+        _handleEvent(data, context, handler);
+    return nativeInstance.onArchive(allowInterop(wrapper));
   }
 
-  dynamic _handleEvent(
-      js.Event jsEvent, FutureOr<void> handler(StorageEvent event)) {
-    final StorageEvent event = new StorageEvent(
-      data: new ObjectMetadata(jsEvent.data),
-      eventId: jsEvent.eventId,
-      eventType: jsEvent.eventType,
-      params: dartify(jsEvent.params),
-      resource: jsEvent.resource,
-      timestamp: DateTime.parse(jsEvent.timestamp),
-    );
-    var result = handler(event);
+  /// Event handler which fires every time a Google Cloud Storage deletion
+  /// occurs.
+  ///
+  /// Sent when an object has been permanently deleted. This includes objects
+  /// that are overwritten or are deleted as part of the bucket's lifecycle
+  /// configuration. For buckets with object versioning enabled, this is not
+  /// sent when an object is archived, even if archival occurs via the
+  /// storage.objects.delete method.
+  js.CloudFunction onDelete(DataEventHandler<ObjectMetadata> handler) {
+    dynamic wrapper(js.ObjectMetadata data, js.EventContext context) =>
+        _handleEvent(data, context, handler);
+    return nativeInstance.onDelete(allowInterop(wrapper));
+  }
+
+  /// Event handler which fires every time a Google Cloud Storage object
+  /// creation occurs.
+  ///
+  /// Sent when a new object (or a new generation of an existing object) is
+  /// successfully created in the bucket. This includes copying or rewriting an
+  /// existing object. A failed upload does not trigger this event.
+  js.CloudFunction onFinalize(DataEventHandler<ObjectMetadata> handler) {
+    dynamic wrapper(js.ObjectMetadata data, js.EventContext context) =>
+        _handleEvent(data, context, handler);
+    return nativeInstance.onFinalize(allowInterop(wrapper));
+  }
+
+  /// Event handler which fires every time the metadata of an existing object
+  /// changes.
+  js.CloudFunction onMetadataUpdate(DataEventHandler<ObjectMetadata> handler) {
+    dynamic wrapper(js.ObjectMetadata data, js.EventContext context) =>
+        _handleEvent(data, context, handler);
+    return nativeInstance.onMetadataUpdate(allowInterop(wrapper));
+  }
+
+  dynamic _handleEvent(js.ObjectMetadata jsData, js.EventContext jsContext,
+      DataEventHandler<ObjectMetadata> handler) {
+    final data = new ObjectMetadata(jsData);
+    final context = new EventContext(jsContext);
+    var result = handler(data, context);
     if (result is Future) {
       return futureToPromise(result);
     }
@@ -621,24 +596,6 @@ class ObjectMetadata {
       : DateTime.parse(nativeInstance.updated);
 }
 
-class StorageEvent extends Event<ObjectMetadata> {
-  StorageEvent({
-    ObjectMetadata data,
-    String eventId,
-    String eventType,
-    Map<String, String> params,
-    String resource,
-    DateTime timestamp,
-  }) : super(
-          data: data,
-          eventId: eventId,
-          eventType: eventType,
-          params: params,
-          resource: resource,
-          timestamp: timestamp,
-        );
-}
-
 class CustomerEncryption {
   final String encryptionAlgorithm;
   final String keySha256;
@@ -662,28 +619,24 @@ class UserBuilder {
   UserBuilder._(this.nativeInstance);
 
   /// Event handler that fires every time a Firebase Authentication user is created.
-  js.CloudFunction onCreate(FutureOr<void> handler(AuthEvent event)) {
-    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+  js.CloudFunction onCreate(DataEventHandler<UserRecord> handler) {
+    dynamic wrapper(js.UserRecord jsData, js.EventContext jsContext) =>
+        _handleEvent(jsData, jsContext, handler);
     return nativeInstance.onCreate(allowInterop(wrapper));
   }
 
   /// Event handler that fires every time a Firebase Authentication user is deleted.
-  js.CloudFunction onDelete(FutureOr<void> handler(AuthEvent event)) {
-    dynamic wrapper(js.Event jsEvent) => _handleEvent(jsEvent, handler);
+  js.CloudFunction onDelete(DataEventHandler<UserRecord> handler) {
+    dynamic wrapper(js.UserRecord jsData, js.EventContext jsContext) =>
+        _handleEvent(jsData, jsContext, handler);
     return nativeInstance.onDelete(allowInterop(wrapper));
   }
 
-  dynamic _handleEvent(
-      js.Event jsEvent, FutureOr<void> handler(AuthEvent event)) {
-    final AuthEvent event = new AuthEvent(
-      data: new UserRecord(jsEvent.data),
-      eventId: jsEvent.eventId,
-      eventType: jsEvent.eventType,
-      params: dartify(jsEvent.params),
-      resource: jsEvent.resource,
-      timestamp: DateTime.parse(jsEvent.timestamp),
-    );
-    var result = handler(event);
+  dynamic _handleEvent(js.UserRecord jsData, js.EventContext jsContext,
+      DataEventHandler<UserRecord> handler) {
+    final data = new UserRecord(jsData);
+    final context = new EventContext(jsContext);
+    var result = handler(data, context);
     if (result is Future) {
       return futureToPromise(result);
     }
@@ -724,22 +677,4 @@ class UserRecord {
 
   /// Returns a JSON-serializable representation of this object.
   dynamic toJson() => dartify(nativeInstance.toJSON());
-}
-
-class AuthEvent extends Event<UserRecord> {
-  AuthEvent({
-    UserRecord data,
-    String eventId,
-    String eventType,
-    Map<String, String> params,
-    String resource,
-    DateTime timestamp,
-  }) : super(
-          data: data,
-          eventId: eventId,
-          eventType: eventType,
-          params: params,
-          resource: resource,
-          timestamp: timestamp,
-        );
 }
