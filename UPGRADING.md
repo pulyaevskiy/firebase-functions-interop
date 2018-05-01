@@ -26,8 +26,8 @@ import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:node_io/node_io.dart'; // to access Platform environment
 
 Future someHttpsFunction(ExpressHttpRequest request) async {
-  final data = json.decode(Platform.environment['FIREBASE_CONFIG']);
-  final config = new Map<String, String>.from(data);
+  final config = new Map<String, String>.from(
+    json.decode(Platform.environment['FIREBASE_CONFIG']));
   // ...do the rest...
   request.response.close();
 }
@@ -41,7 +41,6 @@ replaced by two new parameters: `data` and `context`.
 Before `1.0.0-dev.4.0`:
 
 ```dart
-import 'dart:async';
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
@@ -57,7 +56,6 @@ void logAuth(AuthEvent event) {
 After `1.0.0-dev.4.0`:
 
 ```dart
-import 'dart:async';
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {

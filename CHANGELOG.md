@@ -9,6 +9,7 @@
     expect two arguments `data` and `context` instead of single `event`
     argument. For details see migration guide or updated examples in
     `example/` folder.
+  See `UPGRADING.md` for more details and instructions.
 
 
 ## 1.0.0-dev.3.0
