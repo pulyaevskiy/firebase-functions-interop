@@ -7,10 +7,9 @@
   * `admin.config().firebase` field has been removed
   * Background functions (that is everything except HTTPS) now
     expect two arguments `data` and `context` instead of single `event`
-    argument. For details see migration guide or updated examples in
-    `example/` folder.
-  See `UPGRADING.md` for more details and instructions.
-
+    argument.
+  * See `UPGRADING.md` for more details and instructions. Also check updated
+    examples in `example/`folder.
 
 ## 1.0.0-dev.3.0
 
