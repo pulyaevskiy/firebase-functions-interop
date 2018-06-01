@@ -268,7 +268,8 @@ class RefBuilder {
     if (result is Future) {
       return futureToPromise(result);
     }
-    return null;
+    // See: https://stackoverflow.com/questions/47128440/google-firebase-errorfunction-returned-undefined-expected-promise-or-value
+    return 0;
   }
 
   dynamic _handleChangeEvent<T>(js.Change<js.DataSnapshot> data,
@@ -280,7 +281,8 @@ class RefBuilder {
     if (result is Future) {
       return futureToPromise(result);
     }
-    return null;
+    // See: https://stackoverflow.com/questions/47128440/google-firebase-errorfunction-returned-undefined-expected-promise-or-value
+    return 0;
   }
 }
 
@@ -337,7 +339,8 @@ class DocumentBuilder {
     if (result is Future) {
       return futureToPromise(result);
     }
-    return null;
+    // See: https://stackoverflow.com/questions/47128440/google-firebase-errorfunction-returned-undefined-expected-promise-or-value
+    return 0;
   }
 
   dynamic _handleChangeEvent<T>(js.Change<js.DocumentSnapshot> data,
@@ -350,7 +353,8 @@ class DocumentBuilder {
     if (result is Future) {
       return futureToPromise(result);
     }
-    return null;
+    // See: https://stackoverflow.com/questions/47128440/google-firebase-errorfunction-returned-undefined-expected-promise-or-value
+    return 0;
   }
 }
 
@@ -381,7 +385,8 @@ class TopicBuilder {
     if (result is Future) {
       return futureToPromise(result);
     }
-    return null;
+    // See: https://stackoverflow.com/questions/47128440/google-firebase-errorfunction-returned-undefined-expected-promise-or-value
+    return 0;
   }
 }
 
@@ -485,7 +490,8 @@ class ObjectBuilder {
     if (result is Future) {
       return futureToPromise(result);
     }
-    return null;
+    // See: https://stackoverflow.com/questions/47128440/google-firebase-errorfunction-returned-undefined-expected-promise-or-value
+    return 0;
   }
 }
 
@@ -640,7 +646,8 @@ class UserBuilder {
     if (result is Future) {
       return futureToPromise(result);
     }
-    return null;
+    // See: https://stackoverflow.com/questions/47128440/google-firebase-errorfunction-returned-undefined-expected-promise-or-value
+    return 0;
   }
 }
 

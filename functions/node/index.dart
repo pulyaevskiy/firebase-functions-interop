@@ -12,6 +12,10 @@ void main() {
       .ref('/tests/{testId}/original')
       .onWrite(makeUppercase);
 
+  functions['firestoreUppercase'] = FirebaseFunctions.firestore
+      .document('tests/uppercase')
+      .onWrite(firestoreUppercase);
+
   functions['pubsubToDatabase'] =
       FirebaseFunctions.pubsub.topic('testTopic').onPublish(pubsubToDatabase);
 }
@@ -123,6 +127,25 @@ FutureOr<void> makeUppercase(
   print('Uppercasing $original');
   var uppercase = pushId.toString() + ': ' + original.toUpperCase();
   return data.ref.parent.child('uppercase').setValue(uppercase);
+}
+
+FutureOr<void> firestoreUppercase(
+    Change<DocumentSnapshot> change, EventContext context) {
+  if (!change.after.exists) {
+    print('Skipping uppercase because document was deleted.');
+    return null;
+  }
+  var data = change.after.data;
+  if (data.getString('uppercase') != null) {
+    // This document has been uppercased already, return to avoid infinite loop.
+    print('Skipping uppercase to avoid infinite loop.');
+    return null;
+  }
+  var original = data.getString('text');
+  print('Uppercasing $original');
+  var update = new UpdateData();
+  update.setString('uppercase', original.toUpperCase());
+  return change.after.reference.updateData(update);
 }
 
 FutureOr<void> pubsubToDatabase(Message message, EventContext context) {
