@@ -5,6 +5,7 @@
 import 'dart:convert';
 
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
+import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:node_http/node_http.dart';
 import 'package:test/test.dart';
 
@@ -14,8 +15,9 @@ void main() {
   App app = initFirebaseApp();
   NodeClient http = new NodeClient(keepAlive: false);
   var baseUrl = env['FIREBASE_HTTP_BASE_URL'] + '/httpsTests';
+  var callableUrl = env['FIREBASE_HTTP_BASE_URL'] + '/onCallTests';
 
-  group('HTTPS', () {
+  group('$HttpsFunctions', () {
     tearDownAll(() async {
       http.close();
       await app.delete();
@@ -47,6 +49,16 @@ void main() {
           body: json.encode({"helloJSON": "hi"}));
       expect(response.statusCode, 200);
       expect(response.body, '{"helloJSON":"hi"}');
+    });
+
+    test('callable', () async {
+      var response = await http.post('$callableUrl',
+          headers: {'content-type': 'application/json; charset=utf-8'},
+          body: jsonEncode(
+            {'data': 'body'},
+          ));
+      expect(response.statusCode, 200);
+      expect(json.decode(response.body), {'result': 'ok'});
     });
   });
 }

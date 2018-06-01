@@ -1,3 +1,8 @@
+## 1.0.0-dev.5.0
+
+- Added: `FirebaseFunctions.https.onCall` as well as `HttpsError` and
+    `CallableContext`.
+
 ## 1.0.0-dev.4.0
 
 - Breaking: Upgraded to Functions SDK 1.0.1 and Admin SDK 5.12.0

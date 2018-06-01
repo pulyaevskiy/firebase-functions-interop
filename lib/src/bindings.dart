@@ -117,11 +117,35 @@ abstract class Config {}
 @JS()
 @anonymous
 abstract class HttpsFunctions {
+  /// To send an error from an HTTPS Callable function to a client, throw an
+  /// instance of this class from your handler function.
+  ///
+  /// Make sure to throw this exception at the top level of your function and
+  /// not from within a callback, as that will not necessarily terminate the
+  /// function with this exception.
+  external dynamic get HttpsError;
+
   /// Event handler which is run every time an HTTPS URL is hit.
   ///
   /// The event handler is called with Express Request and Response objects as its
   /// only arguments.
   external HttpsFunction onRequest(HttpRequestListener handler);
+  external HttpsFunction onCall(
+      dynamic handler(dynamic data, CallableContext context));
+}
+
+@JS()
+@anonymous
+abstract class CallableContext {
+  external CallableAuth get auth;
+  external String get instanceIdToken;
+}
+
+@JS()
+@anonymous
+abstract class CallableAuth {
+  external String get uid;
+  external admin.DecodedIdToken get token;
 }
 
 @JS()

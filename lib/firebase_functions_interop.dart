@@ -48,6 +48,8 @@ export 'package:node_io/node_io.dart' show HttpRequest, HttpResponse;
 export 'src/bindings.dart' show CloudFunction, HttpsFunction, EventAuthInfo;
 export 'src/express.dart';
 
+part 'src/https.dart';
+
 /// Main library object which can be used to create and register Firebase
 /// Cloud functions.
 const FirebaseFunctions functions = const FirebaseFunctions._();
@@ -193,27 +195,6 @@ class EventContext {
   final DateTime timestamp;
 }
 
-/// HTTPS functions namespace.
-class HttpsFunctions {
-  const HttpsFunctions._();
-
-  /// Event [handler] which is run every time an HTTPS URL is hit.
-  ///
-  /// Returns a [js.HttpsFunction] which can be exported.
-  ///
-  /// The event handler is called with single [request] argument, instance
-  /// of [ExpressHttpRequest]. This object acts as a
-  /// proxy to JavaScript request and response objects.
-  js.HttpsFunction onRequest(void handler(ExpressHttpRequest request)) {
-    void jsHandler(IncomingMessage request, ServerResponse response) {
-      var requestProxy = new ExpressHttpRequest(request, response);
-      handler(requestProxy);
-    }
-
-    return _js.https.onRequest(allowInterop(jsHandler));
-  }
-}
-
 /// Realtime Database functions namespace.
 class DatabaseFunctions {
   const DatabaseFunctions._();
@@ -261,7 +242,7 @@ class RefBuilder {
   }
 
   dynamic _handleDataEvent<T>(js.DataSnapshot data, js.EventContext jsContext,
-      FutureOr<void> handler(DataSnapshot data, EventContext context)) {
+      FutureOr<void> handler(DataSnapshot<T> data, EventContext context)) {
     var snapshot = new DataSnapshot(data);
     var context = new EventContext(jsContext);
     var result = handler(snapshot, context);
@@ -343,7 +324,7 @@ class DocumentBuilder {
     return 0;
   }
 
-  dynamic _handleChangeEvent<T>(js.Change<js.DocumentSnapshot> data,
+  dynamic _handleChangeEvent(js.Change<js.DocumentSnapshot> data,
       js.EventContext jsContext, ChangeEventHandler<DocumentSnapshot> handler) {
     final firestore = new Firestore(data.after.ref.firestore);
     var after = new DocumentSnapshot(data.after, firestore);

@@ -7,6 +7,7 @@ import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
   functions['httpsTests'] = FirebaseFunctions.https.onRequest(httpsTests);
+  functions['onCallTests'] = FirebaseFunctions.https.onCall(onCallTests);
 
   functions['makeUppercase'] = FirebaseFunctions.database
       .ref('/tests/{testId}/original')
@@ -39,6 +40,10 @@ FutureOr<void> httpsTests(ExpressHttpRequest request) {
       request.response.close();
       return null;
   }
+}
+
+FutureOr onCallTests(dynamic data, CallableContext context) {
+  return 'ok';
 }
 
 jsonTest(ExpressHttpRequest request) {
