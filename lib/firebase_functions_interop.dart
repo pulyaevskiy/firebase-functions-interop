@@ -160,7 +160,7 @@ class EventContext {
       data.authType,
       data.eventId,
       data.eventType,
-      dartify(data.params),
+      new Map<String, String>.from(dartify(data.params)),
       data.resource,
       DateTime.parse(data.timestamp),
     );
