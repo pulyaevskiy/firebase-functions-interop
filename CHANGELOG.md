@@ -1,3 +1,10 @@
+## 1.0.0-dev.6.0
+
+- Fixed: strong mode issue in Firestore `EventContext` after deploying
+    tests with `--preview-dart-2` instead of `--checked`.
+- Fixed: strong mode issue in Database event handlers instantiating
+    `DataSnapshot` with proper generic type argument.
+
 ## 1.0.0-dev.5.0
 
 - Added: `FirebaseFunctions.https.onCall` as well as `HttpsError` and

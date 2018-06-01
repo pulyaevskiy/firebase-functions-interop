@@ -243,7 +243,7 @@ class RefBuilder {
 
   dynamic _handleDataEvent<T>(js.DataSnapshot data, js.EventContext jsContext,
       FutureOr<void> handler(DataSnapshot<T> data, EventContext context)) {
-    var snapshot = new DataSnapshot(data);
+    var snapshot = new DataSnapshot<T>(data);
     var context = new EventContext(jsContext);
     var result = handler(snapshot, context);
     if (result is Future) {
@@ -255,8 +255,8 @@ class RefBuilder {
 
   dynamic _handleChangeEvent<T>(js.Change<js.DataSnapshot> data,
       js.EventContext jsContext, ChangeEventHandler<DataSnapshot<T>> handler) {
-    var after = new DataSnapshot(data.after);
-    var before = new DataSnapshot(data.before);
+    var after = new DataSnapshot<T>(data.after);
+    var before = new DataSnapshot<T>(data.before);
     var context = new EventContext(jsContext);
     var result = handler(new Change<DataSnapshot<T>>(after, before), context);
     if (result is Future) {
