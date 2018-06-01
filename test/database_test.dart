@@ -40,6 +40,6 @@ void main() {
       }
       var expected = 'happyPath: ' + value.toUpperCase();
       expect(data.val(), expected);
-    }, timeout: const Timeout(const Duration(seconds: 10)));
+    }, timeout: const Timeout(const Duration(seconds: 30)));
   });
 }
