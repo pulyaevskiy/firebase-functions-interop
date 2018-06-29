@@ -5,7 +5,8 @@ import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 import 'package:node_interop/node.dart';
 import 'package:node_interop/util.dart';
 
-final Map<String, String> env = dartify(process.env);
+final Map<String, String> env =
+    new Map<String, String>.from(dartify(process.env));
 
 App initFirebaseApp() {
   if (!env.containsKey('FIREBASE_SERVICE_ACCOUNT_FILEPATH') ||

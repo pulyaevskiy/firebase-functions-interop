@@ -1,3 +1,8 @@
+## 1.0.0-dev.7.0
+
+- Internal: upgraded example functions to use latest build_runner.
+- Internal: strong mode fix for tests setup script.
+
 ## 1.0.0-dev.6.0
 
 - Fixed: strong mode issue in Firestore `EventContext` after deploying
