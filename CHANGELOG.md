@@ -1,3 +1,7 @@
+## 1.0.0-dev.8.0
+
+- Fixed analysis warnings and declared support for Dart 2 stable.
+
 ## 1.0.0-dev.7.0
 
 - Internal: upgraded example functions to use latest build_runner.
