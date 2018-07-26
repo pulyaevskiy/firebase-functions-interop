@@ -5,6 +5,7 @@ Requirements:
 * Dart SDK 2
 * Node.js
 * Firebase Tools (`npm install -g firebase-tools` or `yarn global add firebase-tools`)
+* GCloud SDK (https://cloud.google.com/sdk/docs/quickstart-macos for MacOS)
 
 ## Running tests
 
@@ -20,8 +21,8 @@ To run the tests locally you'll need to:
 * Set the environment variables:
     * Use the absolute path of the service account file, with the database URL you found above:
     * ```bash
-      export FIREBASE_SERVICE_ACCOUNT_FILEPATH="/home/me/full-path-to-service-account-key.json"
-      export FIREBASE_DATABASE_URL="https://<project-id>.firebaseio.com"
+      export FIREBASE_SERVICE_ACCOUNT_JSON='<json_content_from_your_service_account_file_in_single_line>'
+      export FIREBASE_CONFIG='{"databaseURL": "https://<project-id>.firebaseio.com","projectId": "<project-id>"}'
       export FIREBASE_HTTP_BASE_URL="https://us-central1-<project-id>.cloudfunctions.net"
       ```
 
