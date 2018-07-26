@@ -9,6 +9,7 @@ environment:
 
 dependencies:
   js: ^0.6.1
+  meta: ^1.1.0
   node_interop: ^1.0.0-dev
   node_io: ^1.0.0-dev
   node_http: ^1.0.0-dev
