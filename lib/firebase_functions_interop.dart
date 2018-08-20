@@ -189,7 +189,7 @@ class EventContext {
   final Map<String, String> params;
 
   /// The resource that emitted the event.
-  final String resource;
+  final js.EventContextResource resource;
 
   /// Timestamp for the event.
   final DateTime timestamp;

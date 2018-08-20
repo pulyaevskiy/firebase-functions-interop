@@ -62,6 +62,13 @@ abstract class Change<T> {
   external T get before;
 }
 
+@JS()
+@anonymous
+abstract class EventContextResource {
+  external String get service;
+  external String get name;
+}
+
 /// The context in which an event occurred.
 ///
 /// An EventContext describes:
@@ -97,7 +104,7 @@ abstract class EventContext {
   external dynamic get params;
 
   /// The resource that emitted the event.
-  external String get resource;
+  external EventContextResource get resource;
 
   /// Timestamp for the event as an RFC 3339 string.
   external String get timestamp;
