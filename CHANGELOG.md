@@ -1,3 +1,8 @@
+## 1.0.0-dev.9.0
+
+- Fixed: EventContext.resource type changed from String to object.
+- Misc: removed strong-mode analyzer option from test functions.
+
 ## 1.0.0-dev.8.0
 
 - Fixed analysis warnings and declared support for Dart 2 stable.
