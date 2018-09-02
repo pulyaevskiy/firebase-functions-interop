@@ -48,7 +48,7 @@ FutureOr<void> makeNamesUppercase(
     print('Uppercasing $original');
 
     UpdateData newData = new UpdateData();
-    newData.setString("uppercasedName", original);
+    newData.setString("uppercasedName", original.toUpperCase());
 
     return snapshot.reference.updateData(newData);
   }
