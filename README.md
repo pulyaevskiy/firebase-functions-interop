@@ -82,7 +82,7 @@ description: My project functions
 version: 0.0.1
 
 environment:
-  sdk: '>=2.0.0-dev <2.0.0'
+  sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
   # Firebase Functions bindings
@@ -90,8 +90,8 @@ dependencies:
 
 dev_dependencies:
   # Needed to compile Dart to valid Node.js module.
-  build_runner: ^0.7.9
-  build_node_compilers: ^0.1.0
+  build_runner: ^0.10.0
+  build_node_compilers: ^0.1.12
 ```
 
 Then run `pub get` to install dependencies.
