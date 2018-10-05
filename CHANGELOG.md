@@ -2,6 +2,8 @@
 
 - Breaking change: upgraded to JS module firebase-functions `v2.0.5` which introduced breaking
     changes in `DocumentSnapshot.createTime`, `DocumentSnapshot.updateTime`
+- Upgraded to `firebase_admin_interop` v1.0.0-dev.20.0 which also introduced breaking changes
+    around Timestamps. See changelog and readme in `firebase_admin_interop` for more details.
 
 ## 1.0.0-dev.9.0
 
