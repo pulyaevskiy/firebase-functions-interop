@@ -1,3 +1,8 @@
+## 1.0.0-dev.10.0
+
+- Breaking change: upgraded to JS module firebase-functions `v2.0.5` which introduced breaking
+    changes in `DocumentSnapshot.createTime`, `DocumentSnapshot.updateTime`
+
 ## 1.0.0-dev.9.0
 
 - Fixed: EventContext.resource type changed from String to object.

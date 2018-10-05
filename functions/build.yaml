@@ -10,5 +10,5 @@ targets:
         options:
           compiler: dart2js
           # List any dart2js specific args here, or omit it.
-          dart2js_args:
-          - --preview-dart-2
+#          dart2js_args:
+#          - --preview-dart-2

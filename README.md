@@ -9,6 +9,10 @@ development preview, open-source project.
 
 [UPGRADING.md]: https://github.com/pulyaevskiy/firebase-functions-interop/blob/master/UPGRADING.md
 
+> From version `1.0.0-dev.10.0` this library depends on the official Functions SDK version
+> `2.0.0` or higher which introduced **breaking changes** in how `createTime` and `updateTime`
+> are handled on `DocumentSnapshot` (returned as instances of new `Timestamp` type).
+
 ## What is this?
 
 `firebase_functions_interop` provides interoperability layer for
@@ -82,7 +86,7 @@ description: My project functions
 version: 0.0.1
 
 environment:
-  sdk: '>=2.0.0-dev <2.0.0'
+  sdk: '>=2.0.0-dev <3.0.0'
 
 dependencies:
   # Firebase Functions bindings
@@ -90,8 +94,8 @@ dependencies:
 
 dev_dependencies:
   # Needed to compile Dart to valid Node.js module.
-  build_runner: ^0.7.9
-  build_node_compilers: ^0.1.0
+  build_runner: ^1.0.0
+  build_node_compilers: ^0.2.0
 ```
 
 Then run `pub get` to install dependencies.
@@ -139,7 +143,7 @@ targets:
           compiler: dart2js
           # List any dart2js specific args here, or omit it.
           dart2js_args:
-          - --checked
+          - --minify
 ```
 
 > By default `build_runner` compiles with DDC which is not supported by this
