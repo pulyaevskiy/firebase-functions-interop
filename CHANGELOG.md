@@ -1,3 +1,8 @@
+## 1.0.0-dev.11.0
+
+- Log console error when callable response cannot be `jsify`-ed, with details about the data
+  (simplifies debugging).
+
 ## 1.0.0-dev.10.0
 
 - Breaking change: upgraded to JS module firebase-functions `v2.0.5` which introduced breaking

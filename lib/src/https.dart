@@ -155,19 +155,35 @@ class HttpsFunctions {
       try {
         var result = handler(dartify(data), ctx);
 
-        return result is Future
-            ? futureToPromise(result.then(jsify).catchError((error) {
-                if (error is HttpsError) {
-                  throw error._toJsHttpsError();
-                } else
-                  throw error;
-              }))
-            : jsify(result);
+        if (result is Future) {
+          final future = result.then(_tryJsify).catchError((error) {
+            if (error is HttpsError) {
+              throw error._toJsHttpsError();
+            } else
+              throw error;
+          });
+          return futureToPromise(future);
+        } else {
+          return _tryJsify(result);
+        }
       } on HttpsError catch (error) {
         throw error._toJsHttpsError();
       }
     }
 
     return _js.https.onCall(allowInterop(jsHandler));
+  }
+
+  dynamic _tryJsify(data) {
+    try {
+      return jsify(data);
+    } on ArgumentError {
+      console.error('Response cannot be encoded.', data.toString(), data);
+      throw HttpsError(
+        HttpsError.internal,
+        'Invalid response, check logs for details',
+        data.toString(),
+      );
+    }
   }
 }
