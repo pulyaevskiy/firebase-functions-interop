@@ -91,7 +91,7 @@ class HttpsError {
 
   dynamic _toJsHttpsError() {
     return callConstructor(
-        _js.https.HttpsError, [code, message, jsify(details)]);
+        _module.https.HttpsError, [code, message, jsify(details)]);
   }
 }
 
