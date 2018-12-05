@@ -112,7 +112,8 @@ class CallableContext {
 
 /// HTTPS functions namespace.
 class HttpsFunctions {
-  const HttpsFunctions._();
+  final js.FirebaseFunctions _functions;
+  HttpsFunctions._(this._functions);
 
   /// Event [handler] which is run every time an HTTPS URL is hit.
   ///
@@ -127,7 +128,7 @@ class HttpsFunctions {
       handler(requestProxy);
     }
 
-    return _js.https.onRequest(allowInterop(jsHandler));
+    return _functions.https.onRequest(allowInterop(jsHandler));
   }
 
   /// Event handler which is run every time an HTTPS Callable function is called
@@ -171,7 +172,7 @@ class HttpsFunctions {
       }
     }
 
-    return _js.https.onCall(allowInterop(jsHandler));
+    return _functions.https.onCall(allowInterop(jsHandler));
   }
 
   dynamic _tryJsify(data) {

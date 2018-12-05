@@ -45,19 +45,17 @@ import 'src/express.dart';
 export 'package:firebase_admin_interop/firebase_admin_interop.dart';
 export 'package:node_io/node_io.dart' show HttpRequest, HttpResponse;
 
-export 'src/bindings.dart' show CloudFunction, HttpsFunction, EventAuthInfo;
+export 'src/bindings.dart'
+    show CloudFunction, HttpsFunction, EventAuthInfo, RuntimeOptions;
 export 'src/express.dart';
 
 part 'src/https.dart';
 
+final js.FirebaseFunctions _module = require('firebase-functions');
+
 /// Main library object which can be used to create and register Firebase
 /// Cloud functions.
-const FirebaseFunctions functions = const FirebaseFunctions._();
-
-@Deprecated('Use "functions" instead.')
-FirebaseFunctions get firebaseFunctions => functions;
-
-final js.FirebaseFunctions _js = require('firebase-functions');
+final FirebaseFunctions functions = FirebaseFunctions._(_module);
 
 typedef DataEventHandler<T> = FutureOr<void> Function(
     T data, EventContext context);
@@ -69,28 +67,50 @@ typedef ChangeEventHandler<T> = FutureOr<void> Function(
 /// Use [functions] as a singleton instance of this class to export function
 /// triggers.
 class FirebaseFunctions {
-  const FirebaseFunctions._();
+  final js.FirebaseFunctions _functions;
 
   /// Configuration object for Firebase functions.
-  static const Config config = const Config._();
+  final Config config;
 
   /// HTTPS functions.
-  static const HttpsFunctions https = const HttpsFunctions._();
+  final HttpsFunctions https;
 
   /// Realtime Database functions.
-  static const DatabaseFunctions database = const DatabaseFunctions._();
+  final DatabaseFunctions database;
 
-  /// Firestore functions
-  static const FirestoreFunctions firestore = const FirestoreFunctions._();
+  /// Firestore functions.
+  final FirestoreFunctions firestore;
 
-  /// Pubsub functions
-  static const PubsubFunctions pubsub = const PubsubFunctions._();
+  /// Pubsub functions.
+  final PubsubFunctions pubsub;
 
-  /// Storage functions
-  static const StorageFunctions storage = const StorageFunctions._();
+  /// Storage functions.
+  final StorageFunctions storage;
 
-  /// Namespace for Firebase Authentication functions.
-  static const AuthFunctions auth = const AuthFunctions._();
+  /// Authentication functions.
+  final AuthFunctions auth;
+
+  FirebaseFunctions._(js.FirebaseFunctions functions)
+      : _functions = functions,
+        config = Config._(functions),
+        https = HttpsFunctions._(functions),
+        database = DatabaseFunctions._(functions),
+        firestore = FirestoreFunctions._(functions),
+        pubsub = PubsubFunctions._(functions),
+        storage = StorageFunctions._(functions),
+        auth = AuthFunctions._(functions);
+
+  /// Configures the regions to which to deploy and run a function.
+  ///
+  /// For a list of valid values see https://firebase.google.com/docs/functions/locations
+  FirebaseFunctions region(String region) {
+    return FirebaseFunctions._(_functions.region(region));
+  }
+
+  /// Configures memory allocation and timeout for a function.
+  FirebaseFunctions runWith(js.RuntimeOptions options) {
+    return FirebaseFunctions._(_functions.runWith(options));
+  }
 
   /// Export [function] under specified [key].
   ///
@@ -106,7 +126,9 @@ class FirebaseFunctions {
 /// See also:
 /// - [https://firebase.google.com/docs/functions/config-env](https://firebase.google.com/docs/functions/config-env)
 class Config {
-  const Config._();
+  final js.FirebaseFunctions _functions;
+
+  Config._(this._functions);
 
   /// Returns configuration value specified by it's [key].
   ///
@@ -117,7 +139,7 @@ class Config {
   /// `functions.config().some_service.client_secret`.
   dynamic get(String key) {
     final List<String> parts = key.split('.');
-    var data = dartify(_js.config());
+    var data = dartify(_functions.config());
     var value;
     for (var subKey in parts) {
       if (data is! Map) return null;
@@ -197,10 +219,12 @@ class EventContext {
 
 /// Realtime Database functions namespace.
 class DatabaseFunctions {
-  const DatabaseFunctions._();
+  final js.FirebaseFunctions _functions;
+  DatabaseFunctions._(this._functions);
 
   /// Returns reference builder for specified [path] in Realtime Database.
-  RefBuilder ref(String path) => new RefBuilder._(_js.database.ref(path));
+  RefBuilder ref(String path) =>
+      new RefBuilder._(_functions.database.ref(path));
 }
 
 /// The Firebase Realtime Database reference builder.
@@ -268,10 +292,12 @@ class RefBuilder {
 }
 
 class FirestoreFunctions {
-  const FirestoreFunctions._();
+  final js.FirebaseFunctions _functions;
+
+  FirestoreFunctions._(this._functions);
 
   DocumentBuilder document(String path) =>
-      new DocumentBuilder._(_js.firestore.document(path));
+      new DocumentBuilder._(_functions.firestore.document(path));
 }
 
 class DocumentBuilder {
@@ -340,9 +366,12 @@ class DocumentBuilder {
 }
 
 class PubsubFunctions {
-  const PubsubFunctions._();
+  final js.FirebaseFunctions _functions;
 
-  TopicBuilder topic(String path) => new TopicBuilder._(_js.pubsub.topic(path));
+  PubsubFunctions._(this._functions);
+
+  TopicBuilder topic(String path) =>
+      new TopicBuilder._(_functions.pubsub.topic(path));
 }
 
 class TopicBuilder {
@@ -392,14 +421,15 @@ class Message {
 }
 
 class StorageFunctions {
-  const StorageFunctions._();
+  final js.FirebaseFunctions _functions;
+  StorageFunctions._(this._functions);
 
   /// Registers a Cloud Function scoped to a specific storage [bucket].
   BucketBuilder bucket(String path) =>
-      new BucketBuilder._(_js.storage.bucket(path));
+      new BucketBuilder._(_functions.storage.bucket(path));
 
   /// Registers a Cloud Function scoped to the default storage bucket for the project.
-  ObjectBuilder object() => new ObjectBuilder._(_js.storage.object());
+  ObjectBuilder object() => new ObjectBuilder._(_functions.storage.object());
 }
 
 class BucketBuilder {
@@ -592,10 +622,12 @@ class CustomerEncryption {
 
 /// Namespace for Firebase Authentication functions.
 class AuthFunctions {
-  const AuthFunctions._();
+  final js.FirebaseFunctions _functions;
+
+  AuthFunctions._(this._functions);
 
   /// Registers a Cloud Function to handle user authentication events.
-  UserBuilder user() => new UserBuilder._(_js.auth.user());
+  UserBuilder user() => new UserBuilder._(_functions.auth.user());
 }
 
 /// The Firebase Authentication user builder interface.

@@ -12,7 +12,28 @@ export 'package:firebase_admin_interop/js.dart';
 
 @JS()
 @anonymous
+abstract class RuntimeOptions {
+  /// Timeout for the function in seconds.
+  external int get timeoutSeconds;
+  /// Amount of memory to allocate to the function.
+  ///
+  /// Valid values are: '128MB', '256MB', '512MB', '1GB', and '2GB'.
+  external String get memory;
+
+  external factory RuntimeOptions({int timeoutSeconds, String memory});
+}
+
+@JS()
+@anonymous
 abstract class FirebaseFunctions {
+  /// Configures the regions to which to deploy and run a function.
+  ///
+  /// For a list of valid values see https://firebase.google.com/docs/functions/locations
+  external FirebaseFunctions region(String region);
+
+  /// Configures memory allocation and timeout for a function.
+  external FirebaseFunctions runWith(RuntimeOptions options);
+
   /// Store and retrieve project configuration data such as third-party API keys
   /// or other settings.
   ///

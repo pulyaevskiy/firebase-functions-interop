@@ -1,3 +1,17 @@
+## Upgrading from 1.0.0-dev.11.0 to 1.0.0-dev.12.0
+
+All static fields on `FirebaseFunctions` class were converted to regular instance fields.
+To migrate your existing code simply replace `FirebaseFunctions` with `functions`. E.g.
+
+```dart
+void main() {
+  // Before
+  functions['myfunc'] = FirebaseFunctions.https.onRequest(myHandler);
+  // After
+  functions['myfunc'] = functions.https.onRequest(myHandler);
+}
+```
+
 ## Upgrading from 1.0.0-dev.3.0 to 1.0.0-dev.4.0
 
 Version `1.0.0-dev.4.0` of this library requires official Functions SDK version

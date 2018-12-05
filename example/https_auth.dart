@@ -6,7 +6,7 @@ import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 
 void main() {
-  functions['secured'] = FirebaseFunctions.https.onRequest(secured);
+  functions['secured'] = functions.https.onRequest(secured);
 }
 
 /// Example HTTPS function which requires Firebase authenticated user.

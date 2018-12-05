@@ -1,3 +1,23 @@
+## 1.0.0-dev.12.0
+
+**Breaking change**: all static fields on `FirebaseFunctions` class were converted to regular
+instance fields. This change was required to introduce new `region` and `runWith` methods on
+`FirebaseFunctions`.
+
+To migrate your existing code simply replace `FirebaseFunctions` with `functions`. E.g.
+
+```dart
+void main() {
+  // Before
+  functions['myfunc'] = FirebaseFunctions.https.onRequest(myHandler);
+  // After
+  functions['myfunc'] = functions.https.onRequest(myHandler);
+}
+```
+
+- Added: `FirebaseFunctions.region` and `FirebaseFunctions.runWith` methods.
+- Removed: Deprecated `firebaseFunctions` library field, use `functions` instead.
+
 ## 1.0.0-dev.11.0
 
 - Log console error when callable response cannot be `jsify`-ed, with details about the data

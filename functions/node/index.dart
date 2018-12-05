@@ -6,19 +6,18 @@ import 'dart:convert';
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
-  functions['httpsTests'] = FirebaseFunctions.https.onRequest(httpsTests);
-  functions['onCallTests'] = FirebaseFunctions.https.onCall(onCallTests);
+  functions['httpsTests'] = functions.https.onRequest(httpsTests);
+  functions['onCallTests'] = functions.https.onCall(onCallTests);
 
-  functions['makeUppercase'] = FirebaseFunctions.database
-      .ref('/tests/{testId}/original')
-      .onWrite(makeUppercase);
+  functions['makeUppercase'] =
+      functions.database.ref('/tests/{testId}/original').onWrite(makeUppercase);
 
-  functions['firestoreUppercase'] = FirebaseFunctions.firestore
+  functions['firestoreUppercase'] = functions.firestore
       .document('tests/uppercase')
       .onWrite(firestoreUppercase);
 
   functions['pubsubToDatabase'] =
-      FirebaseFunctions.pubsub.topic('testTopic').onPublish(pubsubToDatabase);
+      functions.pubsub.topic('testTopic').onPublish(pubsubToDatabase);
 }
 
 FutureOr<void> httpsTests(ExpressHttpRequest request) {
@@ -68,7 +67,7 @@ helloWorld(ExpressHttpRequest request) {
 
 config(ExpressHttpRequest request) {
   try {
-    var config = FirebaseFunctions.config;
+    var config = functions.config;
     Map body = {
       'key': config.get('someservice.key'),
       'url': config.get('someservice.url'),

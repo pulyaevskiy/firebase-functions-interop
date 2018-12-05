@@ -3,6 +3,8 @@
 Write Firebase Cloud functions in Dart, run in Node.js. This is an early
 development preview, open-source project.
 
+**Looking for latest updates? Make sure to check the most recent `1.0.0-dev.*` release!**
+
 > From version `1.0.0-dev.4.0` this library depends on the official Functions SDK
 > version `1.0.0` or higher which introduced some **breaking changes**. See
 > [UPGRADING.md][] for more details and instructions.
@@ -39,10 +41,8 @@ void helloWorld(ExpressHttpRequest request) {
 
 ## Status
 
-This is a early preview, development version which is not feature complete.
-
-Version 1.0.0 of this library requires Dart SDK 2 as it depends on certain
-new features available there.
+Version 1.0.0 is considered stable though not feature complete. It is recommended to
+check 1.0.0-dev.* versions for latest updates and bug fixes.
 
 Below is status report of already implemented functionality by namespace:
 
@@ -55,7 +55,7 @@ Below is status report of already implemented functionality by namespace:
 - [x] functions.https
 - [x] functions.pubsub
 - [x] functions.storage
-
+- [ ] functions.remoteConfig
 
 ## Usage
 

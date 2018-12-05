@@ -12,18 +12,16 @@ void main() {
   /// example `helloWorld` function will be available at `/helloWorld`
   /// URL path and it will also handle all paths under this prefix, e.g.
   /// `/helloWorld/any/number/of/sections`.
-  functions['helloWorld'] = FirebaseFunctions.https.onRequest(helloWorld);
-  functions['makeUppercase'] = FirebaseFunctions.database
-      .ref('/tests/{testId}/original')
-      .onWrite(makeUppercase);
-  functions['makeNamesUppercase'] = FirebaseFunctions.firestore
+  functions['helloWorld'] = functions.https.onRequest(helloWorld);
+  functions['makeUppercase'] =
+      functions.database.ref('/tests/{testId}/original').onWrite(makeUppercase);
+  functions['makeNamesUppercase'] = functions.firestore
       .document('/users/{userId}')
       .onWrite(makeNamesUppercase);
   functions['logPubsub'] =
-      FirebaseFunctions.pubsub.topic('my-topic').onPublish(logPubsub);
-  functions['logStorage'] =
-      FirebaseFunctions.storage.object().onFinalize(logStorage);
-  functions['logAuth'] = FirebaseFunctions.auth.user().onCreate(logAuth);
+      functions.pubsub.topic('my-topic').onPublish(logPubsub);
+  functions['logStorage'] = functions.storage.object().onFinalize(logStorage);
+  functions['logAuth'] = functions.auth.user().onCreate(logAuth);
 }
 
 /// Example Realtime Database function.
@@ -74,7 +72,7 @@ void logAuth(UserRecord data, EventContext context) {
 Future<void> helloWorld(ExpressHttpRequest request) async {
   try {
     /// If there are any config parameters we can access them as follows:
-    var config = FirebaseFunctions.config;
+    var config = functions.config;
     var serviceKey = config.get('someservice.key');
     var serviceUrl = config.get('someservice.url');
     // Don't do this on a real project:
