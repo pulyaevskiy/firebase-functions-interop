@@ -1,3 +1,7 @@
+## 1.0.0+1
+
+- Readme fixes.
+
 ## 1.0.0
 
 This is the first stable release. It includes some breaking changes described below and in

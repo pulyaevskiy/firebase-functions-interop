@@ -230,10 +230,14 @@ void main() {
       .onWrite(makeUppercase);
 }
 
-FutureOr<void> makeUppercase(DatabaseEvent<String> event) {
-  var original = event.data.val();
+FutureOr<void> makeUppercase(
+    Change<DataSnapshot<String>> change, EventContext context) {
+  final DataSnapshot<String> snapshot = change.after;
+  var original = snapshot.val();
+  var pushId = context.params['testId'];
   print('Uppercasing $original');
-  return event.data.ref.parent.child('uppercase').setValue(uppercase);
+  var uppercase = pushId.toString() + ': ' + original.toUpperCase();
+  return snapshot.ref.parent.child('uppercase').setValue(uppercase);
 }
 ```
 
@@ -245,16 +249,20 @@ void main() {
       .document('/users/{userId}').onWrite(makeNamesUppercase)
 }
 
-FutureOr<void> makeNamesUppercase(FirestoreEvent event) {
-  if(event.data.data.getString("uppercasedName") == null) {
-    var original = event.data.data.getString("name");
+FutureOr<void> makeNamesUppercase(Change<DocumentSnapshot> change, EventContext context) {
+  // Since this is an update of the same document we must guard against
+  // infinite cycle of this function writing, reading and writing again.
+  final snapshot = change.after;
+  if (snapshot.data.getString("uppercasedName") == null) {
+    var original = snapshot.data.getString("name");
     print('Uppercasing $original');
 
     UpdateData newData = new UpdateData();
-    newData.setString("uppercasedName", original);
+    newData.setString("uppercasedName", original.toUpperCase());
 
-    return event.data.reference.updateData(newData);
+    return snapshot.reference.updateData(newData);
   }
+  return null;
 }
 ```
 
@@ -265,8 +273,8 @@ void main() {
   functions['logPubsub'] = functions.pubsub.topic('my-topic').onPublish(logPubsub);
 }
 
-void logPubsub(PubsubEvent event) {
-  print(event.data.json["name"]);
+void logPubsub(Message message, EventContext context) {
+  print(message.json["name"]);
 }
 ```
 
@@ -277,8 +285,8 @@ void main() {
   functions['logStorage'] = functions.storage.object().onChange(logStorage);
 }
 
-void logStorage (StorageEvent event){
-  print(event.data.name);
+void logStorage(ObjectMetadata data, EventContext context) {
+  print(data.name);
 }
 ```
 
@@ -289,8 +297,8 @@ void main() {
   functions['logAuth'] = functions.auth.user().onCreate(logAuth);
 }
 
-void logAuth(AuthEvent event) {
-  print(event.data.email);
+void logAuth(UserRecord data, EventContext context) {
+  print(data.email);
 }
 ```
 

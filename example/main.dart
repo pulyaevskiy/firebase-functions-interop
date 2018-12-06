@@ -59,7 +59,7 @@ void logPubsub(Message message, EventContext context) {
 }
 
 /// Example Storage
-void logStorage(ObjectMetadata data, EventContext contet) {
+void logStorage(ObjectMetadata data, EventContext context) {
   print(data.name);
 }
 
