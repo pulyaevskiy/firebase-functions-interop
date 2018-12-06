@@ -18,7 +18,7 @@
 ///
 ///     void main() {
 ///       // Registers helloWorld function under path prefix `/helloWorld`
-///       functions['helloWorld'] = FirebaseFunctions.https
+///       functions['helloWorld'] = functions.https
 ///         .onRequest(helloWorld);
 ///     }
 ///

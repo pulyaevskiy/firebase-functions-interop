@@ -3,17 +3,10 @@
 Write Firebase Cloud functions in Dart, run in Node.js. This is an early
 development preview, open-source project.
 
-**Looking for latest updates? Make sure to check the most recent `1.0.0-dev.*` release!**
-
-> From version `1.0.0-dev.4.0` this library depends on the official Functions SDK
-> version `1.0.0` or higher which introduced some **breaking changes**. See
-> [UPGRADING.md][] for more details and instructions.
+> Using `1.0.0-dev.*` version? See [UPGRADING.md][] for details on breaking changes and
+> upgrade instructions.
 
 [UPGRADING.md]: https://github.com/pulyaevskiy/firebase-functions-interop/blob/master/UPGRADING.md
-
-> From version `1.0.0-dev.10.0` this library depends on the official Functions SDK version
-> `2.0.0` or higher which introduced **breaking changes** in how `createTime` and `updateTime`
-> are handled on `DocumentSnapshot` (returned as instances of new `Timestamp` type).
 
 ## What is this?
 
@@ -29,8 +22,7 @@ Here is a minimalistic "Hello world" example of a HTTPS cloud function:
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
-  functions['helloWorld'] =
-      FirebaseFunctions.https.onRequest(helloWorld);
+  functions['helloWorld'] = functions.https.onRequest(helloWorld);
 }
 
 void helloWorld(ExpressHttpRequest request) {
@@ -41,9 +33,7 @@ void helloWorld(ExpressHttpRequest request) {
 
 ## Status
 
-Version 1.0.0 is considered stable though not feature complete. It is recommended to
-check 1.0.0-dev.* versions for latest updates and bug fixes.
-
+Version 1.0.0 is considered stable though not feature complete.
 Below is status report of already implemented functionality by namespace:
 
 - [x] functions
@@ -90,7 +80,7 @@ environment:
 
 dependencies:
   # Firebase Functions bindings
-  firebase_functions_interop: ^1.0.0-dev
+  firebase_functions_interop: ^1.0.0
 
 dev_dependencies:
   # Needed to compile Dart to valid Node.js module.
@@ -108,8 +98,7 @@ Create `functions/node/index.dart` and type in something like this:
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
-  functions['helloWorld'] =
-      FirebaseFunctions.https.onRequest(helloWorld);
+  functions['helloWorld'] = functions.https.onRequest(helloWorld);
 }
 
 void helloWorld(ExpressHttpRequest request) {
@@ -223,8 +212,7 @@ Update your `functions/package.json` to be like so:
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
-  functions['helloWorld'] =
-      FirebaseFunctions.https.onRequest(helloWorld);
+  functions['helloWorld'] = functions.https.onRequest(helloWorld);
 }
 
 void helloWorld(ExpressHttpRequest request) {
@@ -237,7 +225,7 @@ void helloWorld(ExpressHttpRequest request) {
 
 ```dart
 void main() {
-  functions['makeUppercase'] = FirebaseFunctions.database
+  functions['makeUppercase'] = functions.database
       .ref('/messages/{messageId}/original')
       .onWrite(makeUppercase);
 }
@@ -253,7 +241,7 @@ FutureOr<void> makeUppercase(DatabaseEvent<String> event) {
 
 ```dart
 void main() {
-  functions['makeNamesUppercase'] = FirebaseFunctions.firestore
+  functions['makeNamesUppercase'] = functions.firestore
       .document('/users/{userId}').onWrite(makeNamesUppercase)
 }
 
@@ -274,8 +262,7 @@ FutureOr<void> makeNamesUppercase(FirestoreEvent event) {
 
 ```dart
 void main() {
-  functions['logPubsub'] = FirebaseFunctions.pubsub
-      .topic('my-topic').onPublish(logPubsub);
+  functions['logPubsub'] = functions.pubsub.topic('my-topic').onPublish(logPubsub);
 }
 
 void logPubsub(PubsubEvent event) {
@@ -287,8 +274,7 @@ void logPubsub(PubsubEvent event) {
 
 ```dart
 void main() {
-  functions['logStorage'] = FirebaseFunctions.storage
-      .object().onChange(logStorage);
+  functions['logStorage'] = functions.storage.object().onChange(logStorage);
 }
 
 void logStorage (StorageEvent event){
@@ -300,8 +286,7 @@ void logStorage (StorageEvent event){
 
 ```dart
 void main() {
-  functions['logAuth'] = FirebaseFunctions.storage
-      .user().onCreate(logAuth);
+  functions['logAuth'] = functions.auth.user().onCreate(logAuth);
 }
 
 void logAuth(AuthEvent event) {
@@ -322,7 +307,7 @@ firebase functions:config:set some_service.api_key="secret" some_service.url="ht
 
 For more details see https://firebase.google.com/docs/functions/config-env.
 
-To read these values in a Firebase function use `FirebaseFunctions.config`.
+To read these values in a Firebase function use `functions.config`.
 
 Below example also uses [node_http][] package which provides a HTTP client
 powered by Node.js I/O.
@@ -334,13 +319,12 @@ import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:node_http/node_http.dart' as http;
 
 void main() {
-  functions['helloWorld'] =
-      FirebaseFunctions.https.onRequest(helloWorld);
+  functions['helloWorld'] = functions.https.onRequest(helloWorld);
 }
 
 void helloWorld(ExpressHttpRequest request) async {
   /// fetch env configuration
-  final config = FirebaseFunctions.config;
+  final config = functions.config;
   final String serviceKey = config.get('someservice.key');
   final String serviceUrl = config.get('someservice.url');
   /// `http.get()` function is exposed by the `node_http` package.

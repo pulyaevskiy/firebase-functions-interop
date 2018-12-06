@@ -1,4 +1,7 @@
-## 1.0.0-dev.12.0
+## 1.0.0
+
+This is the first stable release. It includes some breaking changes described below and in
+UPGRADING.md.
 
 **Breaking change**: all static fields on `FirebaseFunctions` class were converted to regular
 instance fields. This change was required to introduce new `region` and `runWith` methods on
