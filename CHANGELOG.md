@@ -1,3 +1,7 @@
+## 1.0.1
+
+- Updated dependency on `node_io` to `1.0.1` and `node_http` to `1.0.0`.
+
 ## 1.0.0+1
 
 - Readme fixes.
