@@ -390,6 +390,19 @@ class TopicBuilder {
     return nativeInstance.onPublish(allowInterop(wrapper));
   }
 
+  dynamic _handleEvent(js.Message jsData, js.EventContext jsContext,
+      DataEventHandler<Message> handler) {
+    final message = new Message(jsData);
+    final context = new EventContext(jsContext);
+    var result = handler(message, context);
+    if (result is Future) {
+      return futureToPromise(result);
+    }
+    // See: https://stackoverflow.com/questions/47128440/google-firebase-errorfunction-returned-undefined-expected-promise-or-value
+    return 0;
+  }
+}
+
 class ScheduleBuilder {
   @protected
   final js.ScheduleBuilder nativeInstance;
@@ -402,7 +415,7 @@ class ScheduleBuilder {
         _handleEvent(jsData, jsContext, handler);
     return nativeInstance.onPublish(allowInterop(wrapper));
   }
-
+    
   dynamic _handleEvent(js.Message jsData, js.EventContext jsContext,
       DataEventHandler<Message> handler) {
     final message = new Message(jsData);
