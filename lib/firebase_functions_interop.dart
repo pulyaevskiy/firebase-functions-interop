@@ -420,7 +420,7 @@ class ScheduleBuilder {
   dynamic _handleEvent(js.EventContext jsContext,
       DataEventHandler<void> handler) {
     final context = new EventContext(jsContext);
-    var result = handler(Void, context);
+    var result = handler(null, context);
     if (result is Future) {
       return futureToPromise(result);
     }
