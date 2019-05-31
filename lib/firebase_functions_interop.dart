@@ -31,7 +31,6 @@
 library firebase_functions_interop;
 
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:js';
 
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
@@ -418,7 +417,7 @@ class ScheduleBuilder {
   }
     
   dynamic _handleEvent(js.EventContext jsContext,
-      DataEventHandler<void> handler) {
+      DataEventHandler<Null> handler) {
     final context = new EventContext(jsContext);
     var result = handler(null, context);
     if (result is Future) {
