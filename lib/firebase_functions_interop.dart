@@ -31,6 +31,7 @@
 library firebase_functions_interop;
 
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:js';
 
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
@@ -411,16 +412,15 @@ class ScheduleBuilder {
 
   /// Event handler that fires every time a schedule occurs.
   js.CloudFunction onRun(DataEventHandler<Message> handler) {
-    dynamic wrapper(js.Message jsData, js.EventContext jsContext) =>
-        _handleEvent(jsData, jsContext, handler);
-    return nativeInstance.onPublish(allowInterop(wrapper));
+    dynamic wrapper(js.EventContext jsContext) =>
+        _handleEvent(jsContext, handler);
+    return nativeInstance.onRun(allowInterop(wrapper));
   }
     
-  dynamic _handleEvent(js.Message jsData, js.EventContext jsContext,
-      DataEventHandler<Message> handler) {
-    final message = new Message(jsData);
+  dynamic _handleEvent(js.EventContext jsContext,
+      DataEventHandler<void> handler) {
     final context = new EventContext(jsContext);
-    var result = handler(message, context);
+    var result = handler(Void, context);
     if (result is Future) {
       return futureToPromise(result);
     }

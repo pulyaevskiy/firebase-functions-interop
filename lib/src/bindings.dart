@@ -252,6 +252,9 @@ abstract class PubsubFunctions {
   /// Registers a function that triggers on Pubsub write events to
   /// the [topic].
   external TopicBuilder topic(String topic);
+
+  /// Registers a function that triggers on Pubsub [schedule].
+  external ScheduleBuilder schedule(String expression);
 }
 
 /// The Pubsub topic builder interface.
@@ -269,7 +272,7 @@ abstract class TopicBuilder {
 abstract class ScheduleBuilder {
   /// Event handler that fires every time a schedule occurs.
   external CloudFunction onRun(
-      dynamic handler(Message data, EventContext context));
+      dynamic handler(EventContext context));
 }
 
 /// Interface representing a Google Cloud Pub/Sub message.
