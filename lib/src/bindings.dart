@@ -263,6 +263,15 @@ abstract class TopicBuilder {
       dynamic handler(Message data, EventContext context));
 }
 
+/// The Pubsub schedule builder interface.
+@JS()
+@anonymous
+abstract class ScheduleBuilder {
+  /// Event handler that fires every time a schedule occurs.
+  external CloudFunction onRun(
+      dynamic handler(Message data, EventContext context));
+}
+
 /// Interface representing a Google Cloud Pub/Sub message.
 @JS()
 @anonymous
