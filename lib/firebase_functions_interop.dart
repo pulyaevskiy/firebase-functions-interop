@@ -372,6 +372,9 @@ class PubsubFunctions {
 
   TopicBuilder topic(String path) =>
       new TopicBuilder._(_functions.pubsub.topic(path));
+
+  ScheduleBuilder schedule(String expression) =>
+      new ScheduleBuilder._(_functions.pubsub.schedule(expression));
 }
 
 class TopicBuilder {
@@ -392,6 +395,31 @@ class TopicBuilder {
     final message = new Message(jsData);
     final context = new EventContext(jsContext);
     var result = handler(message, context);
+    if (result is Future) {
+      return futureToPromise(result);
+    }
+    // See: https://stackoverflow.com/questions/47128440/google-firebase-errorfunction-returned-undefined-expected-promise-or-value
+    return 0;
+  }
+}
+
+class ScheduleBuilder {
+  @protected
+  final js.ScheduleBuilder nativeInstance;
+
+  ScheduleBuilder._(this.nativeInstance);
+
+  /// Event handler that fires every time a schedule occurs.
+  js.CloudFunction onRun(DataEventHandler<Message> handler) {
+    dynamic wrapper(js.EventContext jsContext) =>
+        _handleEvent(jsContext, handler);
+    return nativeInstance.onRun(allowInterop(wrapper));
+  }
+    
+  dynamic _handleEvent(js.EventContext jsContext,
+      DataEventHandler<Null> handler) {
+    final context = new EventContext(jsContext);
+    var result = handler(null, context);
     if (result is Future) {
       return futureToPromise(result);
     }
