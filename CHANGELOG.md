@@ -1,3 +1,8 @@
+## 1.0.2
+
+- Added `functions.pubsub.schedule()`. Note that this requires official `firebase-functions` NPM
+  package version `2.3.0` or later.
+
 ## 1.0.1
 
 - Updated dependency on `node_io` to `1.0.1` and `node_http` to `1.0.0`.
