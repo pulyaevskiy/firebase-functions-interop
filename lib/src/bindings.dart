@@ -15,6 +15,7 @@ export 'package:firebase_admin_interop/js.dart';
 abstract class RuntimeOptions {
   /// Timeout for the function in seconds.
   external int get timeoutSeconds;
+
   /// Amount of memory to allocate to the function.
   ///
   /// Valid values are: '128MB', '256MB', '512MB', '1GB', and '2GB'.
@@ -87,6 +88,7 @@ abstract class Change<T> {
 @anonymous
 abstract class EventContextResource {
   external String get service;
+
   external String get name;
 }
 
@@ -135,6 +137,7 @@ abstract class EventContext {
 @anonymous
 abstract class EventAuthInfo {
   external String get uid;
+
   external String get token;
 }
 
@@ -158,6 +161,7 @@ abstract class HttpsFunctions {
   /// The event handler is called with Express Request and Response objects as its
   /// only arguments.
   external HttpsFunction onRequest(HttpRequestListener handler);
+
   external HttpsFunction onCall(
       dynamic handler(dynamic data, CallableContext context));
 }
@@ -166,6 +170,7 @@ abstract class HttpsFunctions {
 @anonymous
 abstract class CallableContext {
   external CallableAuth get auth;
+
   external String get instanceIdToken;
 }
 
@@ -173,6 +178,7 @@ abstract class CallableContext {
 @anonymous
 abstract class CallableAuth {
   external String get uid;
+
   external admin.DecodedIdToken get token;
 }
 
@@ -236,14 +242,14 @@ abstract class DocumentBuilder {
 
   /// Event handler that fires every time data is updated in Cloud Firestore.
   external CloudFunction onUpdate(
-      dynamic handler(
-          Change<admin.DocumentSnapshot> data, EventContext context));
+      dynamic handler(Change<admin.DocumentSnapshot> data,
+          EventContext context));
 
   /// Event handler that fires every time a Cloud Firestore write of any kind
   /// (creation, update, or delete) occurs.
   external CloudFunction onWrite(
-      dynamic handler(
-          Change<admin.DocumentSnapshot> data, EventContext context));
+      dynamic handler(Change<admin.DocumentSnapshot> data,
+          EventContext context));
 }
 
 @JS()
@@ -271,8 +277,7 @@ abstract class TopicBuilder {
 @anonymous
 abstract class ScheduleBuilder {
   /// Event handler that fires every time a schedule occurs.
-  external CloudFunction onRun(
-      dynamic handler(EventContext context));
+  external CloudFunction onRun(dynamic handler(EventContext context));
 }
 
 /// Interface representing a Google Cloud Pub/Sub message.
