@@ -1,3 +1,7 @@
+## 2.0.0
+
+- Update to use firebase_admin_interop `2.0.0`
+  
 ## 1.0.2
 
 - Added `functions.pubsub.schedule()`. Note that this requires official `firebase-functions` NPM
