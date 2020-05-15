@@ -9,8 +9,8 @@ cache:
     - "$HOME/google-cloud-sdk/"
 
 before_script:
-  - nvm install 8.6.0
-  - nvm use 8.6.0
+  - nvm install 8.13.0
+  - nvm use 8.13.0
   - node --version
   - npm install
   - npm install -g firebase-tools
