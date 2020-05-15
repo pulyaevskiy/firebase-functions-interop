@@ -124,7 +124,7 @@ class HttpsFunctions {
   /// proxy to JavaScript request and response objects.
   js.HttpsFunction onRequest(void handler(ExpressHttpRequest request)) {
     void jsHandler(IncomingMessage request, ServerResponse response) {
-      var requestProxy = new ExpressHttpRequest(request, response);
+      var requestProxy = ExpressHttpRequest(request, response);
       handler(requestProxy);
     }
 
@@ -148,7 +148,7 @@ class HttpsFunctions {
       FutureOr<dynamic> handler(dynamic data, CallableContext context)) {
     dynamic jsHandler(data, js.CallableContext context) {
       var auth = context.auth;
-      var ctx = new CallableContext(
+      var ctx = CallableContext(
         auth?.uid,
         auth?.token,
         context.instanceIdToken,
@@ -160,8 +160,9 @@ class HttpsFunctions {
           final future = result.then(_tryJsify).catchError((error) {
             if (error is HttpsError) {
               throw error._toJsHttpsError();
-            } else
+            } else {
               throw error;
+            }
           });
           return futureToPromise(future);
         } else {

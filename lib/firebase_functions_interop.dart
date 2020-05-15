@@ -177,12 +177,12 @@ class EventContext {
       this.params, this.resource, this.timestamp);
 
   factory EventContext(js.EventContext data) {
-    return new EventContext._(
+    return EventContext._(
       data.auth,
       data.authType,
       data.eventId,
       data.eventType,
-      new Map<String, String>.from(dartify(data.params)),
+      Map<String, String>.from(dartify(data.params)),
       data.resource,
       DateTime.parse(data.timestamp),
     );
@@ -224,7 +224,7 @@ class DatabaseFunctions {
 
   /// Returns reference builder for specified [path] in Realtime Database.
   RefBuilder ref(String path) =>
-      new RefBuilder._(_functions.database.ref(path));
+      RefBuilder._(_functions.database.ref(path));
 }
 
 /// The Firebase Realtime Database reference builder.
@@ -267,8 +267,8 @@ class RefBuilder {
 
   dynamic _handleDataEvent<T>(js.DataSnapshot data, js.EventContext jsContext,
       FutureOr<void> handler(DataSnapshot<T> data, EventContext context)) {
-    var snapshot = new DataSnapshot<T>(data);
-    var context = new EventContext(jsContext);
+    var snapshot = DataSnapshot<T>(data);
+    var context = EventContext(jsContext);
     var result = handler(snapshot, context);
     if (result is Future) {
       return futureToPromise(result);
@@ -279,10 +279,10 @@ class RefBuilder {
 
   dynamic _handleChangeEvent<T>(js.Change<js.DataSnapshot> data,
       js.EventContext jsContext, ChangeEventHandler<DataSnapshot<T>> handler) {
-    var after = new DataSnapshot<T>(data.after);
-    var before = new DataSnapshot<T>(data.before);
-    var context = new EventContext(jsContext);
-    var result = handler(new Change<DataSnapshot<T>>(after, before), context);
+    var after = DataSnapshot<T>(data.after);
+    var before = DataSnapshot<T>(data.before);
+    var context = EventContext(jsContext);
+    var result = handler(Change<DataSnapshot<T>>(after, before), context);
     if (result is Future) {
       return futureToPromise(result);
     }
@@ -297,7 +297,7 @@ class FirestoreFunctions {
   FirestoreFunctions._(this._functions);
 
   DocumentBuilder document(String path) =>
-      new DocumentBuilder._(_functions.firestore.document(path));
+      DocumentBuilder._(_functions.firestore.document(path));
 }
 
 class DocumentBuilder {
@@ -339,9 +339,9 @@ class DocumentBuilder {
 
   dynamic _handleEvent(js.DocumentSnapshot data, js.EventContext jsContext,
       DataEventHandler<DocumentSnapshot> handler) {
-    final firestore = new Firestore(data.ref.firestore);
-    final snapshot = new DocumentSnapshot(data, firestore);
-    final context = new EventContext(jsContext);
+    final firestore = Firestore(data.ref.firestore);
+    final snapshot = DocumentSnapshot(data, firestore);
+    final context = EventContext(jsContext);
     var result = handler(snapshot, context);
     if (result is Future) {
       return futureToPromise(result);
@@ -352,11 +352,11 @@ class DocumentBuilder {
 
   dynamic _handleChangeEvent(js.Change<js.DocumentSnapshot> data,
       js.EventContext jsContext, ChangeEventHandler<DocumentSnapshot> handler) {
-    final firestore = new Firestore(data.after.ref.firestore);
-    var after = new DocumentSnapshot(data.after, firestore);
-    var before = new DocumentSnapshot(data.before, firestore);
-    var context = new EventContext(jsContext);
-    var result = handler(new Change<DocumentSnapshot>(after, before), context);
+    final firestore = Firestore(data.after.ref.firestore);
+    var after = DocumentSnapshot(data.after, firestore);
+    var before = DocumentSnapshot(data.before, firestore);
+    var context = EventContext(jsContext);
+    var result = handler(Change<DocumentSnapshot>(after, before), context);
     if (result is Future) {
       return futureToPromise(result);
     }
@@ -371,10 +371,10 @@ class PubsubFunctions {
   PubsubFunctions._(this._functions);
 
   TopicBuilder topic(String path) =>
-      new TopicBuilder._(_functions.pubsub.topic(path));
+      TopicBuilder._(_functions.pubsub.topic(path));
 
   ScheduleBuilder schedule(String expression) =>
-      new ScheduleBuilder._(_functions.pubsub.schedule(expression));
+      ScheduleBuilder._(_functions.pubsub.schedule(expression));
 }
 
 class TopicBuilder {
@@ -392,8 +392,8 @@ class TopicBuilder {
 
   dynamic _handleEvent(js.Message jsData, js.EventContext jsContext,
       DataEventHandler<Message> handler) {
-    final message = new Message(jsData);
-    final context = new EventContext(jsContext);
+    final message = Message(jsData);
+    final context = EventContext(jsContext);
     var result = handler(message, context);
     if (result is Future) {
       return futureToPromise(result);
@@ -418,7 +418,7 @@ class ScheduleBuilder {
     
   dynamic _handleEvent(js.EventContext jsContext,
       DataEventHandler<Null> handler) {
-    final context = new EventContext(jsContext);
+    final context = EventContext(jsContext);
     var result = handler(null, context);
     if (result is Future) {
       return futureToPromise(result);
@@ -436,7 +436,7 @@ class Message {
 
   /// User-defined attributes published with the message, if any.
   Map<String, String> get attributes =>
-      new Map<String, String>.from(dartify(nativeInstance.attributes));
+      Map<String, String>.from(dartify(nativeInstance.attributes));
 
   /// The data payload of this message object as a base64-encoded string.
   String get data => nativeInstance.data;
@@ -454,10 +454,10 @@ class StorageFunctions {
 
   /// Registers a Cloud Function scoped to a specific storage [bucket].
   BucketBuilder bucket(String path) =>
-      new BucketBuilder._(_functions.storage.bucket(path));
+      BucketBuilder._(_functions.storage.bucket(path));
 
   /// Registers a Cloud Function scoped to the default storage bucket for the project.
-  ObjectBuilder object() => new ObjectBuilder._(_functions.storage.object());
+  ObjectBuilder object() => ObjectBuilder._(_functions.storage.object());
 }
 
 class BucketBuilder {
@@ -467,7 +467,7 @@ class BucketBuilder {
   BucketBuilder._(this.nativeInstance);
 
   /// Storage object builder interface scoped to the specified storage bucket.
-  ObjectBuilder object() => new ObjectBuilder._(nativeInstance.object());
+  ObjectBuilder object() => ObjectBuilder._(nativeInstance.object());
 }
 
 class ObjectBuilder {
@@ -523,8 +523,8 @@ class ObjectBuilder {
 
   dynamic _handleEvent(js.ObjectMetadata jsData, js.EventContext jsContext,
       DataEventHandler<ObjectMetadata> handler) {
-    final data = new ObjectMetadata(jsData);
-    final context = new EventContext(jsContext);
+    final data = ObjectMetadata(jsData);
+    final context = EventContext(jsContext);
     var result = handler(data, context);
     if (result is Future) {
       return futureToPromise(result);
@@ -574,7 +574,7 @@ class ObjectMetadata {
   CustomerEncryption get customerEncryption {
     final dartified = dartify(nativeInstance.customerEncryption);
     if (dartified == null) return null;
-    return new CustomerEncryption(
+    return CustomerEncryption(
       encryptionAlgorithm: dartified['encryptionAlgorithm'],
       keySha256: dartified['keySha256'],
     );
@@ -655,7 +655,7 @@ class AuthFunctions {
   AuthFunctions._(this._functions);
 
   /// Registers a Cloud Function to handle user authentication events.
-  UserBuilder user() => new UserBuilder._(_functions.auth.user());
+  UserBuilder user() => UserBuilder._(_functions.auth.user());
 }
 
 /// The Firebase Authentication user builder interface.
@@ -681,8 +681,8 @@ class UserBuilder {
 
   dynamic _handleEvent(js.UserRecord jsData, js.EventContext jsContext,
       DataEventHandler<UserRecord> handler) {
-    final data = new UserRecord(jsData);
-    final context = new EventContext(jsContext);
+    final data = UserRecord(jsData);
+    final context = EventContext(jsContext);
     var result = handler(data, context);
     if (result is Future) {
       return futureToPromise(result);
