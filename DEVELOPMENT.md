@@ -26,6 +26,10 @@ To run the tests locally you'll need to:
       export FIREBASE_HTTP_BASE_URL="https://us-central1-<project-id>.cloudfunctions.net"
       ```
 
+* You need to:
+    * activate the firestore database (Firebase Console)
+    * create a pubsub topic with `gcloud beta pubsub topics create testTopic`
+
 * Deploy the test suite:
     * ```bash
       sh tool/deploy.sh

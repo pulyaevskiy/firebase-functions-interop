@@ -24,3 +24,4 @@ functions/build/
 
 # Firebase
 .firebaserc
+test/config.json
