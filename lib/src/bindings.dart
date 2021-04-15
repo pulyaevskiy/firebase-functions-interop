@@ -15,6 +15,7 @@ export 'package:firebase_admin_interop/js.dart';
 abstract class RuntimeOptions {
   /// Timeout for the function in seconds.
   external int get timeoutSeconds;
+
   /// Amount of memory to allocate to the function.
   ///
   /// Valid values are: '128MB', '256MB', '512MB', '1GB', and '2GB'.
@@ -271,8 +272,7 @@ abstract class TopicBuilder {
 @anonymous
 abstract class ScheduleBuilder {
   /// Event handler that fires every time a schedule occurs.
-  external CloudFunction onRun(
-      dynamic handler(EventContext context));
+  external CloudFunction onRun(dynamic handler(EventContext context));
 }
 
 /// Interface representing a Google Cloud Pub/Sub message.

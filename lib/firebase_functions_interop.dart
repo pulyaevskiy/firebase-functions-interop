@@ -43,7 +43,8 @@ import 'src/bindings.dart' as js;
 import 'src/express.dart';
 
 export 'package:firebase_admin_interop/firebase_admin_interop.dart';
-export 'package:node_io/node_io.dart' show HttpRequest, HttpResponse;
+export 'package:tekartik_http_node/src/node/http_server.dart'
+    show HttpRequest, HttpResponse;
 
 export 'src/bindings.dart'
     show CloudFunction, HttpsFunction, EventAuthInfo, RuntimeOptions;
@@ -415,9 +416,9 @@ class ScheduleBuilder {
         _handleEvent(jsContext, handler);
     return nativeInstance.onRun(allowInterop(wrapper));
   }
-    
-  dynamic _handleEvent(js.EventContext jsContext,
-      DataEventHandler<Null> handler) {
+
+  dynamic _handleEvent(
+      js.EventContext jsContext, DataEventHandler<Null> handler) {
     final context = new EventContext(jsContext);
     var result = handler(null, context);
     if (result is Future) {

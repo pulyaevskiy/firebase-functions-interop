@@ -1,6 +1,6 @@
 import 'package:node_interop/http.dart';
 import 'package:node_interop/util.dart';
-import 'package:node_io/node_io.dart';
+import 'package:tekartik_http_node/src/node/http_server.dart';
 
 class ExpressHttpRequest extends NodeHttpRequest {
   ExpressHttpRequest(
