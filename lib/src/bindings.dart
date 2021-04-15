@@ -21,7 +21,7 @@ abstract class RuntimeOptions {
   /// Valid values are: '128MB', '256MB', '512MB', '1GB', and '2GB'.
   external String get memory;
 
-  external factory RuntimeOptions({int timeoutSeconds, String memory});
+  external factory RuntimeOptions({int? timeoutSeconds, String? memory});
 }
 
 @JS()
@@ -166,7 +166,7 @@ abstract class HttpsFunctions {
 @JS()
 @anonymous
 abstract class CallableContext {
-  external CallableAuth get auth;
+  external CallableAuth? get auth;
   external String get instanceIdToken;
 }
 
@@ -428,14 +428,14 @@ abstract class ObjectMetadata {
   external String get storageClass;
 
   /// The creation time of this object in RFC 3339 format.
-  external String get timeCreated;
+  external String? get timeCreated;
 
   /// The deletion time of the object in RFC 3339 format. Returned only if this
   /// version of the object has been deleted.
-  external String get timeDeleted;
+  external String? get timeDeleted;
 
   /// The modification time of this object.
-  external String get updated;
+  external String? get updated;
 }
 
 /// Namespace for Firebase Authentication functions.

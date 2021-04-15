@@ -52,7 +52,7 @@ export 'src/express.dart';
 
 part 'src/https.dart';
 
-final js.FirebaseFunctions _module = require('firebase-functions');
+final js.FirebaseFunctions? _module = require('firebase-functions');
 
 /// Main library object which can be used to create and register Firebase
 /// Cloud functions.
@@ -68,7 +68,7 @@ typedef ChangeEventHandler<T> = FutureOr<void> Function(
 /// Use [functions] as a singleton instance of this class to export function
 /// triggers.
 class FirebaseFunctions {
-  final js.FirebaseFunctions _functions;
+  final js.FirebaseFunctions? _functions;
 
   /// Configuration object for Firebase functions.
   final Config config;
@@ -91,7 +91,7 @@ class FirebaseFunctions {
   /// Authentication functions.
   final AuthFunctions auth;
 
-  FirebaseFunctions._(js.FirebaseFunctions functions)
+  FirebaseFunctions._(js.FirebaseFunctions? functions)
       : _functions = functions,
         config = Config._(functions),
         https = HttpsFunctions._(functions),
@@ -105,12 +105,12 @@ class FirebaseFunctions {
   ///
   /// For a list of valid values see https://firebase.google.com/docs/functions/locations
   FirebaseFunctions region(String region) {
-    return FirebaseFunctions._(_functions.region(region));
+    return FirebaseFunctions._(_functions!.region(region));
   }
 
   /// Configures memory allocation and timeout for a function.
   FirebaseFunctions runWith(js.RuntimeOptions options) {
-    return FirebaseFunctions._(_functions.runWith(options));
+    return FirebaseFunctions._(_functions!.runWith(options));
   }
 
   /// Export [function] under specified [key].
@@ -127,7 +127,7 @@ class FirebaseFunctions {
 /// See also:
 /// - [https://firebase.google.com/docs/functions/config-env](https://firebase.google.com/docs/functions/config-env)
 class Config {
-  final js.FirebaseFunctions _functions;
+  final js.FirebaseFunctions? _functions;
 
   Config._(this._functions);
 
@@ -140,7 +140,7 @@ class Config {
   /// `functions.config().some_service.client_secret`.
   dynamic get(String key) {
     final List<String> parts = key.split('.');
-    var data = dartify(_functions.config());
+    var data = dartify(_functions!.config());
     var value;
     for (var subKey in parts) {
       if (data is! Map) return null;
@@ -220,12 +220,12 @@ class EventContext {
 
 /// Realtime Database functions namespace.
 class DatabaseFunctions {
-  final js.FirebaseFunctions _functions;
+  final js.FirebaseFunctions? _functions;
   DatabaseFunctions._(this._functions);
 
   /// Returns reference builder for specified [path] in Realtime Database.
   RefBuilder ref(String path) =>
-      new RefBuilder._(_functions.database.ref(path));
+      new RefBuilder._(_functions!.database.ref(path));
 }
 
 /// The Firebase Realtime Database reference builder.
@@ -293,12 +293,12 @@ class RefBuilder {
 }
 
 class FirestoreFunctions {
-  final js.FirebaseFunctions _functions;
+  final js.FirebaseFunctions? _functions;
 
   FirestoreFunctions._(this._functions);
 
   DocumentBuilder document(String path) =>
-      new DocumentBuilder._(_functions.firestore.document(path));
+      new DocumentBuilder._(_functions!.firestore.document(path));
 }
 
 class DocumentBuilder {
@@ -367,15 +367,15 @@ class DocumentBuilder {
 }
 
 class PubsubFunctions {
-  final js.FirebaseFunctions _functions;
+  final js.FirebaseFunctions? _functions;
 
   PubsubFunctions._(this._functions);
 
   TopicBuilder topic(String path) =>
-      new TopicBuilder._(_functions.pubsub.topic(path));
+      new TopicBuilder._(_functions!.pubsub.topic(path));
 
   ScheduleBuilder schedule(String expression) =>
-      new ScheduleBuilder._(_functions.pubsub.schedule(expression));
+      new ScheduleBuilder._(_functions!.pubsub.schedule(expression));
 }
 
 class TopicBuilder {
@@ -411,7 +411,7 @@ class ScheduleBuilder {
   ScheduleBuilder._(this.nativeInstance);
 
   /// Event handler that fires every time a schedule occurs.
-  js.CloudFunction onRun(DataEventHandler<Message> handler) {
+  js.CloudFunction onRun(DataEventHandler<Message?> handler) {
     dynamic wrapper(js.EventContext jsContext) =>
         _handleEvent(jsContext, handler);
     return nativeInstance.onRun(allowInterop(wrapper));
@@ -450,15 +450,15 @@ class Message {
 }
 
 class StorageFunctions {
-  final js.FirebaseFunctions _functions;
+  final js.FirebaseFunctions? _functions;
   StorageFunctions._(this._functions);
 
   /// Registers a Cloud Function scoped to a specific storage [bucket].
   BucketBuilder bucket(String path) =>
-      new BucketBuilder._(_functions.storage.bucket(path));
+      new BucketBuilder._(_functions!.storage.bucket(path));
 
   /// Registers a Cloud Function scoped to the default storage bucket for the project.
-  ObjectBuilder object() => new ObjectBuilder._(_functions.storage.object());
+  ObjectBuilder object() => new ObjectBuilder._(_functions!.storage.object());
 }
 
 class BucketBuilder {
@@ -572,9 +572,10 @@ class ObjectMetadata {
   String get crc32c => nativeInstance.crc32c;
 
   /// Customer-supplied encryption key.
-  CustomerEncryption get customerEncryption {
+  CustomerEncryption? get customerEncryption {
+    if (nativeInstance.customerEncryption == null) return null;
     final dartified = dartify(nativeInstance.customerEncryption);
-    if (dartified == null) return null;
+
     return new CustomerEncryption(
       encryptionAlgorithm: dartified['encryptionAlgorithm'],
       keySha256: dartified['keySha256'],
@@ -625,38 +626,38 @@ class ObjectMetadata {
   String get storageClass => nativeInstance.storageClass;
 
   /// The creation time of this object.
-  DateTime get timeCreated => nativeInstance.timeCreated == null
+  DateTime? get timeCreated => nativeInstance.timeCreated == null
       ? null
-      : DateTime.parse(nativeInstance.timeCreated);
+      : DateTime.parse(nativeInstance.timeCreated!);
 
   /// The deletion time of this object.
   ///
   /// Returned only if this version of the object has been deleted.
-  DateTime get timeDeleted => nativeInstance.timeDeleted == null
+  DateTime? get timeDeleted => nativeInstance.timeDeleted == null
       ? null
-      : DateTime.parse(nativeInstance.timeDeleted);
+      : DateTime.parse(nativeInstance.timeDeleted!);
 
   /// The modification time of this object.
-  DateTime get updated => nativeInstance.updated == null
+  DateTime? get updated => nativeInstance.updated == null
       ? null
-      : DateTime.parse(nativeInstance.updated);
+      : DateTime.parse(nativeInstance.updated!);
 }
 
 class CustomerEncryption {
-  final String encryptionAlgorithm;
-  final String keySha256;
+  final String? encryptionAlgorithm;
+  final String? keySha256;
 
   CustomerEncryption({this.encryptionAlgorithm, this.keySha256});
 }
 
 /// Namespace for Firebase Authentication functions.
 class AuthFunctions {
-  final js.FirebaseFunctions _functions;
+  final js.FirebaseFunctions? _functions;
 
   AuthFunctions._(this._functions);
 
   /// Registers a Cloud Function to handle user authentication events.
-  UserBuilder user() => new UserBuilder._(_functions.auth.user());
+  UserBuilder user() => new UserBuilder._(_functions!.auth.user());
 }
 
 /// The Firebase Authentication user builder interface.

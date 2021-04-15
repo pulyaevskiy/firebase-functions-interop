@@ -91,18 +91,18 @@ class HttpsError {
 
   dynamic _toJsHttpsError() {
     return callConstructor(
-        _module.https.HttpsError, [code, message, jsify(details)]);
+        _module!.https.HttpsError, [code, message, jsify(details)]);
   }
 }
 
 class CallableContext {
   /// The uid from decoding and verifying a Firebase Auth ID token. Value may
   /// be `null`.
-  final String authUid;
+  final String? authUid;
 
   /// The result of decoding and verifying a Firebase Auth ID token. Value may
   /// be `null`.
-  final DecodedIdToken authToken;
+  final DecodedIdToken? authToken;
 
   /// An unverified token for a Firebase Instance ID.
   final String instanceIdToken;
@@ -112,7 +112,7 @@ class CallableContext {
 
 /// HTTPS functions namespace.
 class HttpsFunctions {
-  final js.FirebaseFunctions _functions;
+  final js.FirebaseFunctions? _functions;
   HttpsFunctions._(this._functions);
 
   /// Event [handler] which is run every time an HTTPS URL is hit.
@@ -128,7 +128,7 @@ class HttpsFunctions {
       handler(requestProxy);
     }
 
-    return _functions.https.onRequest(allowInterop(jsHandler));
+    return _functions!.https.onRequest(allowInterop(jsHandler));
   }
 
   /// Event handler which is run every time an HTTPS Callable function is called
@@ -172,7 +172,7 @@ class HttpsFunctions {
       }
     }
 
-    return _functions.https.onCall(allowInterop(jsHandler));
+    return _functions!.https.onCall(allowInterop(jsHandler));
   }
 
   dynamic _tryJsify(data) {

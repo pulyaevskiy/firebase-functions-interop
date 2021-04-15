@@ -8,10 +8,10 @@ import 'package:test/test.dart';
 import 'setup_admin.dart';
 
 void main() {
-  App app = initFirebaseApp();
+  App? app = initFirebaseApp();
 
   deletePath(String path) async {
-    var ref = app.database().ref(path);
+    var ref = app!.database().ref(path);
 
     await ref.setValue(null);
     var data = await ref.once('value');
@@ -26,11 +26,11 @@ void main() {
     });
 
     tearDownAll(() async {
-      await app.delete();
+      await app!.delete();
     });
 
     test('happy path integration test', () async {
-      var ref = app.database().ref('/tests/happyPath/original');
+      var ref = app!.database().ref('/tests/happyPath/original');
       var value = 'lowercase' + (new DateTime.now().toIso8601String());
       await ref.setValue(value);
       var ucRef = app.database().ref('/tests/happyPath/uppercase');

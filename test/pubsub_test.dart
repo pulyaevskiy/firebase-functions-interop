@@ -12,11 +12,11 @@ import 'package:test/test.dart';
 import 'setup_admin.dart';
 
 void main() {
-  App app = initFirebaseApp();
+  App? app = initFirebaseApp();
 
   group('Pubsub', () {
     tearDownAll(() async {
-      await app.delete();
+      await app!.delete();
     });
 
     test('save to database', () async {
@@ -26,7 +26,7 @@ void main() {
       var exitCode = await exec(command);
       expect(exitCode, 0);
 
-      var snapshot = await app
+      var snapshot = await app!
           .database()
           .ref('/tests/pubsubToDatabase')
           .once<String>('value');
@@ -44,8 +44,8 @@ void main() {
 Future<int> exec(String command) {
   Completer<int> completer = new Completer<int>();
   childProcess.exec(command, new ExecOptions(),
-      allowInterop((error, stdout, stderr) {
-    int result = (error == null) ? 0 : error.code;
+      allowInterop((dynamic error, stdout, stderr) {
+    int result = (error == null) ? 0 : error!.code as int;
     print(stdout);
     if (error != null) {
       print(error);

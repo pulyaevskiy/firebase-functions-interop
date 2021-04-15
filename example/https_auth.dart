@@ -19,15 +19,17 @@ void main() {
 
 Future secured(ExpressHttpRequest request) async {
   try {
-    String auth = request.headers.value('authorization');
+    String? auth = request.headers.value('authorization');
     if (auth != null && auth.startsWith('Bearer ')) {
       print('Authorization header found.');
       var admin = FirebaseAdmin.instance;
-      var app = admin.initializeApp();
+      var app = admin.initializeApp()!;
 
       String idToken = auth.split(' ').last;
-      DecodedIdToken decodedToken =
-          await app.auth().verifyIdToken(idToken).catchError((error) => null);
+      DecodedIdToken? decodedToken;
+      try {
+        decodedToken = await app.auth().verifyIdToken(idToken);
+      } catch (_) {}
       if (decodedToken == null) {
         print('Invalid or expired authorization token provided.');
         request.response.statusCode = 403;
