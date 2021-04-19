@@ -167,14 +167,14 @@ abstract class HttpsFunctions {
 @anonymous
 abstract class CallableContext {
   external CallableAuth? get auth;
-  external String get instanceIdToken;
+  external String? get instanceIdToken;
 }
 
 @JS()
 @anonymous
 abstract class CallableAuth {
-  external String get uid;
-  external admin.DecodedIdToken get token;
+  external String? get uid;
+  external admin.DecodedIdToken? get token;
 }
 
 @JS()

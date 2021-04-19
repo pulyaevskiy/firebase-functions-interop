@@ -105,7 +105,7 @@ class CallableContext {
   final DecodedIdToken? authToken;
 
   /// An unverified token for a Firebase Instance ID.
-  final String instanceIdToken;
+  final String? instanceIdToken;
 
   CallableContext(this.authUid, this.authToken, this.instanceIdToken);
 }
@@ -155,7 +155,6 @@ class HttpsFunctions {
       );
       try {
         var result = handler(dartify(data), ctx);
-
         if (result is Future) {
           final future = result.then(_tryJsify).catchError((error) {
             if (error is HttpsError) {
