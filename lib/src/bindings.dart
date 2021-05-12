@@ -15,12 +15,13 @@ export 'package:firebase_admin_interop/js.dart';
 abstract class RuntimeOptions {
   /// Timeout for the function in seconds.
   external int get timeoutSeconds;
+
   /// Amount of memory to allocate to the function.
   ///
   /// Valid values are: '128MB', '256MB', '512MB', '1GB', and '2GB'.
   external String get memory;
 
-  external factory RuntimeOptions({int timeoutSeconds, String memory});
+  external factory RuntimeOptions({int? timeoutSeconds, String? memory});
 }
 
 @JS()
@@ -107,12 +108,12 @@ abstract class EventContext {
   /// For an unauthenticated user, this field is null. For event types that do
   /// not provide user information (all except Realtime Database) or for
   /// Firebase admin users, this field will not exist.
-  external EventAuthInfo get auth;
+  external EventAuthInfo? get auth;
 
   /// The level of permissions for a user.
   ///
   /// Valid values are: `ADMIN`, `USER`, `UNAUTHENTICATED` and `null`.
-  external String get authType;
+  external String? get authType;
 
   /// The event’s unique identifier.
   external String get eventId;
@@ -271,8 +272,7 @@ abstract class TopicBuilder {
 @anonymous
 abstract class ScheduleBuilder {
   /// Event handler that fires every time a schedule occurs.
-  external CloudFunction onRun(
-      dynamic handler(EventContext context));
+  external CloudFunction onRun(dynamic handler(EventContext context));
 }
 
 /// Interface representing a Google Cloud Pub/Sub message.
@@ -428,14 +428,14 @@ abstract class ObjectMetadata {
   external String get storageClass;
 
   /// The creation time of this object in RFC 3339 format.
-  external String get timeCreated;
+  external String? get timeCreated;
 
   /// The deletion time of the object in RFC 3339 format. Returned only if this
   /// version of the object has been deleted.
-  external String get timeDeleted;
+  external String? get timeDeleted;
 
   /// The modification time of this object.
-  external String get updated;
+  external String? get updated;
 }
 
 /// Namespace for Firebase Authentication functions.

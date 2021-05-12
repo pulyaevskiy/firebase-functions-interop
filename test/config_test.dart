@@ -11,7 +11,7 @@ import 'setup_admin.dart';
 void main() {
   group('Config', () {
     test('read config', () async {
-      var baseUrl = env['FIREBASE_HTTP_BASE_URL'] + '/httpsTests';
+      var baseUrl = env['FIREBASE_HTTP_BASE_URL']! + '/httpsTests';
       var response = await http.get('$baseUrl/config');
       expect(response.statusCode, 200);
       final Map result = json.decode(response.body);

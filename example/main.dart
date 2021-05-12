@@ -28,7 +28,7 @@ void main() {
 FutureOr<void> makeUppercase(
     Change<DataSnapshot<String>> change, EventContext context) {
   final DataSnapshot<String> snapshot = change.after;
-  var original = snapshot.val();
+  var original = snapshot.val()!;
   var pushId = context.params['testId'];
   print('Uppercasing $original');
   var uppercase = pushId.toString() + ': ' + original.toUpperCase();
@@ -42,7 +42,7 @@ FutureOr<void> makeNamesUppercase(
   // infinite cycle of this function writing, reading and writing again.
   final snapshot = change.after;
   if (snapshot.data.getString("uppercasedName") == null) {
-    var original = snapshot.data.getString("name");
+    var original = snapshot.data.getString("name")!;
     print('Uppercasing $original');
 
     UpdateData newData = new UpdateData();
@@ -83,7 +83,7 @@ Future<void> helloWorld(ExpressHttpRequest request) async {
     /// Note though that Firebase uses body-parser expressjs middleware which
     /// decodes request body for some common content-types (json included).
     /// In such cases use `request.body` which contains decoded body.
-    String name = request.requestedUri.queryParameters['name'];
+    String? name = request.requestedUri.queryParameters['name'];
     if (name != null) {
       // We can also write to Realtime Database right here:
       var admin = FirebaseAdmin.instance;

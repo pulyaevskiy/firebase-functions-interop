@@ -43,15 +43,16 @@ void main() {
 
 Future<int> exec(String command) {
   Completer<int> completer = new Completer<int>();
-  childProcess.exec(command, new ExecOptions(),
-      allowInterop((error, stdout, stderr) {
-    int result = (error == null) ? 0 : error.code;
-    print(stdout);
-    if (error != null) {
+  childProcess.exec(
+    command,
+    new ExecOptions(),
+    allowInterop((error, stdout, stderr) {
+      int result = error.code as int;
+      print(stdout);
       print(error);
       print(stderr);
-    }
-    completer.complete(result);
-  }));
+      completer.complete(result);
+    }),
+  );
   return completer.future;
 }

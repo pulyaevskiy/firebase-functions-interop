@@ -1,3 +1,7 @@
+## 3.0.0
+
+- Support for NNBD: Bump sdk to 2.12
+
 ## 2.0.0
 
 - Update to use firebase_admin_interop `2.0.0`

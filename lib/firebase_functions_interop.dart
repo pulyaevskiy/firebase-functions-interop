@@ -173,8 +173,15 @@ class Change<T> {
 ///   * Authorization of the request that triggered the event, if applicable
 ///     and available.
 class EventContext {
-  EventContext._(this.auth, this.authType, this.eventId, this.eventType,
-      this.params, this.resource, this.timestamp);
+  EventContext._(
+    this.auth,
+    this.authType,
+    this.eventId,
+    this.eventType,
+    this.params,
+    this.resource,
+    this.timestamp,
+  );
 
   factory EventContext(js.EventContext data) {
     return new EventContext._(
@@ -193,12 +200,12 @@ class EventContext {
   /// For an unauthenticated user, this field is null. For event types that do
   /// not provide user information (all except Realtime Database) or for
   /// Firebase admin users, this field will not exist.
-  final js.EventAuthInfo auth;
+  final js.EventAuthInfo? auth;
 
   /// The level of permissions for a user.
   ///
   /// Valid values are: `ADMIN`, `USER`, `UNAUTHENTICATED` and `null`.
-  final String authType;
+  final String? authType;
 
   /// The event’s unique identifier.
   final String eventId;
@@ -410,14 +417,14 @@ class ScheduleBuilder {
   ScheduleBuilder._(this.nativeInstance);
 
   /// Event handler that fires every time a schedule occurs.
-  js.CloudFunction onRun(DataEventHandler<Message> handler) {
+  js.CloudFunction onRun(DataEventHandler<Message?> handler) {
     dynamic wrapper(js.EventContext jsContext) =>
         _handleEvent(jsContext, handler);
     return nativeInstance.onRun(allowInterop(wrapper));
   }
-    
-  dynamic _handleEvent(js.EventContext jsContext,
-      DataEventHandler<Null> handler) {
+
+  dynamic _handleEvent(
+      js.EventContext jsContext, DataEventHandler<Null> handler) {
     final context = new EventContext(jsContext);
     var result = handler(null, context);
     if (result is Future) {
@@ -571,7 +578,7 @@ class ObjectMetadata {
   String get crc32c => nativeInstance.crc32c;
 
   /// Customer-supplied encryption key.
-  CustomerEncryption get customerEncryption {
+  CustomerEncryption? get customerEncryption {
     final dartified = dartify(nativeInstance.customerEncryption);
     if (dartified == null) return null;
     return new CustomerEncryption(
@@ -624,28 +631,31 @@ class ObjectMetadata {
   String get storageClass => nativeInstance.storageClass;
 
   /// The creation time of this object.
-  DateTime get timeCreated => nativeInstance.timeCreated == null
+  DateTime? get timeCreated => nativeInstance.timeCreated == null
       ? null
-      : DateTime.parse(nativeInstance.timeCreated);
+      : DateTime.parse(nativeInstance.timeCreated!);
 
   /// The deletion time of this object.
   ///
   /// Returned only if this version of the object has been deleted.
-  DateTime get timeDeleted => nativeInstance.timeDeleted == null
+  DateTime? get timeDeleted => nativeInstance.timeDeleted == null
       ? null
-      : DateTime.parse(nativeInstance.timeDeleted);
+      : DateTime.parse(nativeInstance.timeDeleted!);
 
   /// The modification time of this object.
-  DateTime get updated => nativeInstance.updated == null
+  DateTime? get updated => nativeInstance.updated == null
       ? null
-      : DateTime.parse(nativeInstance.updated);
+      : DateTime.parse(nativeInstance.updated!);
 }
 
 class CustomerEncryption {
   final String encryptionAlgorithm;
   final String keySha256;
 
-  CustomerEncryption({this.encryptionAlgorithm, this.keySha256});
+  CustomerEncryption({
+    required this.encryptionAlgorithm,
+    required this.keySha256,
+  });
 }
 
 /// Namespace for Firebase Authentication functions.

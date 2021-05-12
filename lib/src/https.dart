@@ -98,11 +98,11 @@ class HttpsError {
 class CallableContext {
   /// The uid from decoding and verifying a Firebase Auth ID token. Value may
   /// be `null`.
-  final String authUid;
+  final String? authUid;
 
   /// The result of decoding and verifying a Firebase Auth ID token. Value may
   /// be `null`.
-  final DecodedIdToken authToken;
+  final DecodedIdToken? authToken;
 
   /// An unverified token for a Firebase Instance ID.
   final String instanceIdToken;
@@ -149,8 +149,8 @@ class HttpsFunctions {
     dynamic jsHandler(data, js.CallableContext context) {
       var auth = context.auth;
       var ctx = new CallableContext(
-        auth?.uid,
-        auth?.token,
+        auth.uid,
+        auth.token,
         context.instanceIdToken,
       );
       try {
