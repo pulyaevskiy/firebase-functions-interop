@@ -90,8 +90,8 @@ class HttpsError {
   final dynamic details;
 
   dynamic _toJsHttpsError() {
-    return callConstructor(
-        _module!.https.HttpsError, [code, message, jsify(details)]);
+    return callConstructor(_module!.https.HttpsError,
+        [code, message, details == null ? null : jsify(details)]);
   }
 }
 
@@ -176,7 +176,7 @@ class HttpsFunctions {
 
   dynamic _tryJsify(data) {
     try {
-      return jsify(data);
+      return data == null ? null : jsify(data);
     } on ArgumentError {
       console.error('Response cannot be encoded.', data.toString(), data);
       throw HttpsError(

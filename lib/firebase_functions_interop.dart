@@ -43,8 +43,7 @@ import 'src/bindings.dart' as js;
 import 'src/express.dart';
 
 export 'package:firebase_admin_interop/firebase_admin_interop.dart';
-export 'package:tekartik_http_node/src/node/http_server.dart'
-    show HttpRequest, HttpResponse;
+export 'package:tekartik_http/http_server.dart' show HttpRequest, HttpResponse;
 
 export 'src/bindings.dart'
     show CloudFunction, HttpsFunction, EventAuthInfo, RuntimeOptions;
