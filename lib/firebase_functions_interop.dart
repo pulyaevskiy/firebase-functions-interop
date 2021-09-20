@@ -428,6 +428,9 @@ class ScheduleBuilder {
     // See: https://stackoverflow.com/questions/47128440/google-firebase-errorfunction-returned-undefined-expected-promise-or-value
     return 0;
   }
+
+  ScheduleBuilder timeZone(String timeZone) =>
+      ScheduleBuilder._(nativeInstance.timeZone(timeZone));
 }
 
 class Message {
