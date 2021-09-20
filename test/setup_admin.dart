@@ -7,25 +7,25 @@ import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 import 'package:node_interop/node.dart';
 import 'package:node_interop/util.dart';
 
-final Map<String, String> env =
-    new Map<String, String>.from(dartify(process.env));
+final Map<String, String> env = Map<String, String>.from(dartify(process.env));
 
 App? initFirebaseApp() {
   if (!env.containsKey('FIREBASE_CONFIG') ||
       !env.containsKey('FIREBASE_SERVICE_ACCOUNT_JSON') ||
-      !env.containsKey('FIREBASE_HTTP_BASE_URL'))
-    throw new StateError('Environment variables are not set.');
+      !env.containsKey('FIREBASE_HTTP_BASE_URL')) {
+    throw StateError('Environment variables are not set.');
+  }
 
-  Map certConfig = jsonDecode(env['FIREBASE_SERVICE_ACCOUNT_JSON']!);
+  var certConfig = jsonDecode(env['FIREBASE_SERVICE_ACCOUNT_JSON']!) as Map;
   final cert = FirebaseAdmin.instance.cert(
-    projectId: certConfig['project_id'],
-    clientEmail: certConfig['client_email'],
-    privateKey: certConfig['private_key'],
+    projectId: certConfig['project_id'] as String?,
+    clientEmail: certConfig['client_email'] as String?,
+    privateKey: certConfig['private_key'] as String?,
   );
-  final Map config = jsonDecode(env['FIREBASE_CONFIG']!);
-  final databaseUrl = config['databaseURL'];
-  return FirebaseAdmin.instance.initializeApp(
-      new AppOptions(credential: cert, databaseURL: databaseUrl));
+  final config = jsonDecode(env['FIREBASE_CONFIG']!) as Map;
+  final databaseUrl = config['databaseURL'] as String?;
+  return FirebaseAdmin.instance
+      .initializeApp(AppOptions(credential: cert, databaseURL: databaseUrl));
 //
 //  if (!env.containsKey('FIREBASE_SERVICE_ACCOUNT_FILEPATH') ||
 //      !env.containsKey('FIREBASE_DATABASE_URL') ||

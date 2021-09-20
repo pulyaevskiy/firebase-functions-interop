@@ -3,6 +3,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
@@ -153,7 +154,7 @@ FutureOr<void> firestoreUppercase(
 }
 
 FutureOr<void> pubsubToDatabase(Message message, EventContext context) {
-  var data = new Map<String, String>.from(message.json);
+  var data = new Map<String, String>.from(message.json!);
   var payload = data['payload'];
   var admin = FirebaseAdmin.instance;
   var app = admin.initializeApp()!;

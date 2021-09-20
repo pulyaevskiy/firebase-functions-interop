@@ -4,7 +4,6 @@
 @TestOn('node')
 import 'dart:convert';
 
-import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 import 'package:tekartik_http_node/src/node/node_client.dart';
 import 'package:test/test.dart';
@@ -12,8 +11,8 @@ import 'package:test/test.dart';
 import 'setup_admin.dart';
 
 void main() {
-  App? app = initFirebaseApp();
-  NodeClient http = new NodeClient(keepAlive: false);
+  var app = initFirebaseApp();
+  var http = NodeClient(keepAlive: false);
   var baseUrl = env['FIREBASE_HTTP_BASE_URL']! + '/httpsTests';
   var callableUrl = env['FIREBASE_HTTP_BASE_URL']! + '/onCallTests';
 
@@ -30,7 +29,7 @@ void main() {
     });
 
     test('save to database', () async {
-      var time = new DateTime.now().millisecondsSinceEpoch.toString();
+      var time = DateTime.now().millisecondsSinceEpoch.toString();
       var response = await http
           .get(Uri.parse('$baseUrl/httpsToDatabase?name=Firebase$time'));
       expect(response.statusCode, 200);
@@ -46,13 +45,13 @@ void main() {
     test('get json body', () async {
       var response = await http.post(Uri.parse('$baseUrl/jsonTest'),
           headers: {'Content-Type': 'application/json'},
-          body: json.encode({"helloJSON": "hi"}));
+          body: json.encode({'helloJSON': 'hi'}));
       expect(response.statusCode, 200);
       expect(response.body, '{"helloJSON":"hi"}');
     });
 
     test('callable', () async {
-      var response = await http.post(Uri.parse('$callableUrl'),
+      var response = await http.post(Uri.parse(callableUrl),
           headers: {'content-type': 'application/json; charset=utf-8'},
           body: jsonEncode(
             {'data': 'body'},

@@ -8,9 +8,9 @@ import 'package:test/test.dart';
 import 'setup_admin.dart';
 
 void main() {
-  App? app = initFirebaseApp();
+  var app = initFirebaseApp();
 
-  deletePath(String path) async {
+  Future<void> deletePath(String path) async {
     var ref = app!.firestore().document(path);
 
     await ref.delete();
@@ -31,8 +31,8 @@ void main() {
 
     test('uppercase', () async {
       var ref = app!.firestore().document('tests/uppercase');
-      var value = 'lowercase' + (new DateTime.now().toIso8601String());
-      var data = new DocumentData();
+      var value = 'lowercase' + (DateTime.now().toIso8601String());
+      var data = DocumentData();
       data.setString('text', value);
       await ref.setData(data);
 
@@ -42,6 +42,6 @@ void main() {
       }
 
       expect(result.data.getString('uppercase'), value.toUpperCase());
-    }, timeout: const Timeout(const Duration(seconds: 30)));
+    }, timeout: const Timeout(Duration(seconds: 30)));
   });
 }

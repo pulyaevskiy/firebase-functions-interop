@@ -5,14 +5,13 @@
 import 'dart:async';
 import 'dart:js';
 
-import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 import 'package:node_interop/child_process.dart';
 import 'package:test/test.dart';
 
 import 'setup_admin.dart';
 
 void main() {
-  App? app = initFirebaseApp();
+  var app = initFirebaseApp();
 
   group('Pubsub', () {
     tearDownAll(() async {
@@ -20,7 +19,7 @@ void main() {
     });
 
     test('save to database', () async {
-      var payload = new DateTime.now().toUtc().toIso8601String();
+      var payload = DateTime.now().toUtc().toIso8601String();
       var command =
           'gcloud -q beta pubsub topics publish testTopic --message \'{"payload":"$payload"}\'';
       var exitCode = await exec(command);
@@ -37,15 +36,16 @@ void main() {
             .once<String>('value');
       }
       expect(snapshot.val(), payload);
-    }, timeout: const Timeout(const Duration(seconds: 20)));
+    }, timeout: const Timeout(Duration(seconds: 20)));
   });
 }
 
 Future<int> exec(String command) {
-  Completer<int> completer = new Completer<int>();
-  childProcess.exec(command, new ExecOptions(),
+  var completer = Completer<int>();
+  childProcess.exec(command, ExecOptions(),
       allowInterop((dynamic error, stdout, stderr) {
-    int result = (error == null) ? 0 : error!.code as int;
+    // ignore: avoid_dynamic_calls
+    var result = (error == null) ? 0 : error!.code as int;
     print(stdout);
     if (error != null) {
       print(error);

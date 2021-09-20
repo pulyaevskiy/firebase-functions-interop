@@ -2,6 +2,7 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
@@ -27,7 +28,7 @@ void main() {
 /// Example Realtime Database function.
 FutureOr<void> makeUppercase(
     Change<DataSnapshot<String>> change, EventContext context) {
-  final DataSnapshot<String> snapshot = change.after;
+  final snapshot = change.after;
   var original = snapshot.val()!;
   var pushId = context.params['testId'];
   print('Uppercasing $original');
@@ -41,12 +42,12 @@ FutureOr<void> makeNamesUppercase(
   // Since this is an update of the same document we must guard against
   // infinite cycle of this function writing, reading and writing again.
   final snapshot = change.after;
-  if (snapshot.data.getString("uppercasedName") == null) {
-    var original = snapshot.data.getString("name")!;
+  if (snapshot.data.getString('uppercasedName') == null) {
+    var original = snapshot.data.getString('name')!;
     print('Uppercasing $original');
 
-    UpdateData newData = new UpdateData();
-    newData.setString("uppercasedName", original.toUpperCase());
+    var newData = UpdateData();
+    newData.setString('uppercasedName', original.toUpperCase());
 
     return snapshot.reference.updateData(newData);
   }
@@ -55,7 +56,7 @@ FutureOr<void> makeNamesUppercase(
 
 /// Example Pubsub
 void logPubsub(Message message, EventContext context) {
-  print(message.json["name"]);
+  print(message.json!['name']);
 }
 
 /// Example Storage
@@ -83,7 +84,7 @@ Future<void> helloWorld(ExpressHttpRequest request) async {
     /// Note though that Firebase uses body-parser expressjs middleware which
     /// decodes request body for some common content-types (json included).
     /// In such cases use `request.body` which contains decoded body.
-    String? name = request.requestedUri.queryParameters['name'];
+    var name = request.requestedUri.queryParameters['name'];
     if (name != null) {
       // We can also write to Realtime Database right here:
       var admin = FirebaseAdmin.instance;
@@ -93,6 +94,6 @@ Future<void> helloWorld(ExpressHttpRequest request) async {
     }
     request.response.writeln('Hello world');
   } finally {
-    request.response.close();
+    await request.response.close();
   }
 }

@@ -2,7 +2,6 @@ name: firebase_functions_interop
 description: Firebase Cloud Functions SDK for Dart written as a JS interop wrapper for official Node.js SDK.
 version: 2.0.0
 homepage: https://www.github.com/pulyaevskiy/firebase-functions-interop
-author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 publish_to: none
 
 environment:
@@ -11,6 +10,7 @@ environment:
 dependencies:
   js: ^0.6.1+1
   meta: ^1.1.8
+  dev_test:
   node_interop: ^2.0.0
   # node_io: ^1.0.1+2
   # node_http: ^1.0.0
@@ -24,6 +24,11 @@ dependencies:
       url: git://github.com/tekartik/common_node.dart
       path: http_node
       ref: null_safety
-
+  tekartik_lints:
+    git:
+      url: git://github.com/tekartik/common.dart
+      ref: null_safety
+      path: packages/lints
+    version: '>=0.1.0'
 dev_dependencies:
   test: ^1.12.0
