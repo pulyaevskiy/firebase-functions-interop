@@ -280,6 +280,9 @@ abstract class TopicBuilder {
 @JS()
 @anonymous
 abstract class ScheduleBuilder {
+  /// Select timezone
+  external ScheduleBuilder timeZone(String timeZone);
+
   /// Event handler that fires every time a schedule occurs.
   external CloudFunction onRun(dynamic Function(EventContext context) handler);
 }
