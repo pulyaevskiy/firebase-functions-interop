@@ -1,17 +1,17 @@
 // Copyright (c) 2017, Anatoly Pulyaevskiy. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
-
 @TestOn('node')
-import 'package:firebase_admin_interop/firebase_admin_interop.dart';
+library database_test;
+
 import 'package:test/test.dart';
 
 import 'setup_admin.dart';
 
 void main() {
-  App app = initFirebaseApp();
+  var app = initFirebaseApp();
 
-  deletePath(String path) async {
-    var ref = app.database().ref(path);
+  Future<void> deletePath(String path) async {
+    var ref = app!.database().ref(path);
 
     await ref.setValue(null);
     var data = await ref.once('value');
@@ -26,12 +26,12 @@ void main() {
     });
 
     tearDownAll(() async {
-      await app.delete();
+      await app!.delete();
     });
 
     test('happy path integration test', () async {
-      var ref = app.database().ref('/tests/happyPath/original');
-      var value = 'lowercase' + (new DateTime.now().toIso8601String());
+      var ref = app!.database().ref('/tests/happyPath/original');
+      var value = 'lowercase' + (DateTime.now().toIso8601String());
       await ref.setValue(value);
       var ucRef = app.database().ref('/tests/happyPath/uppercase');
       var data = await ucRef.once('value');
@@ -40,6 +40,6 @@ void main() {
       }
       var expected = 'happyPath: ' + value.toUpperCase();
       expect(data.val(), expected);
-    }, timeout: const Timeout(const Duration(seconds: 30)));
+    }, timeout: const Timeout(Duration(seconds: 30)));
   });
 }

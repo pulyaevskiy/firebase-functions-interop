@@ -2,8 +2,9 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
-import 'package:firebase_functions_interop/firebase_functions_interop.dart';
+
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
+import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
   functions['secured'] = functions.https.onRequest(secured);
@@ -19,15 +20,17 @@ void main() {
 
 Future secured(ExpressHttpRequest request) async {
   try {
-    String auth = request.headers.value('authorization');
+    var auth = request.headers.value('authorization');
     if (auth != null && auth.startsWith('Bearer ')) {
       print('Authorization header found.');
       var admin = FirebaseAdmin.instance;
-      var app = admin.initializeApp();
+      var app = admin.initializeApp()!;
 
-      String idToken = auth.split(' ').last;
-      DecodedIdToken decodedToken =
-          await app.auth().verifyIdToken(idToken).catchError((error) => null);
+      var idToken = auth.split(' ').last;
+      DecodedIdToken? decodedToken;
+      try {
+        decodedToken = await app.auth().verifyIdToken(idToken);
+      } catch (_) {}
       if (decodedToken == null) {
         print('Invalid or expired authorization token provided.');
         request.response.statusCode = 403;
@@ -45,6 +48,6 @@ Future secured(ExpressHttpRequest request) async {
       request.response.write('Unauthorized');
     }
   } finally {
-    request.response.close();
+    await request.response.close();
   }
 }

@@ -1,3 +1,6 @@
+# tekartik recommended lints (extension over google lints and pedantic)
+include: package:tekartik_lints/recommended.yaml
+
 analyzer:
   exclude:
     - functions/build/**

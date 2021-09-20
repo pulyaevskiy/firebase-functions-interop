@@ -3,6 +3,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
@@ -82,11 +83,11 @@ config(ExpressHttpRequest request) {
 
 FutureOr<void> httpsToDatabase(ExpressHttpRequest request) async {
   try {
-    String name = request.requestedUri.queryParameters['name'];
+    var name = request.requestedUri.queryParameters['name'];
     if (name != null) {
       var admin = FirebaseAdmin.instance;
       var app = admin.initializeApp();
-      var database = app.database();
+      var database = app!.database();
       await database
           .ref('/tests/httpsToDatabase/original')
           .setValue(name.toUpperCase());
@@ -103,10 +104,10 @@ FutureOr<void> httpsToDatabase(ExpressHttpRequest request) async {
 
 FutureOr<void> httpsToFirestore(ExpressHttpRequest request) async {
   try {
-    String name = request.requestedUri.queryParameters['name'];
+    var name = request.requestedUri.queryParameters['name'];
     if (name != null) {
       var admin = FirebaseAdmin.instance;
-      var app = admin.initializeApp();
+      var app = admin.initializeApp()!;
       var firestore = app.firestore();
       var doc = new DocumentData();
       doc.setGeoPoint('location', new GeoPoint(23.03, 19.84));
@@ -126,7 +127,7 @@ FutureOr<void> httpsToFirestore(ExpressHttpRequest request) async {
 FutureOr<void> makeUppercase(
     Change<DataSnapshot<String>> change, EventContext context) {
   var data = change.after;
-  var original = data.val();
+  var original = data.val()!;
   var pushId = context.params['testId'];
   print('Uppercasing $original');
   var uppercase = pushId.toString() + ': ' + original.toUpperCase();
@@ -145,7 +146,7 @@ FutureOr<void> firestoreUppercase(
     print('Skipping uppercase to avoid infinite loop.');
     return null;
   }
-  var original = data.getString('text');
+  var original = data.getString('text')!;
   print('Uppercasing $original');
   var update = new UpdateData();
   update.setString('uppercase', original.toUpperCase());
@@ -153,10 +154,10 @@ FutureOr<void> firestoreUppercase(
 }
 
 FutureOr<void> pubsubToDatabase(Message message, EventContext context) {
-  var data = new Map<String, String>.from(message.json);
+  var data = new Map<String, String>.from(message.json!);
   var payload = data['payload'];
   var admin = FirebaseAdmin.instance;
-  var app = admin.initializeApp();
+  var app = admin.initializeApp()!;
   var database = app.database();
   return database.ref('/tests/pubsubToDatabase').setValue(payload);
 }

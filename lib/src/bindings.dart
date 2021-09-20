@@ -4,9 +4,9 @@
 @JS()
 library firebase_functions_interop.bindings;
 
+import 'package:firebase_admin_interop/js.dart' as admin;
 import 'package:js/js.dart';
 import 'package:node_interop/http.dart';
-import 'package:firebase_admin_interop/js.dart' as admin;
 
 export 'package:firebase_admin_interop/js.dart';
 
@@ -15,12 +15,13 @@ export 'package:firebase_admin_interop/js.dart';
 abstract class RuntimeOptions {
   /// Timeout for the function in seconds.
   external int get timeoutSeconds;
+
   /// Amount of memory to allocate to the function.
   ///
   /// Valid values are: '128MB', '256MB', '512MB', '1GB', and '2GB'.
   external String get memory;
 
-  external factory RuntimeOptions({int timeoutSeconds, String memory});
+  external factory RuntimeOptions({int? timeoutSeconds, String? memory});
 }
 
 @JS()
@@ -54,6 +55,7 @@ abstract class FirebaseFunctions {
   external AuthFunctions get auth;
 
   /// Constructor for Firebase [Event] objects.
+  // ignore: non_constant_identifier_names
   external dynamic get Event;
 }
 
@@ -62,14 +64,15 @@ abstract class FirebaseFunctions {
 /// This should be exported from your JavaScript file to define a Cloud Function.
 /// This type is a special JavaScript function which takes a generic [Event]
 /// object as its only argument.
-typedef void CloudFunction<T>(data, EventContext context);
+typedef CloudFunction<T> = void Function(dynamic data, EventContext context);
 
 /// The Cloud Function type for HTTPS triggers.
 ///
 /// This should be exported from your JavaScript file to define a Cloud
 /// Function. This type is a special JavaScript function which takes Express
 /// Request and Response objects as its only arguments.
-typedef void HttpsFunction(IncomingMessage request, ServerResponse response);
+typedef HttpsFunction = void Function(
+    IncomingMessage request, ServerResponse response);
 
 /// The Functions interface for events that change state, such as
 /// Realtime Database or Cloud Firestore `onWrite` and `onUpdate`.
@@ -151,7 +154,8 @@ abstract class HttpsFunctions {
   /// Make sure to throw this exception at the top level of your function and
   /// not from within a callback, as that will not necessarily terminate the
   /// function with this exception.
-  external dynamic get HttpsError;
+  // ignore: non_constant_identifier_names
+  external Object get HttpsError;
 
   /// Event handler which is run every time an HTTPS URL is hit.
   ///
@@ -159,21 +163,21 @@ abstract class HttpsFunctions {
   /// only arguments.
   external HttpsFunction onRequest(HttpRequestListener handler);
   external HttpsFunction onCall(
-      dynamic handler(dynamic data, CallableContext context));
+      dynamic Function(dynamic data, CallableContext context) handler);
 }
 
 @JS()
 @anonymous
 abstract class CallableContext {
-  external CallableAuth get auth;
-  external String get instanceIdToken;
+  external CallableAuth? get auth;
+  external String? get instanceIdToken;
 }
 
 @JS()
 @anonymous
 abstract class CallableAuth {
-  external String get uid;
-  external admin.DecodedIdToken get token;
+  external String? get uid;
+  external admin.DecodedIdToken? get token;
 }
 
 @JS()
@@ -195,22 +199,24 @@ abstract class RefBuilder {
   /// Event handler that fires every time new data is created in Firebase
   /// Realtime Database.
   external CloudFunction onCreate(
-      dynamic handler(admin.DataSnapshot data, EventContext context));
+      dynamic Function(admin.DataSnapshot data, EventContext context) handler);
 
   /// Event handler that fires every time data is deleted from Firebase Realtime
   /// Database.
   external CloudFunction onDelete(
-      dynamic handler(admin.DataSnapshot data, EventContext context));
+      dynamic Function(admin.DataSnapshot data, EventContext context) handler);
 
   /// Event handler that fires every time data is updated in Firebase Realtime
   /// Database.
   external CloudFunction onUpdate(
-      dynamic handler(Change<admin.DataSnapshot> data, EventContext context));
+      dynamic Function(Change<admin.DataSnapshot> data, EventContext context)
+          handler);
 
   /// Event handler that fires every time a Firebase Realtime Database write of
   /// any kind (creation, update, or delete) occurs.
   external CloudFunction onWrite(
-      dynamic handler(Change<admin.DataSnapshot> data, EventContext context));
+      dynamic Function(Change<admin.DataSnapshot> data, EventContext context)
+          handler);
 }
 
 @JS()
@@ -228,22 +234,26 @@ abstract class DocumentBuilder {
   /// Event handler that fires every time new data is created in Cloud
   /// Firestore.
   external CloudFunction onCreate(
-      dynamic handler(admin.DocumentSnapshot data, EventContext context));
+      dynamic Function(admin.DocumentSnapshot data, EventContext context)
+          handler);
 
   /// Event handler that fires every time data is deleted from Cloud Firestore.
   external CloudFunction onDelete(
-      dynamic handler(admin.DocumentSnapshot data, EventContext context));
+      dynamic Function(admin.DocumentSnapshot data, EventContext context)
+          handler);
 
   /// Event handler that fires every time data is updated in Cloud Firestore.
   external CloudFunction onUpdate(
-      dynamic handler(
-          Change<admin.DocumentSnapshot> data, EventContext context));
+      dynamic Function(
+              Change<admin.DocumentSnapshot> data, EventContext context)
+          handler);
 
   /// Event handler that fires every time a Cloud Firestore write of any kind
   /// (creation, update, or delete) occurs.
   external CloudFunction onWrite(
-      dynamic handler(
-          Change<admin.DocumentSnapshot> data, EventContext context));
+      dynamic Function(
+              Change<admin.DocumentSnapshot> data, EventContext context)
+          handler);
 }
 
 @JS()
@@ -263,16 +273,18 @@ abstract class PubsubFunctions {
 abstract class TopicBuilder {
   /// Event handler that fires every time an event is publish in Pubsub.
   external CloudFunction onPublish(
-      dynamic handler(Message data, EventContext context));
+      dynamic Function(Message data, EventContext context) handler);
 }
 
 /// The Pubsub schedule builder interface.
 @JS()
 @anonymous
 abstract class ScheduleBuilder {
+  /// Select timezone
+  external ScheduleBuilder timeZone(String timeZone);
+
   /// Event handler that fires every time a schedule occurs.
-  external CloudFunction onRun(
-      dynamic handler(EventContext context));
+  external CloudFunction onRun(dynamic Function(EventContext context) handler);
 }
 
 /// Interface representing a Google Cloud Pub/Sub message.
@@ -320,7 +332,7 @@ abstract class ObjectBuilder {
   /// archived version, either because it was archived or because it was
   /// overwritten by the upload of an object of the same name.
   external CloudFunction onArchive(
-      void handler(ObjectMetadata data, EventContext context));
+      void Function(ObjectMetadata data, EventContext context) handler);
 
   /// Event handler which fires every time a Google Cloud Storage deletion
   /// occurs.
@@ -331,7 +343,7 @@ abstract class ObjectBuilder {
   /// sent when an object is archived, even if archival occurs via the
   /// storage.objects.delete method.
   external CloudFunction onDelete(
-      void handler(ObjectMetadata data, EventContext context));
+      void Function(ObjectMetadata data, EventContext context) handler);
 
   /// Event handler which fires every time a Google Cloud Storage object
   /// creation occurs.
@@ -340,12 +352,12 @@ abstract class ObjectBuilder {
   /// successfully created in the bucket. This includes copying or rewriting an
   /// existing object. A failed upload does not trigger this event.
   external CloudFunction onFinalize(
-      void handler(ObjectMetadata data, EventContext context));
+      void Function(ObjectMetadata data, EventContext context) handler);
 
   /// Event handler which fires every time the metadata of an existing object
   /// changes.
   external CloudFunction onMetadataUpdate(
-      void handler(ObjectMetadata data, EventContext context));
+      void Function(ObjectMetadata data, EventContext context) handler);
 }
 
 /// Interface representing a Google Google Cloud Storage object metadata object.
@@ -428,14 +440,14 @@ abstract class ObjectMetadata {
   external String get storageClass;
 
   /// The creation time of this object in RFC 3339 format.
-  external String get timeCreated;
+  external String? get timeCreated;
 
   /// The deletion time of the object in RFC 3339 format. Returned only if this
   /// version of the object has been deleted.
-  external String get timeDeleted;
+  external String? get timeDeleted;
 
   /// The modification time of this object.
-  external String get updated;
+  external String? get updated;
 }
 
 /// Namespace for Firebase Authentication functions.
@@ -452,11 +464,11 @@ abstract class AuthFunctions {
 abstract class UserBuilder {
   /// Event handler that fires every time a Firebase Authentication user is created.
   external CloudFunction onCreate(
-      void handler(UserRecord data, EventContext context));
+      void Function(UserRecord data, EventContext context) handler);
 
   /// Event handler that fires every time a Firebase Authentication user is deleted.
   external CloudFunction onDelete(
-      void handler(UserRecord data, EventContext context));
+      void Function(UserRecord data, EventContext context) handler);
 }
 
 /// Interface representing a user.

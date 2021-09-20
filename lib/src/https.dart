@@ -87,32 +87,32 @@ class HttpsError {
   /// As with the data returned from a callable HTTPS handler, this can be
   /// `null` or any JSON-encodable object (`String`, `int`, `List` or `Map`
   /// containing primitive types).
-  final dynamic details;
+  final Object? details;
 
-  dynamic _toJsHttpsError() {
-    return callConstructor(
-        _module.https.HttpsError, [code, message, jsify(details)]);
+  Object _toJsHttpsError() {
+    return callConstructor(_module!.https.HttpsError,
+        [code, message, details == null ? null : jsify(details!)]) as Object;
   }
 }
 
 class CallableContext {
   /// The uid from decoding and verifying a Firebase Auth ID token. Value may
   /// be `null`.
-  final String authUid;
+  final String? authUid;
 
   /// The result of decoding and verifying a Firebase Auth ID token. Value may
   /// be `null`.
-  final DecodedIdToken authToken;
+  final DecodedIdToken? authToken;
 
   /// An unverified token for a Firebase Instance ID.
-  final String instanceIdToken;
+  final String? instanceIdToken;
 
   CallableContext(this.authUid, this.authToken, this.instanceIdToken);
 }
 
 /// HTTPS functions namespace.
 class HttpsFunctions {
-  final js.FirebaseFunctions _functions;
+  final js.FirebaseFunctions? _functions;
   HttpsFunctions._(this._functions);
 
   /// Event [handler] which is run every time an HTTPS URL is hit.
@@ -122,13 +122,14 @@ class HttpsFunctions {
   /// The event handler is called with single [request] argument, instance
   /// of [ExpressHttpRequest]. This object acts as a
   /// proxy to JavaScript request and response objects.
-  js.HttpsFunction onRequest(void handler(ExpressHttpRequest request)) {
+  js.HttpsFunction onRequest(
+      void Function(ExpressHttpRequest request) handler) {
     void jsHandler(IncomingMessage request, ServerResponse response) {
-      var requestProxy = new ExpressHttpRequest(request, response);
+      var requestProxy = ExpressHttpRequest(request, response);
       handler(requestProxy);
     }
 
-    return _functions.https.onRequest(allowInterop(jsHandler));
+    return _functions!.https.onRequest(allowInterop(jsHandler));
   }
 
   /// Event handler which is run every time an HTTPS Callable function is called
@@ -145,23 +146,24 @@ class HttpsFunctions {
   /// client. If this handler throws any other kind of error, then the client
   /// receives an error of type [HttpsError.internal].
   js.HttpsFunction onCall(
-      FutureOr<dynamic> handler(dynamic data, CallableContext context)) {
+      FutureOr<dynamic> Function(dynamic data, CallableContext context)
+          handler) {
     dynamic jsHandler(data, js.CallableContext context) {
       var auth = context.auth;
-      var ctx = new CallableContext(
+      var ctx = CallableContext(
         auth?.uid,
         auth?.token,
         context.instanceIdToken,
       );
       try {
         var result = handler(dartify(data), ctx);
-
         if (result is Future) {
-          final future = result.then(_tryJsify).catchError((error) {
+          final future = result.then(_tryJsify).catchError((Object error) {
             if (error is HttpsError) {
               throw error._toJsHttpsError();
-            } else
+            } else {
               throw error;
+            }
           });
           return futureToPromise(future);
         } else {
@@ -172,12 +174,12 @@ class HttpsFunctions {
       }
     }
 
-    return _functions.https.onCall(allowInterop(jsHandler));
+    return _functions!.https.onCall(allowInterop(jsHandler));
   }
 
-  dynamic _tryJsify(data) {
+  dynamic _tryJsify(Object? data) {
     try {
-      return jsify(data);
+      return data == null ? null : jsify(data);
     } on ArgumentError {
       console.error('Response cannot be encoded.', data.toString(), data);
       throw HttpsError(
