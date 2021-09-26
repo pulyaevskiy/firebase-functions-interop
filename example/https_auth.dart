@@ -3,7 +3,6 @@
 
 import 'dart:async';
 
-import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 import 'package:firebase_functions_interop/firebase_functions_interop.dart';
 
 void main() {
