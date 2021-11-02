@@ -88,6 +88,14 @@ dev_dependencies:
   build_node_compilers: ^0.2.0
 ```
 
+Git:
+```yaml
+  firebase_functions_interop:
+    git:
+      url: https://github.com/tekartikdev/firebase-functions-interop
+      ref: dart2_3
+```
+
 Then run `pub get` to install dependencies.
 
 ### 3 Write a Basic Function
