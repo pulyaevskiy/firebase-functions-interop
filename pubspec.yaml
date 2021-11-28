@@ -17,17 +17,17 @@ dependencies:
   # firebase_admin_interop:
   firebase_admin_interop:
     git:
-      url: git://github.com/tekartikdev/firebase-admin-interop
-      ref: null_safety
+      url: https://github.com/tekartikdev/firebase-admin-interop
+      ref: dart2_3
   tekartik_http_node:
     git:
-      url: git://github.com/tekartik/common_node.dart
+      url: https://github.com/tekartik/common_node.dart
       path: http_node
-      ref: null_safety
+      ref: dart2_3
   tekartik_lints:
     git:
-      url: git://github.com/tekartik/common.dart
-      ref: null_safety
+      url: https://github.com/tekartik/common.dart
+      ref: dart2_3
       path: packages/lints
     version: '>=0.1.0'
 dev_dependencies:
