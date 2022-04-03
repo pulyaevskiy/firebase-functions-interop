@@ -9,7 +9,7 @@ import 'setup_admin.dart';
 void main() {
   group('Config', () {
     test('read config', () async {
-      var baseUrl = env['FIREBASE_HTTP_BASE_URL']! + '/httpsTests';
+      var baseUrl = '${env['FIREBASE_HTTP_BASE_URL']!}/httpsTests';
       var client = httpFactoryUniversal.client.newClient();
       var response = await client.get(Uri.parse('$baseUrl/config'));
       expect(response.statusCode, 200);

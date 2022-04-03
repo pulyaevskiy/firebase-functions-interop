@@ -31,7 +31,7 @@ void main() {
 
     test('uppercase', () async {
       var ref = app!.firestore().document('tests/uppercase');
-      var value = 'lowercase' + (DateTime.now().toIso8601String());
+      var value = 'lowercase${DateTime.now().toIso8601String()}';
       var data = DocumentData();
       data.setString('text', value);
       await ref.setData(data);

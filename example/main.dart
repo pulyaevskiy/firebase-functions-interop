@@ -32,7 +32,7 @@ FutureOr<void> makeUppercase(
   var original = snapshot.val()!;
   var pushId = context.params['testId'];
   print('Uppercasing $original');
-  var uppercase = pushId.toString() + ': ' + original.toUpperCase();
+  var uppercase = '$pushId: ${original.toUpperCase()}';
   return snapshot.ref.parent.child('uppercase').setValue(uppercase);
 }
 

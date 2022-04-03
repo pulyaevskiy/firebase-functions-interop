@@ -43,11 +43,11 @@ import 'src/bindings.dart' as js;
 import 'src/express.dart';
 
 export 'package:firebase_admin_interop/firebase_admin_interop.dart';
-export 'package:tekartik_http/http_server.dart' show HttpRequest, HttpResponse;
 
 export 'src/bindings.dart'
     show CloudFunction, HttpsFunction, EventAuthInfo, RuntimeOptions;
 export 'src/express.dart';
+export 'src/import.dart' show HttpRequest, HttpResponse;
 
 part 'src/https.dart';
 
@@ -220,6 +220,7 @@ class EventContext {
 /// Realtime Database functions namespace.
 class DatabaseFunctions {
   final js.FirebaseFunctions? _functions;
+
   DatabaseFunctions._(this._functions);
 
   /// Returns reference builder for specified [path] in Realtime Database.
@@ -455,6 +456,7 @@ class Message {
 
 class StorageFunctions {
   final js.FirebaseFunctions? _functions;
+
   StorageFunctions._(this._functions);
 
   /// Registers a Cloud Function scoped to a specific storage [bucket].
