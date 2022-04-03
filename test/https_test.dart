@@ -13,8 +13,8 @@ import 'setup_admin.dart';
 void main() {
   var app = initFirebaseApp();
   var http = NodeClient(keepAlive: false);
-  var baseUrl = env['FIREBASE_HTTP_BASE_URL']! + '/httpsTests';
-  var callableUrl = env['FIREBASE_HTTP_BASE_URL']! + '/onCallTests';
+  var baseUrl = '${env['FIREBASE_HTTP_BASE_URL']!}/httpsTests';
+  var callableUrl = '${env['FIREBASE_HTTP_BASE_URL']!}/onCallTests';
 
   group('$HttpsFunctions', () {
     tearDownAll(() async {

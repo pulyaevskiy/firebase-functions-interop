@@ -53,7 +53,7 @@ jsonTest(ExpressHttpRequest request) {
 }
 
 date(ExpressHttpRequest request) {
-  DateTime now = new DateTime.now().toUtc();
+  DateTime now = DateTime.now().toUtc();
   request.response.writeln(now.toIso8601String());
   request.response.close();
 }
@@ -109,8 +109,8 @@ FutureOr<void> httpsToFirestore(ExpressHttpRequest request) async {
       var admin = FirebaseAdmin.instance;
       var app = admin.initializeApp()!;
       var firestore = app.firestore();
-      var doc = new DocumentData();
-      doc.setGeoPoint('location', new GeoPoint(23.03, 19.84));
+      var doc = DocumentData();
+      doc.setGeoPoint('location', GeoPoint(23.03, 19.84));
       doc.setString('name', name);
       await firestore.document('/tests/httpsToFirestore').setData(doc);
       request.response.writeln('httpsToFirestore: ok');
@@ -148,13 +148,13 @@ FutureOr<void> firestoreUppercase(
   }
   var original = data.getString('text')!;
   print('Uppercasing $original');
-  var update = new UpdateData();
+  var update = UpdateData();
   update.setString('uppercase', original.toUpperCase());
   return change.after.reference.updateData(update);
 }
 
 FutureOr<void> pubsubToDatabase(Message message, EventContext context) {
-  var data = new Map<String, String>.from(message.json!);
+  var data = Map<String, String>.from(message.json!);
   var payload = data['payload'];
   var admin = FirebaseAdmin.instance;
   var app = admin.initializeApp()!;

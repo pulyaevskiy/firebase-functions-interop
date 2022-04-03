@@ -31,14 +31,14 @@ void main() {
 
     test('happy path integration test', () async {
       var ref = app!.database().ref('/tests/happyPath/original');
-      var value = 'lowercase' + (DateTime.now().toIso8601String());
+      var value = 'lowercase${DateTime.now().toIso8601String()}';
       await ref.setValue(value);
       var ucRef = app.database().ref('/tests/happyPath/uppercase');
       var data = await ucRef.once('value');
       while (data.val() == null) {
         data = await ucRef.once('value');
       }
-      var expected = 'happyPath: ' + value.toUpperCase();
+      var expected = 'happyPath: ${value.toUpperCase()}';
       expect(data.val(), expected);
     }, timeout: const Timeout(Duration(seconds: 30)));
   });
