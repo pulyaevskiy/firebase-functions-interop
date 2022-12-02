@@ -1,3 +1,7 @@
+## 2.1.0
+
+- Add cloud functions v2 support
+
 ## 2.0.0
 
 - Update to use firebase_admin_interop `2.0.0`
