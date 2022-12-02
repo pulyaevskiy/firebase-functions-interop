@@ -52,10 +52,15 @@ export 'src/import.dart' show HttpRequest, HttpResponse;
 part 'src/https.dart';
 
 final _module = require('firebase-functions') as js.FirebaseFunctions?;
+final _moduleV2 = require('firebase-functions/v2') as js.FirebaseFunctions;
 
 /// Main library object which can be used to create and register Firebase
 /// Cloud functions.
 final FirebaseFunctions functions = FirebaseFunctions._(_module);
+
+/// Main library object which can be used to create and register Firebase
+/// Cloud functions v2
+final FirebaseFunctions functionsV2 = FirebaseFunctions._(_moduleV2);
 
 typedef DataEventHandler<T> = FutureOr<void> Function(
     T data, EventContext context);
