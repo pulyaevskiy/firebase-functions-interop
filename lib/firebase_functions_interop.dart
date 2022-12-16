@@ -45,7 +45,12 @@ import 'src/express.dart';
 export 'package:firebase_admin_interop/firebase_admin_interop.dart';
 
 export 'src/bindings.dart'
-    show CloudFunction, HttpsFunction, EventAuthInfo, RuntimeOptions;
+    show
+        CloudFunction,
+        HttpsFunction,
+        EventAuthInfo,
+        RuntimeOptions,
+        HttpsOptions;
 export 'src/express.dart';
 export 'src/import.dart' show HttpRequest, HttpResponse;
 

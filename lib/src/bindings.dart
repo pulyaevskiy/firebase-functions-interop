@@ -90,6 +90,7 @@ abstract class Change<T> {
 @anonymous
 abstract class EventContextResource {
   external String get service;
+
   external String get name;
 }
 
@@ -138,6 +139,7 @@ abstract class EventContext {
 @anonymous
 abstract class EventAuthInfo {
   external String get uid;
+
   external String get token;
 }
 
@@ -147,7 +149,10 @@ abstract class Config {}
 
 @JS()
 @anonymous
-abstract class HttpsFunctions {
+@staticInterop
+abstract class HttpsFunctions {}
+
+extension HttpsFunctionsExtV1 on HttpsFunctions {
   /// To send an error from an HTTPS Callable function to a client, throw an
   /// instance of this class from your handler function.
   ///
@@ -162,14 +167,36 @@ abstract class HttpsFunctions {
   /// The event handler is called with Express Request and Response objects as its
   /// only arguments.
   external HttpsFunction onRequest(HttpRequestListener handler);
+
   external HttpsFunction onCall(
       dynamic Function(dynamic data, CallableContext context) handler);
+}
+
+extension HttpsFunctionsExtV2 on HttpsFunctions {
+  /// Event handler which is run every time an HTTPS URL is hit.
+  ///
+  /// The event handler is called with Express Request and Response objects as its
+  /// only arguments.
+  external HttpsFunction onRequest(
+      HttpsOptions options, HttpRequestListener handler);
+}
+
+@JS()
+@anonymous
+abstract class HttpsOptions {
+  /// String or array string
+  external Object? get region;
+
+  external factory HttpsOptions({
+    Object? region,
+  });
 }
 
 @JS()
 @anonymous
 abstract class CallableContext {
   external CallableAuth? get auth;
+
   external String? get instanceIdToken;
 }
 
@@ -177,6 +204,7 @@ abstract class CallableContext {
 @anonymous
 abstract class CallableAuth {
   external String? get uid;
+
   external admin.DecodedIdToken? get token;
 }
 

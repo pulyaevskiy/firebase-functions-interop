@@ -123,13 +123,30 @@ class HttpsFunctions {
   /// of [ExpressHttpRequest]. This object acts as a
   /// proxy to JavaScript request and response objects.
   js.HttpsFunction onRequest(
+          void Function(ExpressHttpRequest request) handler) =>
+      onRequestV2(null, handler);
+
+  /// Event [handler] which is run every time an HTTPS URL is hit.
+  ///
+  /// Returns a [js.HttpsFunction] which can be exported.
+  ///
+  /// The event handler is called with single [request] argument, instance
+  /// of [ExpressHttpRequest]. This object acts as a
+  /// proxy to JavaScript request and response objects.
+  js.HttpsFunction onRequestV2(js.HttpsOptions? options,
       void Function(ExpressHttpRequest request) handler) {
     void jsHandler(IncomingMessage request, ServerResponse response) {
       var requestProxy = ExpressHttpRequest(request, response);
       handler(requestProxy);
     }
 
-    return _functions!.https.onRequest(allowInterop(jsHandler));
+    if (options == null) {
+      return js.HttpsFunctionsExtV1(_functions!.https)
+          .onRequest(allowInterop(jsHandler));
+    } else {
+      return js.HttpsFunctionsExtV2(_functions!.https)
+          .onRequest(options, allowInterop(jsHandler));
+    }
   }
 
   /// Event handler which is run every time an HTTPS Callable function is called
