@@ -187,9 +187,27 @@ abstract class HttpsOptions {
   /// String or array string
   external Object? get region;
 
-  external factory HttpsOptions({
-    Object? region,
-  });
+  /// Amount of memory to allocate to a function.
+  /// "128MiB" | "256MiB" | "512MiB" | "1GiB" | "2GiB" | "4GiB" | "8GiB" | "16GiB" | "32GiB";
+  /// external Object? get region;
+  external String? get memory;
+
+  /// Number of requests a function can serve at once.
+  external int get concurrency;
+
+  /// If true, allows CORS on requests to this function.
+  external bool get cors;
+
+  /// Timeout for the function in sections, possible values are 0 to 540. HTTPS functions can specify a higher timeout.
+  external int get timeoutSeconds;
+
+  /// Options
+  external factory HttpsOptions(
+      {Object? region,
+      String? memory,
+      int? concurrency,
+      bool? cors,
+      timeoutSeconds});
 }
 
 @JS()
