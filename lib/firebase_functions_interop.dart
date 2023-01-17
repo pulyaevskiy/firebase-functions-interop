@@ -125,7 +125,7 @@ class FirebaseFunctions {
   /// Export [function] under specified [key].
   ///
   /// For HTTPS functions the [key] defines URL path prefix.
-  operator []=(String key, Object function) {
+  void operator []=(String key, Object function) {
     assert(function is js.HttpsFunction || function is js.CloudFunction);
     setExport(key, function);
   }
@@ -149,7 +149,7 @@ class Config {
   /// `functions.config().some_service.client_secret`.
   Object? get(String key) {
     final parts = key.split('.');
-    var data = dartify(_functions!.config());
+    var data = dartify<Object?>(_functions!.config());
     Object? value;
     for (var subKey in parts) {
       if (data is! Map) return null;
@@ -461,7 +461,7 @@ class Message {
   Map? get json => dartify(nativeInstance.json) as Map?;
 
   /// Returns a JSON-serializable representation of this object.
-  dynamic toJson() => dartify(nativeInstance.toJSON());
+  dynamic toJson() => dartify<Object?>(nativeInstance.toJSON());
 }
 
 class StorageFunctions {
@@ -742,5 +742,5 @@ class UserRecord {
   String get uid => nativeInstance.uid;
 
   /// Returns a JSON-serializable representation of this object.
-  dynamic toJson() => dartify(nativeInstance.toJSON());
+  dynamic toJson() => dartify<Object?>(nativeInstance.toJSON());
 }

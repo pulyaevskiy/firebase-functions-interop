@@ -165,7 +165,7 @@ class HttpsFunctions {
   js.HttpsFunction onCall(
       FutureOr<dynamic> Function(dynamic data, CallableContext context)
           handler) {
-    dynamic jsHandler(data, js.CallableContext context) {
+    dynamic jsHandler(Object? data, js.CallableContext context) {
       var auth = context.auth;
       var ctx = CallableContext(
         auth?.uid,
@@ -173,7 +173,7 @@ class HttpsFunctions {
         context.instanceIdToken,
       );
       try {
-        var result = handler(dartify(data), ctx);
+        var result = handler(dartify<Object?>(data), ctx);
         if (result is Future) {
           final future = result.then(_tryJsify).catchError((Object error) {
             if (error is HttpsError) {
