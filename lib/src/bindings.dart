@@ -195,8 +195,14 @@ abstract class HttpsOptions {
   /// Number of requests a function can serve at once.
   external int get concurrency;
 
-  /// If true, allows CORS on requests to this function.
-  external bool get cors;
+  /// string | boolean | RegExp | Array<string | RegExp>
+  ///
+  /// If true, allows CORS on requests to this function. If this is a string or
+  /// RegExp, allows requests from domains that match the provided value. If
+  /// this is an Array, allows requests from domains matching at least one entry
+  /// of the array. Defaults to true for https.CallableFunction and false
+  /// otherwise.
+  external Object? get cors;
 
   /// Timeout for the function in sections, possible values are 0 to 540. HTTPS functions can specify a higher timeout.
   external int get timeoutSeconds;
@@ -206,7 +212,7 @@ abstract class HttpsOptions {
       {Object? region,
       String? memory,
       int? concurrency,
-      bool? cors,
+      Object? cors,
       timeoutSeconds});
 }
 
