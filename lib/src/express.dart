@@ -12,7 +12,7 @@ class ExpressHttpRequest extends NodeHttpRequest {
   dynamic get body {
     if (!hasProperty(nativeInstance, 'body')) return null;
     if (_body != null) return _body;
-    _body = dartify(getProperty(nativeInstance, 'body'));
+    _body = dartify<Object?>(getProperty<Object?>(nativeInstance, 'body'));
     return _body;
   }
 

@@ -14,7 +14,7 @@ void main() {
     var ref = app!.database().ref(path);
 
     await ref.setValue(null);
-    var data = await ref.once('value');
+    var data = await ref.once<Object?>('value');
     while (data.val() != null) {
       data = await ref.once('value');
     }
@@ -34,7 +34,7 @@ void main() {
       var value = 'lowercase${DateTime.now().toIso8601String()}';
       await ref.setValue(value);
       var ucRef = app.database().ref('/tests/happyPath/uppercase');
-      var data = await ucRef.once('value');
+      var data = await ucRef.once<Object?>('value');
       while (data.val() == null) {
         data = await ucRef.once('value');
       }

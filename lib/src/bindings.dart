@@ -90,6 +90,7 @@ abstract class Change<T> {
 @anonymous
 abstract class EventContextResource {
   external String get service;
+
   external String get name;
 }
 
@@ -138,6 +139,7 @@ abstract class EventContext {
 @anonymous
 abstract class EventAuthInfo {
   external String get uid;
+
   external String get token;
 }
 
@@ -147,7 +149,10 @@ abstract class Config {}
 
 @JS()
 @anonymous
-abstract class HttpsFunctions {
+@staticInterop
+abstract class HttpsFunctions {}
+
+extension HttpsFunctionsExtV1 on HttpsFunctions {
   /// To send an error from an HTTPS Callable function to a client, throw an
   /// instance of this class from your handler function.
   ///
@@ -162,14 +167,60 @@ abstract class HttpsFunctions {
   /// The event handler is called with Express Request and Response objects as its
   /// only arguments.
   external HttpsFunction onRequest(HttpRequestListener handler);
+
   external HttpsFunction onCall(
       dynamic Function(dynamic data, CallableContext context) handler);
+}
+
+extension HttpsFunctionsExtV2 on HttpsFunctions {
+  /// Event handler which is run every time an HTTPS URL is hit.
+  ///
+  /// The event handler is called with Express Request and Response objects as its
+  /// only arguments.
+  external HttpsFunction onRequest(
+      HttpsOptions options, HttpRequestListener handler);
+}
+
+@JS()
+@anonymous
+abstract class HttpsOptions {
+  /// String or array string
+  external Object? get region;
+
+  /// Amount of memory to allocate to a function.
+  /// "128MiB" | "256MiB" | "512MiB" | "1GiB" | "2GiB" | "4GiB" | "8GiB" | "16GiB" | "32GiB";
+  /// external Object? get region;
+  external String? get memory;
+
+  /// Number of requests a function can serve at once.
+  external int get concurrency;
+
+  /// string | boolean | RegExp | Array<string | RegExp>
+  ///
+  /// If true, allows CORS on requests to this function. If this is a string or
+  /// RegExp, allows requests from domains that match the provided value. If
+  /// this is an Array, allows requests from domains matching at least one entry
+  /// of the array. Defaults to true for https.CallableFunction and false
+  /// otherwise.
+  external Object? get cors;
+
+  /// Timeout for the function in sections, possible values are 0 to 540. HTTPS functions can specify a higher timeout.
+  external int get timeoutSeconds;
+
+  /// Options
+  external factory HttpsOptions(
+      {Object? region,
+      String? memory,
+      int? concurrency,
+      Object? cors,
+      timeoutSeconds});
 }
 
 @JS()
 @anonymous
 abstract class CallableContext {
   external CallableAuth? get auth;
+
   external String? get instanceIdToken;
 }
 
@@ -177,6 +228,7 @@ abstract class CallableContext {
 @anonymous
 abstract class CallableAuth {
   external String? get uid;
+
   external admin.DecodedIdToken? get token;
 }
 

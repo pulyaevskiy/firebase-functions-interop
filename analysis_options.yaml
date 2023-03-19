@@ -1,5 +1,5 @@
 # tekartik recommended lints (extension over google lints and pedantic)
-include: package:tekartik_lints/recommended.yaml
+include: package:tekartik_lints/strict.yaml
 
 analyzer:
   exclude:
