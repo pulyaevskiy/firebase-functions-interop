@@ -142,10 +142,10 @@ class HttpsFunctions {
 
     if (options == null) {
       return js.HttpsFunctionsExtV1(_functions!.https)
-          .onRequest(allowInterop(jsHandler));
+          .onRequest(js.allowInterop(jsHandler));
     } else {
       return js.HttpsFunctionsExtV2(_functions!.https)
-          .onRequest(options, allowInterop(jsHandler));
+          .onRequest(options, js.allowInterop(jsHandler));
     }
   }
 
@@ -191,7 +191,7 @@ class HttpsFunctions {
       }
     }
 
-    return _functions!.https.onCall(allowInterop(jsHandler));
+    return _functions!.https.onCall(js.allowInterop(jsHandler));
   }
 
   dynamic _tryJsify(Object? data) {
