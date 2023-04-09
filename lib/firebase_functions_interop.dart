@@ -31,9 +31,9 @@
 library firebase_functions_interop;
 
 import 'dart:async';
-import 'dart:js';
 
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
+import 'package:js/js.dart' as js;
 import 'package:meta/meta.dart';
 import 'package:node_interop/http.dart';
 import 'package:node_interop/node.dart';
@@ -248,7 +248,7 @@ class RefBuilder {
   js.CloudFunction onCreate<T>(DataEventHandler<DataSnapshot<T>> handler) {
     dynamic wrapper(js.DataSnapshot data, js.EventContext context) =>
         _handleDataEvent<T>(data, context, handler);
-    return nativeInstance.onCreate(allowInterop(wrapper));
+    return nativeInstance.onCreate(js.allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is deleted from Firebase
@@ -256,7 +256,7 @@ class RefBuilder {
   js.CloudFunction onDelete<T>(DataEventHandler<DataSnapshot<T>> handler) {
     dynamic wrapper(js.DataSnapshot data, js.EventContext context) =>
         _handleDataEvent<T>(data, context, handler);
-    return nativeInstance.onDelete(allowInterop(wrapper));
+    return nativeInstance.onDelete(js.allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is updated in Firebase Realtime
@@ -264,7 +264,7 @@ class RefBuilder {
   js.CloudFunction onUpdate<T>(ChangeEventHandler<DataSnapshot<T>> handler) {
     dynamic wrapper(js.Change<js.DataSnapshot> data, js.EventContext context) =>
         _handleChangeEvent<T>(data, context, handler);
-    return nativeInstance.onUpdate(allowInterop(wrapper));
+    return nativeInstance.onUpdate(js.allowInterop(wrapper));
   }
 
   /// Event handler that fires every time a Firebase Realtime Database write of
@@ -272,7 +272,7 @@ class RefBuilder {
   js.CloudFunction onWrite<T>(ChangeEventHandler<DataSnapshot<T>> handler) {
     dynamic wrapper(js.Change<js.DataSnapshot> data, js.EventContext context) =>
         _handleChangeEvent<T>(data, context, handler);
-    return nativeInstance.onWrite(allowInterop(wrapper));
+    return nativeInstance.onWrite(js.allowInterop(wrapper));
   }
 
   dynamic _handleDataEvent<T>(
@@ -323,14 +323,14 @@ class DocumentBuilder {
   js.CloudFunction onCreate(DataEventHandler<DocumentSnapshot> handler) {
     dynamic wrapper(js.DocumentSnapshot data, js.EventContext context) =>
         _handleEvent(data, context, handler);
-    return nativeInstance.onCreate(allowInterop(wrapper));
+    return nativeInstance.onCreate(js.allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is deleted from Cloud Firestore.
   js.CloudFunction onDelete(DataEventHandler<DocumentSnapshot> handler) {
     dynamic wrapper(js.DocumentSnapshot data, js.EventContext context) =>
         _handleEvent(data, context, handler);
-    return nativeInstance.onDelete(allowInterop(wrapper));
+    return nativeInstance.onDelete(js.allowInterop(wrapper));
   }
 
   /// Event handler that fires every time data is updated in Cloud Firestore.
@@ -338,7 +338,7 @@ class DocumentBuilder {
     dynamic wrapper(
             js.Change<js.DocumentSnapshot> data, js.EventContext context) =>
         _handleChangeEvent(data, context, handler);
-    return nativeInstance.onUpdate(allowInterop(wrapper));
+    return nativeInstance.onUpdate(js.allowInterop(wrapper));
   }
 
   /// Event handler that fires every time a Cloud Firestore write of any
@@ -347,7 +347,7 @@ class DocumentBuilder {
     dynamic wrapper(
             js.Change<js.DocumentSnapshot> data, js.EventContext context) =>
         _handleChangeEvent(data, context, handler);
-    return nativeInstance.onWrite(allowInterop(wrapper));
+    return nativeInstance.onWrite(js.allowInterop(wrapper));
   }
 
   dynamic _handleEvent(js.DocumentSnapshot data, js.EventContext jsContext,
@@ -400,7 +400,7 @@ class TopicBuilder {
   js.CloudFunction onPublish(DataEventHandler<Message> handler) {
     dynamic wrapper(js.Message jsData, js.EventContext jsContext) =>
         _handleEvent(jsData, jsContext, handler);
-    return nativeInstance.onPublish(allowInterop(wrapper));
+    return nativeInstance.onPublish(js.allowInterop(wrapper));
   }
 
   dynamic _handleEvent(js.Message jsData, js.EventContext jsContext,
@@ -426,7 +426,7 @@ class ScheduleBuilder {
   js.CloudFunction onRun(DataEventHandler<Message?> handler) {
     dynamic wrapper(js.EventContext jsContext) =>
         _handleEvent(jsContext, handler);
-    return nativeInstance.onRun(allowInterop(wrapper));
+    return nativeInstance.onRun(js.allowInterop(wrapper));
   }
 
   dynamic _handleEvent(
@@ -501,7 +501,7 @@ class ObjectBuilder {
   js.CloudFunction onArchive(DataEventHandler<ObjectMetadata> handler) {
     dynamic wrapper(js.ObjectMetadata data, js.EventContext context) =>
         _handleEvent(data, context, handler);
-    return nativeInstance.onArchive(allowInterop(wrapper));
+    return nativeInstance.onArchive(js.allowInterop(wrapper));
   }
 
   /// Event handler which fires every time a Google Cloud Storage deletion
@@ -515,7 +515,7 @@ class ObjectBuilder {
   js.CloudFunction onDelete(DataEventHandler<ObjectMetadata> handler) {
     dynamic wrapper(js.ObjectMetadata data, js.EventContext context) =>
         _handleEvent(data, context, handler);
-    return nativeInstance.onDelete(allowInterop(wrapper));
+    return nativeInstance.onDelete(js.allowInterop(wrapper));
   }
 
   /// Event handler which fires every time a Google Cloud Storage object
@@ -527,7 +527,7 @@ class ObjectBuilder {
   js.CloudFunction onFinalize(DataEventHandler<ObjectMetadata> handler) {
     dynamic wrapper(js.ObjectMetadata data, js.EventContext context) =>
         _handleEvent(data, context, handler);
-    return nativeInstance.onFinalize(allowInterop(wrapper));
+    return nativeInstance.onFinalize(js.allowInterop(wrapper));
   }
 
   /// Event handler which fires every time the metadata of an existing object
@@ -535,7 +535,7 @@ class ObjectBuilder {
   js.CloudFunction onMetadataUpdate(DataEventHandler<ObjectMetadata> handler) {
     dynamic wrapper(js.ObjectMetadata data, js.EventContext context) =>
         _handleEvent(data, context, handler);
-    return nativeInstance.onMetadataUpdate(allowInterop(wrapper));
+    return nativeInstance.onMetadataUpdate(js.allowInterop(wrapper));
   }
 
   dynamic _handleEvent(js.ObjectMetadata jsData, js.EventContext jsContext,
@@ -687,14 +687,14 @@ class UserBuilder {
   js.CloudFunction onCreate(DataEventHandler<UserRecord> handler) {
     dynamic wrapper(js.UserRecord jsData, js.EventContext jsContext) =>
         _handleEvent(jsData, jsContext, handler);
-    return nativeInstance.onCreate(allowInterop(wrapper));
+    return nativeInstance.onCreate(js.allowInterop(wrapper));
   }
 
   /// Event handler that fires every time a Firebase Authentication user is deleted.
   js.CloudFunction onDelete(DataEventHandler<UserRecord> handler) {
     dynamic wrapper(js.UserRecord jsData, js.EventContext jsContext) =>
         _handleEvent(jsData, jsContext, handler);
-    return nativeInstance.onDelete(allowInterop(wrapper));
+    return nativeInstance.onDelete(js.allowInterop(wrapper));
   }
 
   dynamic _handleEvent(js.UserRecord jsData, js.EventContext jsContext,
