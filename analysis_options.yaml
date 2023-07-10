@@ -13,8 +13,7 @@ linter:
     - close_sinks
     - directives_ordering
     - hash_and_equals
-    - iterable_contains_unrelated_type
-    - list_remove_unrelated_type
+    - collection_methods_unrelated_type
     - prefer_final_fields
     - prefer_is_not_empty
     - test_types_in_equals
