@@ -5,7 +5,7 @@ homepage: https://www.github.com/pulyaevskiy/firebase-functions-interop
 publish_to: none
 
 environment:
-  sdk: '>=2.18.0 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   js: ^0.6.1+1
@@ -18,16 +18,16 @@ dependencies:
   firebase_admin_interop:
     git:
       url: https://github.com/tekartikdev/firebase-admin-interop
-      ref: dart2_3
+      ref: dart3a
   tekartik_http_node:
     git:
       url: https://github.com/tekartik/common_node.dart
       path: http_node
-      ref: dart2_3
+      ref: dart3a
   tekartik_lints:
     git:
       url: https://github.com/tekartik/common.dart
-      ref: dart2_3
+      ref: dart3a
       path: packages/lints
     version: '>=0.1.0'
 dev_dependencies:
