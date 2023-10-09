@@ -93,7 +93,7 @@ Git:
   firebase_functions_interop:
     git:
       url: https://github.com/tekartikdev/firebase-functions-interop
-      ref: dart2_3
+      ref: dart3a
 ```
 
 Then run `pub get` to install dependencies.
