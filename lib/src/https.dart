@@ -1,4 +1,14 @@
-part of firebase_functions_interop;
+import 'dart:async';
+
+import 'package:firebase_admin_interop/firebase_admin_interop.dart';
+import 'package:js/js.dart' as js;
+import 'package:node_interop/http.dart';
+import 'package:node_interop/node.dart';
+import 'package:node_interop/util.dart';
+
+import 'bindings.dart' as js;
+import 'express.dart';
+import 'module.dart';
 
 /// To send an error from an HTTPS Callable function to a client, throw an
 /// instance of this class from your handler function.
@@ -90,7 +100,7 @@ class HttpsError {
   final Object? details;
 
   Object _toJsHttpsError() {
-    return callConstructor(_module!.https.HttpsError,
+    return callConstructor(moduleFirebaseFunctions.https.HttpsError,
         [code, message, details == null ? null : jsify(details!)]) as Object;
   }
 }
@@ -113,7 +123,7 @@ class CallableContext {
 /// HTTPS functions namespace.
 class HttpsFunctions {
   final js.FirebaseFunctions? _functions;
-  HttpsFunctions._(this._functions);
+  HttpsFunctions(this._functions);
 
   /// Event [handler] which is run every time an HTTPS URL is hit.
   ///

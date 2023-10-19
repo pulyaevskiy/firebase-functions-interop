@@ -1,12 +1,9 @@
-import 'package:node_interop/http.dart';
 import 'package:node_interop/util.dart';
 // ignore: implementation_imports
 import 'package:tekartik_http_node/src/node/http_server.dart';
 
 class ExpressHttpRequest extends NodeHttpRequest {
-  ExpressHttpRequest(
-      IncomingMessage nativeRequest, ServerResponse nativeResponse)
-      : super(nativeRequest, nativeResponse);
+  ExpressHttpRequest(super.nativeRequest, super.nativeResponse);
 
   /// Decoded request body.
   dynamic get body {
