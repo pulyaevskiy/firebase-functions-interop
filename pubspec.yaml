@@ -8,10 +8,10 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  js: ^0.6.1+1
-  meta: ^1.1.8
+  js: '>=0.6.7'
+  meta: '>=1.1.8'
   dev_test:
-  node_interop: ^2.0.0
+  node_interop: '>=2.0.0'
   # node_io: ^1.0.1+2
   # node_http: ^1.0.0
   # firebase_admin_interop:

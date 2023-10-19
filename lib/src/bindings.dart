@@ -54,6 +54,9 @@ abstract class FirebaseFunctions {
 
   external AuthFunctions get auth;
 
+  /// Params namespace
+  external Params get params;
+
   /// Constructor for Firebase [Event] objects.
   // ignore: non_constant_identifier_names
   external dynamic get Event;
@@ -214,6 +217,16 @@ abstract class HttpsOptions {
       int? concurrency,
       Object? cors,
       timeoutSeconds});
+}
+
+@JS()
+@anonymous
+@staticInterop
+abstract class Params {}
+
+extension ParamsExt on Params {
+  /// A builtin param that resolves to the Cloud project ID associated with the project, without prompting the deployer.
+  external String get projectID;
 }
 
 @JS()
