@@ -26,7 +26,10 @@ abstract class RuntimeOptions {
 
 @JS()
 @anonymous
-abstract class FirebaseFunctions {
+@staticInterop
+abstract class FirebaseFunctions {}
+
+extension FirebaseFunctionsExt on FirebaseFunctions {
   /// Configures the regions to which to deploy and run a function.
   ///
   /// For a list of valid values see https://firebase.google.com/docs/functions/locations
@@ -226,7 +229,18 @@ abstract class Params {}
 
 extension ParamsExt on Params {
   /// A builtin param that resolves to the Cloud project ID associated with the project, without prompting the deployer.
-  external String get projectID;
+  external Param get projectID;
+}
+
+@JS()
+@anonymous
+@staticInterop
+abstract class Param {}
+
+extension ParamExt on Param {
+  /// A builtin param that resolves to the Cloud project ID associated with the project, without prompting the deployer.
+  external String value();
+  external dynamic get name;
 }
 
 @JS()

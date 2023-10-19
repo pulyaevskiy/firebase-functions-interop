@@ -7,5 +7,7 @@ class Params {
   Params(this._functions);
 
   /// projectId
-  String get projectId => _functions.params.projectID;
+  String get projectId {
+    return _functions.params.projectID.value();
+  }
 }

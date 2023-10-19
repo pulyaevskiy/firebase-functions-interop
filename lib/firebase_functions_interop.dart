@@ -101,6 +101,7 @@ class FirebaseFunctions {
   /// Authentication functions.
   final AuthFunctions auth;
 
+  /// Params namespace.
   final Params params;
 
   FirebaseFunctions._(js.FirebaseFunctions functions)
