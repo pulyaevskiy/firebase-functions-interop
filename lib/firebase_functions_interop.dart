@@ -54,6 +54,7 @@ export 'src/bindings.dart'
 export 'src/express.dart';
 export 'src/https.dart';
 export 'src/import.dart' show HttpRequest, HttpResponse;
+export 'src/params.dart' show Params;
 
 final _module = moduleFirebaseFunctions;
 final _moduleV2 = require('firebase-functions/v2') as js.FirebaseFunctions;
