@@ -2,10 +2,10 @@ import 'bindings.dart' as js;
 
 /// Namespace for Firebase Authentication functions.
 class Params {
-  final js.Params _params;
+  final js.FirebaseFunctions _functions;
 
-  Params._(this._params);
+  Params(this._functions);
 
   /// projectId
-  String get projectId => _params.projectID;
+  String get projectId => _functions.params.projectID;
 }

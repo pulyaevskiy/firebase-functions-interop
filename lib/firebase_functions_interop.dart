@@ -33,6 +33,7 @@ library firebase_functions_interop;
 import 'dart:async';
 
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
+import 'package:firebase_functions_interop/src/params.dart';
 import 'package:js/js.dart' as js;
 import 'package:meta/meta.dart';
 import 'package:node_interop/node.dart';
@@ -100,7 +101,9 @@ class FirebaseFunctions {
   /// Authentication functions.
   final AuthFunctions auth;
 
-  FirebaseFunctions._(js.FirebaseFunctions? functions)
+  final Params params;
+
+  FirebaseFunctions._(js.FirebaseFunctions functions)
       : _functions = functions,
         config = Config._(functions),
         https = HttpsFunctions(functions),
@@ -108,7 +111,8 @@ class FirebaseFunctions {
         firestore = FirestoreFunctions._(functions),
         pubsub = PubsubFunctions._(functions),
         storage = StorageFunctions._(functions),
-        auth = AuthFunctions._(functions);
+        auth = AuthFunctions._(functions),
+        params = Params(functions);
 
   /// Configures the regions to which to deploy and run a function.
   ///
